@@ -31,6 +31,7 @@ import android.os.IBinder;
 import android.os.ParcelableException;
 import android.os.RemoteCallback;
 import android.os.RemoteException;
+import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.provider.DeviceConfig;
 import android.service.resumeonreboot.IResumeOnRebootService;
@@ -55,6 +56,10 @@ public class ResumeOnRebootServiceProvider {
             Manifest.permission.BIND_RESUME_ON_REBOOT_SERVICE;
     private static final String TAG = "ResumeOnRebootServiceProvider";
 
+    // The system property name that overrides the default service provider package name.
+    static final String PROP_ROR_PROVIDER_PACKAGE =
+            "persist.sys.resume_on_reboot_provider_package";
+
     private final Context mContext;
     private final PackageManager mPackageManager;
 
@@ -72,12 +77,19 @@ public class ResumeOnRebootServiceProvider {
     private ServiceInfo resolveService() {
         Intent intent = new Intent();
         intent.setAction(ResumeOnRebootService.SERVICE_INTERFACE);
-        if (PROVIDER_PACKAGE != null && !PROVIDER_PACKAGE.equals("")) {
-            intent.setPackage(PROVIDER_PACKAGE);
+        int queryFlag = PackageManager.GET_SERVICES;
+        String testAppName = SystemProperties.get(PROP_ROR_PROVIDER_PACKAGE, "");
+        if (!testAppName.isEmpty()) {
+            Slog.i(TAG, "Using test app: " + testAppName);
+            intent.setPackage(testAppName);
+        } else {
+            queryFlag |= PackageManager.MATCH_SYSTEM_ONLY;
+            if (PROVIDER_PACKAGE != null && !PROVIDER_PACKAGE.equals("")) {
+                intent.setPackage(PROVIDER_PACKAGE);
+            }
         }
 
-        List<ResolveInfo> resolvedIntents =
-                mPackageManager.queryIntentServices(intent, PackageManager.MATCH_SYSTEM_ONLY);
+        List<ResolveInfo> resolvedIntents = mPackageManager.queryIntentServices(intent, queryFlag);
         for (ResolveInfo resolvedInfo : resolvedIntents) {
             if (resolvedInfo.serviceInfo != null
                     && PROVIDER_REQUIRED_PERMISSION.equals(resolvedInfo.serviceInfo.permission)) {
@@ -120,10 +132,11 @@ public class ResumeOnRebootServiceProvider {
             if (mServiceConnection != null) {
                 mContext.unbindService(mServiceConnection);
             }
+            mBinder = null;
         }
 
         /** Bind to the service */
-        public void bindToService(long timeOut) throws TimeoutException {
+        public void bindToService(long timeOut) throws RemoteException, TimeoutException {
             if (mBinder == null || !mBinder.asBinder().isBinderAlive()) {
                 CountDownLatch connectionLatch = new CountDownLatch(1);
                 Intent intent = new Intent();
@@ -197,27 +210,25 @@ public class ResumeOnRebootServiceProvider {
 
         private void throwTypedException(
                 ParcelableException exception)
-                throws IOException {
-            if (exception.getCause() instanceof IOException) {
+                throws IOException, RemoteException {
+            if (exception != null && exception.getCause() instanceof IOException) {
                 exception.maybeRethrow(IOException.class);
-            } else if (exception.getCause() instanceof IllegalStateException) {
-                exception.maybeRethrow(IllegalStateException.class);
             } else {
-                // This should not happen. Wrap the cause in IllegalStateException so that it
-                // doesn't disrupt the exception handling
-                throw new IllegalStateException(exception.getCause());
+                // Wrap the exception and throw it as a RemoteException.
+                throw new RemoteException(TAG + " wrap/unwrap failed", exception,
+                        true /* enableSuppression */, true /* writableStackTrace */);
             }
         }
 
         private void waitForLatch(CountDownLatch latch, String reason, long timeOut)
-                throws TimeoutException {
+                throws RemoteException, TimeoutException {
             try {
                 if (!latch.await(timeOut, TimeUnit.SECONDS)) {
                     throw new TimeoutException("Latch wait for " + reason + " elapsed");
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                throw new IllegalStateException("Latch wait for " + reason + " interrupted");
+                throw new RemoteException("Latch wait for " + reason + " interrupted");
             }
         }
     }

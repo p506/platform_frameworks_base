@@ -161,7 +161,7 @@
     <item msgid="2715700596495505626">"256 КБ"</item>
     <item msgid="7099386891713159947">"1 МБ"</item>
     <item msgid="6069075827077845520">"4 МБ"</item>
-    <item msgid="8243549501764402572">"16 МБ"</item>
+    <item msgid="6078203297886482480">"8 МБ"</item>
   </string-array>
   <string-array name="select_logd_size_lowram_titles">
     <item msgid="1145807928339101085">"Өшірулі"</item>
@@ -175,7 +175,7 @@
     <item msgid="7464037639415220106">"Әр журнал буферіне 256 КБ"</item>
     <item msgid="8539423820514360724">"Әр журнал буферіне 1 МБ"</item>
     <item msgid="1984761927103140651">"Әр журнал буферіне 4 МБ"</item>
-    <item msgid="7892098981256010498">"Әр журнал буферіне 16 МБ"</item>
+    <item msgid="2983219471251787208">"Әр журнал буферіне 8 МБ"</item>
   </string-array>
   <string-array name="select_logpersist_titles">
     <item msgid="704720725704372366">"Өшірулі"</item>
@@ -217,7 +217,7 @@
     <item msgid="2464080977843960236">"Анимация өлшемі 10x"</item>
   </string-array>
   <string-array name="overlay_display_devices_entries">
-    <item msgid="4497393944195787240">"Ешқандай"</item>
+    <item msgid="4497393944195787240">"Жоқ"</item>
     <item msgid="8461943978957133391">"480p"</item>
     <item msgid="6923083594932909205">"480p (қауіпсіз)"</item>
     <item msgid="1226941831391497335">"720p"</item>
@@ -231,7 +231,7 @@
     <item msgid="7346816300608639624">"720p, 1080p (қос экранды)"</item>
   </string-array>
   <string-array name="enable_opengl_traces_entries">
-    <item msgid="4433736508877934305">"Ешқандай"</item>
+    <item msgid="4433736508877934305">"Жоқ"</item>
     <item msgid="9140053004929079158">"Logcat"</item>
     <item msgid="3866871644917859262">"Systrace (Графика)"</item>
     <item msgid="7345673972166571060">"glGetError қоңыраулар тізімі"</item>

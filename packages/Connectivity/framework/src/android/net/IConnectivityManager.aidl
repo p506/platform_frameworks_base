@@ -20,6 +20,10 @@ import android.app.PendingIntent;
 import android.net.ConnectionInfo;
 import android.net.ConnectivityDiagnosticsManager;
 import android.net.IConnectivityDiagnosticsCallback;
+import android.net.INetworkAgent;
+import android.net.IOnCompleteListener;
+import android.net.INetworkActivityListener;
+import android.net.INetworkOfferCallback;
 import android.net.IQosCallback;
 import android.net.ISocketKeepaliveCallback;
 import android.net.LinkProperties;
@@ -28,23 +32,20 @@ import android.net.NetworkAgentConfig;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.NetworkRequest;
+import android.net.NetworkScore;
 import android.net.NetworkState;
+import android.net.NetworkStateSnapshot;
 import android.net.OemNetworkPreferences;
 import android.net.ProxyInfo;
 import android.net.UidRange;
 import android.net.QosSocketInfo;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.INetworkActivityListener;
 import android.os.Messenger;
 import android.os.ParcelFileDescriptor;
 import android.os.PersistableBundle;
 import android.os.ResultReceiver;
-
-import com.android.connectivity.aidl.INetworkAgent;
-import com.android.internal.net.LegacyVpnInfo;
-import com.android.internal.net.VpnConfig;
-import com.android.internal.net.VpnProfile;
+import android.os.UserHandle;
 
 /**
  * Interface that answers queries about, and allows changing, the
@@ -80,6 +81,8 @@ interface IConnectivityManager
 
     @UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
     NetworkState[] getAllNetworkState();
+
+    List<NetworkStateSnapshot> getAllNetworkStateSnapshots();
 
     boolean isActiveNetworkMetered();
 
@@ -122,35 +125,8 @@ interface IConnectivityManager
 
     ProxyInfo getProxyForNetwork(in Network nework);
 
-    boolean prepareVpn(String oldPackage, String newPackage, int userId);
-
-    void setVpnPackageAuthorization(String packageName, int userId, int vpnType);
-
-    ParcelFileDescriptor establishVpn(in VpnConfig config);
-
-    boolean provisionVpnProfile(in VpnProfile profile, String packageName);
-
-    void deleteVpnProfile(String packageName);
-
-    void startVpnProfile(String packageName);
-
-    void stopVpnProfile(String packageName);
-
-    VpnConfig getVpnConfig(int userId);
-
-    @UnsupportedAppUsage(maxTargetSdk = 30, trackingBug = 170729553)
-    void startLegacyVpn(in VpnProfile profile);
-
-    LegacyVpnInfo getLegacyVpnInfo(int userId);
-
-    boolean updateLockdownVpn();
-    boolean isAlwaysOnVpnPackageSupported(int userId, String packageName);
-    boolean setAlwaysOnVpnPackage(int userId, String packageName, boolean lockdown,
-            in List<String> lockdownWhitelist);
-    String getAlwaysOnVpnPackage(int userId);
-    boolean isVpnLockdownEnabled(int userId);
-    List<String> getVpnLockdownWhitelist(int userId);
     void setRequireVpnForUids(boolean requireVpn, in UidRange[] ranges);
+    void setLegacyLockdownVpnEnabled(boolean enabled);
 
     void setProvisioningNotificationVisible(boolean visible, int networkType, in String action);
 
@@ -164,12 +140,12 @@ interface IConnectivityManager
     void declareNetworkRequestUnfulfillable(in NetworkRequest request);
 
     Network registerNetworkAgent(in INetworkAgent na, in NetworkInfo ni, in LinkProperties lp,
-            in NetworkCapabilities nc, int score, in NetworkAgentConfig config,
+            in NetworkCapabilities nc, in NetworkScore score, in NetworkAgentConfig config,
             in int factorySerialNumber);
 
-    NetworkRequest requestNetwork(in NetworkCapabilities networkCapabilities, int reqType,
+    NetworkRequest requestNetwork(int uid, in NetworkCapabilities networkCapabilities, int reqType,
             in Messenger messenger, int timeoutSec, in IBinder binder, int legacy,
-            String callingPackageName, String callingAttributionTag);
+            int callbackFlags, String callingPackageName, String callingAttributionTag);
 
     NetworkRequest pendingRequestForNetwork(in NetworkCapabilities networkCapabilities,
             in PendingIntent operation, String callingPackageName, String callingAttributionTag);
@@ -177,7 +153,7 @@ interface IConnectivityManager
     void releasePendingNetworkRequest(in PendingIntent operation);
 
     NetworkRequest listenForNetwork(in NetworkCapabilities networkCapabilities,
-            in Messenger messenger, in IBinder binder, String callingPackageName,
+            in Messenger messenger, in IBinder binder, int callbackFlags, String callingPackageName,
             String callingAttributionTag);
 
     void pendingListenForNetwork(in NetworkCapabilities networkCapabilities,
@@ -199,10 +175,6 @@ interface IConnectivityManager
 
     int getRestoreDefaultNetworkDelay(int networkType);
 
-    boolean addVpnAddress(String address, int prefixLength);
-    boolean removeVpnAddress(String address, int prefixLength);
-    boolean setUnderlyingNetworksForVpn(in Network[] networks);
-
     void factoryReset();
 
     void startNattKeepalive(in Network network, int intervalSeconds,
@@ -222,8 +194,6 @@ interface IConnectivityManager
     byte[] getNetworkWatchlistConfigHash();
 
     int getConnectionOwnerUid(in ConnectionInfo connectionInfo);
-    boolean isCallerCurrentAlwaysOnVpnApp();
-    boolean isCallerCurrentAlwaysOnVpnLockdownApp();
 
     void registerConnectivityDiagnosticsCallback(in IConnectivityDiagnosticsCallback callback,
             in NetworkRequest request, String callingPackageName);
@@ -245,5 +215,15 @@ interface IConnectivityManager
     void registerQosSocketCallback(in QosSocketInfo socketInfo, in IQosCallback callback);
     void unregisterQosCallback(in IQosCallback callback);
 
-    void setOemNetworkPreference(in OemNetworkPreferences preference);
+    void setOemNetworkPreference(in OemNetworkPreferences preference,
+            in IOnCompleteListener listener);
+
+    void setProfileNetworkPreference(in UserHandle profile, int preference,
+            in IOnCompleteListener listener);
+
+    int getRestrictBackgroundStatusByCaller();
+
+    void offerNetwork(in Messenger messenger, in NetworkScore score,
+            in NetworkCapabilities caps, in INetworkOfferCallback callback);
+    void unofferNetwork(in INetworkOfferCallback callback);
 }

@@ -284,7 +284,7 @@
     <string name="wifi_verbose_logging_summary" msgid="4993823188807767892">"เพิ่มระดับการบันทึก Wi‑Fi แสดงต่อ SSID RSSI ในตัวเลือก Wi‑Fi"</string>
     <string name="wifi_scan_throttling_summary" msgid="2577105472017362814">"ลดการเปลืองแบตเตอรี่และเพิ่มประสิทธิภาพเครือข่าย"</string>
     <string name="wifi_enhanced_mac_randomization_summary" msgid="1210663439867489931">"เมื่อเปิดใช้โหมดนี้ ที่อยู่ MAC ของอุปกรณ์นี้อาจเปลี่ยนทุกครั้งที่เชื่อมต่อกับเครือข่ายที่มีการเปิดใช้การสุ่ม MAC"</string>
-    <string name="wifi_metered_label" msgid="8737187690304098638">"แบบจำกัดปริมาณอินเทอร์เน็ต"</string>
+    <string name="wifi_metered_label" msgid="8737187690304098638">"แบบจำกัดปริมาณ"</string>
     <string name="wifi_unmetered_label" msgid="6174142840934095093">"ไม่มีการวัดปริมาณอินเทอร์เน็ต"</string>
     <string name="select_logd_size_title" msgid="1604578195914595173">"ขนาดบัฟเฟอร์ของตัวบันทึก"</string>
     <string name="select_logd_size_dialog_title" msgid="2105401994681013578">"เลือกขนาด Logger ต่อบัฟเฟอร์ไฟล์บันทึก"</string>
@@ -367,9 +367,9 @@
     <string name="debug_applications_category" msgid="5394089406638954196">"แอปพลิเคชัน"</string>
     <string name="immediately_destroy_activities" msgid="1826287490705167403">"ไม่เก็บกิจกรรม"</string>
     <string name="immediately_destroy_activities_summary" msgid="6289590341144557614">"ล้างทุกกิจกรรมทันทีที่ผู้ใช้ออกไป"</string>
-    <string name="app_process_limit_title" msgid="8361367869453043007">"ขีดจำกัดกระบวนการพื้นหลัง"</string>
+    <string name="app_process_limit_title" msgid="8361367869453043007">"ขีดจำกัดกระบวนการเบื้องหลัง"</string>
     <string name="show_all_anrs" msgid="9160563836616468726">"แสดง ANR พื้นหลัง"</string>
-    <string name="show_all_anrs_summary" msgid="8562788834431971392">"แสดงกล่องโต้ตอบ \"แอปไม่ตอบสนอง\" สำหรับแอปพื้นหลัง"</string>
+    <string name="show_all_anrs_summary" msgid="8562788834431971392">"แสดงกล่องโต้ตอบ \"แอปไม่ตอบสนอง\" สำหรับแอปเบื้องหลัง"</string>
     <string name="show_notification_channel_warnings" msgid="3448282400127597331">"แสดงคำเตือนจากช่องทางการแจ้งเตือน"</string>
     <string name="show_notification_channel_warnings_summary" msgid="68031143745094339">"แสดงคำเตือนบนหน้าจอเมื่อแอปโพสต์การแจ้งเตือนโดยไม่มีช่องทางที่ถูกต้อง"</string>
     <string name="force_allow_on_external" msgid="9187902444231637880">"บังคับให้แอปสามารถใช้ที่เก็บภายนอก"</string>
@@ -446,6 +446,7 @@
     <string name="power_charging" msgid="6727132649743436802">"<xliff:g id="LEVEL">%1$s</xliff:g> - <xliff:g id="STATE">%2$s</xliff:g>"</string>
     <string name="power_remaining_charging_duration_only" msgid="7415639699283965818">"เหลือ <xliff:g id="TIME">%1$s</xliff:g> จนกว่าจะชาร์จเต็ม"</string>
     <string name="power_charging_duration" msgid="5005740040558984057">"<xliff:g id="LEVEL">%1$s</xliff:g> - <xliff:g id="TIME">%2$s</xliff:g> จนกว่าจะชาร์จ"</string>
+    <string name="power_charging_limited" msgid="1956874810658999681">"<xliff:g id="LEVEL">%1$s</xliff:g> - กำลังเพิ่มประสิทธิภาพแบตเตอรี่"</string>
     <string name="battery_info_status_unknown" msgid="268625384868401114">"ไม่ทราบ"</string>
     <string name="battery_info_status_charging" msgid="4279958015430387405">"กำลังชาร์จ"</string>
     <string name="battery_info_status_charging_fast" msgid="8027559755902954885">"กำลังชาร์จอย่างเร็ว"</string>

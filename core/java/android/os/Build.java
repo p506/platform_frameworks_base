@@ -115,15 +115,20 @@ public class Build {
     public static final String HARDWARE = getString("ro.hardware");
 
     /**
-     * The SKU of the hardware (from the kernel command line). The SKU is reported by the bootloader
-     * to configure system software features.
+     * The SKU of the hardware (from the kernel command line).
+     *
+     * <p>The SKU is reported by the bootloader to configure system software features.
+     * If no value is supplied by the bootloader, this is reported as {@link #UNKNOWN}.
+
      */
     @NonNull
     public static final String SKU = getString("ro.boot.hardware.sku");
 
     /**
-     * The SKU of the device as set by the original design manufacturer (ODM). This is a
-     * runtime-initialized property set during startup to configure device services.
+     * The SKU of the device as set by the original design manufacturer (ODM).
+     *
+     * <p>This is a runtime-initialized property set during startup to configure device
+     * services. If no value is set, this is reported as {@link #UNKNOWN}.
      *
      * <p>The ODM SKU may have multiple variants for the same system SKU in case a manufacturer
      * produces variants of the same design. For example, the same build may be released with
@@ -138,7 +143,7 @@ public class Build {
      */
     @UnsupportedAppUsage
     @TestApi
-    public static final boolean IS_EMULATOR = getString("ro.kernel.qemu").equals("1");
+    public static final boolean IS_EMULATOR = getString("ro.boot.qemu").equals("1");
 
     /**
      * A hardware serial number, if available. Alphanumeric only, case-insensitive.
@@ -419,7 +424,8 @@ public class Build {
          * Magic version number for a current development build, which has
          * not yet turned into an official release.
          */
-        public static final int CUR_DEVELOPMENT = VMRuntime.SDK_VERSION_CUR_DEVELOPMENT;
+        // This must match VMRuntime.SDK_VERSION_CUR_DEVELOPMENT.
+        public static final int CUR_DEVELOPMENT = 10000;
 
         /**
          * October 2008: The original, first, version of Android.  Yay!
@@ -1116,6 +1122,18 @@ public class Build {
     }
 
     /**
+     * A multiplier for various timeouts on the system.
+     *
+     * The intent is that products targeting software emulators that are orders of magnitude slower
+     * than real hardware may set this to a large number. On real devices and hardware-accelerated
+     * virtualized devices this should not be set.
+     *
+     * @hide
+     */
+    public static final int HW_TIMEOUT_MULTIPLIER =
+        SystemProperties.getInt("ro.hw_timeout_multiplier", 1);
+
+    /**
      * True if Treble is enabled and required for this device.
      *
      * @hide
@@ -1287,12 +1305,30 @@ public class Build {
     public static final String HOST = getString("ro.build.host");
 
     /**
-     * Returns true if we are running a debug build such as "user-debug" or "eng".
+     * Returns true if the device is running a debuggable build such as "userdebug" or "eng".
+     *
+     * Debuggable builds allow users to gain root access via local shell, attach debuggers to any
+     * application regardless of whether they have the "debuggable" attribute set, or downgrade
+     * selinux into "permissive" mode in particular.
      * @hide
      */
     @UnsupportedAppUsage
     public static final boolean IS_DEBUGGABLE =
             SystemProperties.getInt("ro.debuggable", 0) == 1;
+
+    /**
+     * Returns true if the device is running a debuggable build such as "userdebug" or "eng".
+     *
+     * Debuggable builds allow users to gain root access via local shell, attach debuggers to any
+     * application regardless of whether they have the "debuggable" attribute set, or downgrade
+     * selinux into "permissive" mode in particular.
+     * @hide
+     */
+    @TestApi
+    @SystemApi(client = SystemApi.Client.MODULE_LIBRARIES)
+    public static boolean isDebuggable() {
+        return IS_DEBUGGABLE;
+    }
 
     /** {@hide} */
     public static final boolean IS_ENG = "eng".equals(TYPE);

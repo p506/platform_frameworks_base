@@ -21,6 +21,8 @@ import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_METERED;
 
 import static com.android.server.job.JobSchedulerService.RESTRICTED_INDEX;
 
+import android.annotation.NonNull;
+import android.annotation.Nullable;
 import android.app.job.JobInfo;
 import android.net.ConnectivityManager;
 import android.net.ConnectivityManager.NetworkCallback;
@@ -85,9 +87,12 @@ public final class ConnectivityController extends RestrictingController implemen
     @GuardedBy("mLock")
     private final SparseArray<ArraySet<JobStatus>> mRequestedWhitelistJobs = new SparseArray<>();
 
-    /** List of currently available networks. */
+    /**
+     * Set of currently available networks mapped to their latest network capabilities. Cache the
+     * latest capabilities to avoid unnecessary calls into ConnectivityManager.
+     */
     @GuardedBy("mLock")
-    private final ArraySet<Network> mAvailableNetworks = new ArraySet<>();
+    private final ArrayMap<Network, NetworkCapabilities> mAvailableNetworks = new ArrayMap<>();
 
     private static final int MSG_DATA_SAVER_TOGGLED = 0;
     private static final int MSG_UID_RULES_CHANGES = 1;
@@ -164,9 +169,8 @@ public final class ConnectivityController extends RestrictingController implemen
     public boolean isNetworkAvailable(JobStatus job) {
         synchronized (mLock) {
             for (int i = 0; i < mAvailableNetworks.size(); ++i) {
-                final Network network = mAvailableNetworks.valueAt(i);
-                final NetworkCapabilities capabilities = mConnManager.getNetworkCapabilities(
-                        network);
+                final Network network = mAvailableNetworks.keyAt(i);
+                final NetworkCapabilities capabilities = mAvailableNetworks.valueAt(i);
                 final boolean satisfied = isSatisfied(job, network, capabilities, mConstants);
                 if (DEBUG) {
                     Slog.v(TAG, "isNetworkAvailable(" + job + ") with network " + network
@@ -370,15 +374,23 @@ public final class ConnectivityController extends RestrictingController implemen
         }
     }
 
+    private static NetworkCapabilities.Builder copyCapabilities(
+            @NonNull final NetworkRequest request) {
+        final NetworkCapabilities.Builder builder = new NetworkCapabilities.Builder();
+        for (int transport : request.getTransportTypes()) builder.addTransportType(transport);
+        for (int capability : request.getCapabilities()) builder.addCapability(capability);
+        return builder;
+    }
+
     private static boolean isStrictSatisfied(JobStatus jobStatus, Network network,
             NetworkCapabilities capabilities, Constants constants) {
         // A restricted job that's out of quota MUST use an unmetered network.
         if (jobStatus.getEffectiveStandbyBucket() == RESTRICTED_INDEX
                 && !jobStatus.isConstraintSatisfied(JobStatus.CONSTRAINT_WITHIN_QUOTA)) {
-            final NetworkCapabilities required = new NetworkCapabilities.Builder(
-                    jobStatus.getJob().getRequiredNetwork().networkCapabilities)
-                    .addCapability(NET_CAPABILITY_NOT_METERED).build();
-            return required.satisfiedByNetworkCapabilities(capabilities);
+            final NetworkCapabilities.Builder builder =
+                    copyCapabilities(jobStatus.getJob().getRequiredNetwork());
+            builder.addCapability(NET_CAPABILITY_NOT_METERED);
+            return builder.build().satisfiedByNetworkCapabilities(capabilities);
         } else {
             return jobStatus.getJob().getRequiredNetwork().canBeSatisfiedBy(capabilities);
         }
@@ -392,10 +404,10 @@ public final class ConnectivityController extends RestrictingController implemen
         }
 
         // See if we match after relaxing any unmetered request
-        final NetworkCapabilities relaxed = new NetworkCapabilities.Builder(
-                jobStatus.getJob().getRequiredNetwork().networkCapabilities)
-                        .removeCapability(NET_CAPABILITY_NOT_METERED).build();
-        if (relaxed.satisfiedByNetworkCapabilities(capabilities)) {
+        final NetworkCapabilities.Builder builder =
+                copyCapabilities(jobStatus.getJob().getRequiredNetwork());
+        builder.removeCapability(NET_CAPABILITY_NOT_METERED);
+        if (builder.build().satisfiedByNetworkCapabilities(capabilities)) {
             // TODO: treat this as "maybe" response; need to check quotas
             return jobStatus.getFractionRunTime() > constants.CONN_PREFETCH_RELAX_FRAC;
         } else {
@@ -424,9 +436,33 @@ public final class ConnectivityController extends RestrictingController implemen
         return false;
     }
 
+    @Nullable
+    private NetworkCapabilities getNetworkCapabilities(@Nullable Network network) {
+        if (network == null) {
+            return null;
+        }
+        synchronized (mLock) {
+            // There is technically a race here if the Network object is reused. This can happen
+            // only if that Network disconnects and the auto-incrementing network ID in
+            // ConnectivityService wraps. This should no longer be a concern if/when we only make
+            // use of asynchronous calls.
+            if (mAvailableNetworks.get(network) != null) {
+                return mAvailableNetworks.get(network);
+            }
+
+            // This should almost never happen because any time a new network connects, the
+            // NetworkCallback would populate mAvailableNetworks. However, it's currently necessary
+            // because we also call synchronous methods such as getActiveNetworkForUid.
+            // TODO(134978280): remove after switching to callback-based APIs
+            final NetworkCapabilities capabilities = mConnManager.getNetworkCapabilities(network);
+            mAvailableNetworks.put(network, capabilities);
+            return capabilities;
+        }
+    }
+
     private boolean updateConstraintsSatisfied(JobStatus jobStatus) {
         final Network network = mConnManager.getActiveNetworkForUid(jobStatus.getSourceUid());
-        final NetworkCapabilities capabilities = mConnManager.getNetworkCapabilities(network);
+        final NetworkCapabilities capabilities = getNetworkCapabilities(network);
         return updateConstraintsSatisfied(jobStatus, network, capabilities);
     }
 
@@ -467,19 +503,13 @@ public final class ConnectivityController extends RestrictingController implemen
      */
     private void updateTrackedJobs(int filterUid, Network filterNetwork) {
         synchronized (mLock) {
-            // Since this is a really hot codepath, temporarily cache any
-            // answers that we get from ConnectivityManager.
-            final ArrayMap<Network, NetworkCapabilities> networkToCapabilities = new ArrayMap<>();
-
             boolean changed = false;
             if (filterUid == -1) {
                 for (int i = mTrackedJobs.size() - 1; i >= 0; i--) {
-                    changed |= updateTrackedJobsLocked(mTrackedJobs.valueAt(i),
-                            filterNetwork, networkToCapabilities);
+                    changed |= updateTrackedJobsLocked(mTrackedJobs.valueAt(i), filterNetwork);
                 }
             } else {
-                changed = updateTrackedJobsLocked(mTrackedJobs.get(filterUid),
-                        filterNetwork, networkToCapabilities);
+                changed = updateTrackedJobsLocked(mTrackedJobs.get(filterUid), filterNetwork);
             }
             if (changed) {
                 mStateChangedListener.onControllerStateChanged();
@@ -487,18 +517,13 @@ public final class ConnectivityController extends RestrictingController implemen
         }
     }
 
-    private boolean updateTrackedJobsLocked(ArraySet<JobStatus> jobs, Network filterNetwork,
-            ArrayMap<Network, NetworkCapabilities> networkToCapabilities) {
+    private boolean updateTrackedJobsLocked(ArraySet<JobStatus> jobs, Network filterNetwork) {
         if (jobs == null || jobs.size() == 0) {
             return false;
         }
 
         final Network network = mConnManager.getActiveNetworkForUid(jobs.valueAt(0).getSourceUid());
-        NetworkCapabilities capabilities = networkToCapabilities.get(network);
-        if (capabilities == null) {
-            capabilities = mConnManager.getNetworkCapabilities(network);
-            networkToCapabilities.put(network, capabilities);
-        }
+        final NetworkCapabilities capabilities = getNetworkCapabilities(network);
         final boolean networkMatch = (filterNetwork == null
                 || Objects.equals(filterNetwork, network));
 
@@ -541,15 +566,18 @@ public final class ConnectivityController extends RestrictingController implemen
         @Override
         public void onAvailable(Network network) {
             if (DEBUG) Slog.v(TAG, "onAvailable: " + network);
-            synchronized (mLock) {
-                mAvailableNetworks.add(network);
-            }
+            // Documentation says not to call getNetworkCapabilities here but wait for
+            // onCapabilitiesChanged instead.  onCapabilitiesChanged should be called immediately
+            // after this, so no need to update mAvailableNetworks here.
         }
 
         @Override
         public void onCapabilitiesChanged(Network network, NetworkCapabilities capabilities) {
             if (DEBUG) {
                 Slog.v(TAG, "onCapabilitiesChanged: " + network);
+            }
+            synchronized (mLock) {
+                mAvailableNetworks.put(network, capabilities);
             }
             updateTrackedJobs(-1, network);
         }
@@ -627,6 +655,8 @@ public final class ConnectivityController extends RestrictingController implemen
             pw.println("Available networks:");
             pw.increaseIndent();
             for (int i = 0; i < mAvailableNetworks.size(); i++) {
+                pw.print(mAvailableNetworks.keyAt(i));
+                pw.print(": ");
                 pw.println(mAvailableNetworks.valueAt(i));
             }
             pw.decreaseIndent();
@@ -663,13 +693,6 @@ public final class ConnectivityController extends RestrictingController implemen
                     StateControllerProto.ConnectivityController.REQUESTED_STANDBY_EXCEPTION_UIDS,
                     mRequestedWhitelistJobs.keyAt(i));
         }
-        for (int i = 0; i < mAvailableNetworks.size(); i++) {
-            Network network = mAvailableNetworks.valueAt(i);
-            if (network != null) {
-                network.dumpDebug(proto,
-                        StateControllerProto.ConnectivityController.AVAILABLE_NETWORKS);
-            }
-        }
         for (int i = 0; i < mTrackedJobs.size(); i++) {
             final ArraySet<JobStatus> jobs = mTrackedJobs.valueAt(i);
             for (int j = 0; j < jobs.size(); j++) {
@@ -683,12 +706,6 @@ public final class ConnectivityController extends RestrictingController implemen
                         StateControllerProto.ConnectivityController.TrackedJob.INFO);
                 proto.write(StateControllerProto.ConnectivityController.TrackedJob.SOURCE_UID,
                         js.getSourceUid());
-                NetworkRequest rn = js.getJob().getRequiredNetwork();
-                if (rn != null) {
-                    rn.dumpDebug(proto,
-                            StateControllerProto.ConnectivityController.TrackedJob
-                                    .REQUIRED_NETWORK);
-                }
                 proto.end(jsToken);
             }
         }

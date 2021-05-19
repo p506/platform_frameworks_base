@@ -57,7 +57,7 @@
     <string name="imei" msgid="2157082351232630390">"IMEI"</string>
     <string name="meid" msgid="3291227361605924674">"MEID"</string>
     <string name="ClipMmi" msgid="4110549342447630629">"Papasok na Caller ID"</string>
-    <string name="ClirMmi" msgid="4702929460236547156">"Papalabas na Caller ID"</string>
+    <string name="ClirMmi" msgid="6752346475055446417">"Itago ang Outgoing Caller ID"</string>
     <string name="ColpMmi" msgid="4736462893284419302">"Connected Line ID"</string>
     <string name="ColrMmi" msgid="5889782479745764278">"Paghihigpit sa Connected Line ID"</string>
     <string name="CfMmi" msgid="8390012691099787178">"Pagpapasa ng tawag"</string>
@@ -220,7 +220,7 @@
     <string name="reboot_to_update_prepare" msgid="6978842143587422365">"Naghahandang i-update…"</string>
     <string name="reboot_to_update_package" msgid="4644104795527534811">"Pinoproseso ang package ng update…"</string>
     <string name="reboot_to_update_reboot" msgid="4474726009984452312">"Nagre-restart…"</string>
-    <string name="reboot_to_reset_title" msgid="2226229680017882787">"I-reset ang data ng factory"</string>
+    <string name="reboot_to_reset_title" msgid="2226229680017882787">"Pag-reset sa factory data"</string>
     <string name="reboot_to_reset_message" msgid="3347690497972074356">"Nagre-restart…"</string>
     <string name="shutdown_progress" msgid="5017145516412657345">"Nagsa-shut down…"</string>
     <string name="shutdown_confirm" product="tablet" msgid="2872769463279602432">"Mag-shut down ang iyong tablet."</string>
@@ -349,6 +349,8 @@
     <string name="permdesc_receiveMms" msgid="958102423732219710">"Pinapayagan ang app na tumanggap at magproseso ng mga mensaheng MMS. Nangangahulugan ito na maaaring sumubaybay o magtanggal ang app ng mga mensaheng ipinapadala sa iyong device nang hindi ipinapakita ang mga ito sa iyo."</string>
     <string name="permlab_bindCellBroadcastService" msgid="586746677002040651">"Magpasa ng mga mensahe ng cell broadcast"</string>
     <string name="permdesc_bindCellBroadcastService" msgid="6540910200973641606">"Nagbibigay-daan sa app na mag-bind sa module ng cell broadcast para makapagpasa ng mga mensahe ng cell broadcast pagkatanggap sa mga ito. Inihahatid ang mga alerto ng cell broadcast sa ilang lokasyon para balaan ka tungkol sa mga emergency na sitwasyon. Posibleng makasagabal ang mga nakakahamak na app sa performance o pagpapatakbo ng iyong device kapag nakatanggap ito ng emergency na cell broadcast."</string>
+    <string name="permlab_manageOngoingCalls" msgid="281244770664231782">"Pamahalaan ang mga kasalukuyang tawag"</string>
+    <string name="permdesc_manageOngoingCalls" msgid="7003138133829915265">"Pinapayagan ang app na makita ang mga detalye tungkol sa mga kasalukuyang tawag sa iyong device at kontrolin ang mga tawag na ito."</string>
     <string name="permlab_readCellBroadcasts" msgid="5869884450872137693">"basahin ang mga mensahe ng cell broadcast"</string>
     <string name="permdesc_readCellBroadcasts" msgid="672513437331980168">"Binibigyang-daan ang app na magbasa ng mga mensahe ng cell broadcast na natanggap ng iyong device. Inihahatid ang mga alerto ng cell broadcast sa ilang lokasyon upang balaan ka tungkol sa mga emergency na sitwasyon. Maaaring makaabala ang nakakahamak na apps sa performance o pagpapatakbo ng iyong device kapag nakatanggap ng emergency na cell broadcast."</string>
     <string name="permlab_subscribedFeedsRead" msgid="217624769238425461">"magbasa ng mga na-subscribe na feed"</string>
@@ -1340,11 +1342,14 @@
     <string name="alert_windows_notification_turn_off_action" msgid="7805857234839123780">"I-off"</string>
     <string name="ext_media_checking_notification_title" msgid="8299199995416510094">"Sinusuri ang <xliff:g id="NAME">%s</xliff:g>…"</string>
     <string name="ext_media_checking_notification_message" msgid="2231566971425375542">"Sinusuri ang kasalukuyang content"</string>
+    <string name="ext_media_checking_notification_message" product="tv" msgid="7986154434946021415">"Sinusuri ang storage ng media"</string>
     <string name="ext_media_new_notification_title" msgid="3517407571407687677">"Bagong <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_new_notification_title" product="automotive" msgid="9085349544984742727">"Hindi gumagana ang <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_new_notification_message" msgid="6095403121990786986">"Mag-tap para i-set up"</string>
+    <string name="ext_media_new_notification_message" product="tv" msgid="216863352100263668">"Piliin para i-set up"</string>
     <string name="ext_media_new_notification_message" product="automotive" msgid="5140127881613227162">"Baka kailanganin mong i-reformat ang device. I-tap para i-eject."</string>
     <string name="ext_media_ready_notification_message" msgid="777258143284919261">"Para sa paglilipat ng mga larawan at media"</string>
+    <string name="ext_media_ready_notification_message" product="tv" msgid="8847134811163165935">"Mag-browse ng mga media file"</string>
     <string name="ext_media_unmountable_notification_title" msgid="4895444667278979910">"Isyu sa <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_unmountable_notification_title" product="automotive" msgid="3142723758949023280">"Hindi gumagana ang <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_unmountable_notification_message" msgid="3256290114063126205">"Mag-tap para ayusin"</string>
@@ -1353,7 +1358,7 @@
     <string name="ext_media_unsupported_notification_title" msgid="4358280700537030333">"Hindi sinusuportahang <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_unsupported_notification_title" product="automotive" msgid="6004193172658722381">"Hindi gumagana ang <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_unsupported_notification_message" msgid="917738524888367560">"Hindi sinusuportahan ng device na ito ang <xliff:g id="NAME">%s</xliff:g> na ito. I-tap upang i-set up sa isang sinusuportahang format."</string>
-    <string name="ext_media_unsupported_notification_message" product="tv" msgid="7744945987775645685">"Hindi sinusuportahan ng device na ito ang <xliff:g id="NAME">%s</xliff:g> na ito. Piliin upang i-set up sa isang sinusuportahang format."</string>
+    <string name="ext_media_unsupported_notification_message" product="tv" msgid="1595482802187036532">"Piliin para i-set up ang <xliff:g id="NAME">%s</xliff:g> sa isang sinusuportahang format."</string>
     <string name="ext_media_unsupported_notification_message" product="automotive" msgid="3412494732736336330">"Baka kailanganin mong i-reformat ang device"</string>
     <string name="ext_media_badremoval_notification_title" msgid="4114625551266196872">"Hindi inaasahang naalis ang <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_badremoval_notification_message" msgid="1986514704499809244">"I-eject ang media bago tanggalin para maiwasan ang pagkawala ng content"</string>
@@ -1713,6 +1718,28 @@
     <string name="mediasize_na_monarch" msgid="4396943937986136896">"Monarch"</string>
     <string name="mediasize_na_quarto" msgid="2119101847712239885">"Quarto"</string>
     <string name="mediasize_na_foolscap" msgid="5011612828564394648">"Foolscap"</string>
+    <!-- no translation found for mediasize_na_ansi_c (3104916921818289618) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_d (254005964819282724) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_e (4424174989686785675) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_f (146980362213260987) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_a (5280681822380032361) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_b (2113344093437297427) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_c (971002546186856623) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_d (6450996075335049806) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e (6782708486949266519) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e1 (4707138568738504275) -->
+    <skip />
+    <!-- no translation found for mediasize_na_super_b (6964127155618393178) -->
+    <skip />
     <string name="mediasize_chinese_roc_8k" msgid="411670106572707544">"ROC 8K"</string>
     <string name="mediasize_chinese_roc_16k" msgid="7496706798725321898">"ROC 16K"</string>
     <string name="mediasize_chinese_prc_1" msgid="946949835711037253">"PRC 1"</string>
@@ -1749,6 +1776,8 @@
     <string name="mediasize_japanese_kahu" msgid="7290232592648122042">"Kahu"</string>
     <string name="mediasize_japanese_kaku2" msgid="7477551750461028312">"Kaku2"</string>
     <string name="mediasize_japanese_you4" msgid="5552111912684384833">"You4"</string>
+    <!-- no translation found for mediasize_japanese_l (1326765321473431817) -->
+    <skip />
     <string name="mediasize_unknown_portrait" msgid="3817016220446495613">"Hindi alam na portrait"</string>
     <string name="mediasize_unknown_landscape" msgid="1584741567225095325">"Hindi alam na landscape"</string>
     <string name="write_fail_reason_cancelled" msgid="2344081488493969190">"Kinansela"</string>

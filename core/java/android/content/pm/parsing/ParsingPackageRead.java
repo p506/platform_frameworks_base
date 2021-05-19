@@ -854,7 +854,22 @@ public interface ParsingPackageRead extends Parcelable {
      * @see ApplicationInfo#gwpAsanMode
      * @see R.styleable#AndroidManifest_gwpAsanMode
      */
-    public int getGwpAsanMode();
+    @ApplicationInfo.GwpAsanMode
+    int getGwpAsanMode();
+
+    /**
+     * @see ApplicationInfo#memtagMode
+     * @see R.styleable#AndroidManifest_memtagMode
+     */
+    @ApplicationInfo.MemtagMode
+    int getMemtagMode();
+
+    /**
+     * @see ApplicationInfo#nativeHeapZeroInitialized
+     * @see R.styleable#AndroidManifest_nativeHeapZeroInitialized
+     */
+    @ApplicationInfo.NativeHeapZeroInitialized
+    int getNativeHeapZeroInitialized();
 
     // TODO(b/135203078): Hide and enforce going through PackageInfoUtils
     ApplicationInfo toAppInfoWithoutState();

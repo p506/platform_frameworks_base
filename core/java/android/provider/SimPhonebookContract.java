@@ -17,23 +17,21 @@
 package android.provider;
 
 import static android.provider.SimPhonebookContract.ElementaryFiles.EF_ADN;
-import static android.provider.SimPhonebookContract.ElementaryFiles.EF_ADN_PATH_SEGMENT;
 import static android.provider.SimPhonebookContract.ElementaryFiles.EF_FDN;
-import static android.provider.SimPhonebookContract.ElementaryFiles.EF_FDN_PATH_SEGMENT;
 import static android.provider.SimPhonebookContract.ElementaryFiles.EF_SDN;
-import static android.provider.SimPhonebookContract.ElementaryFiles.EF_SDN_PATH_SEGMENT;
+import static android.provider.SimPhonebookContract.ElementaryFiles.PATH_SEGMENT_EF_ADN;
+import static android.provider.SimPhonebookContract.ElementaryFiles.PATH_SEGMENT_EF_FDN;
+import static android.provider.SimPhonebookContract.ElementaryFiles.PATH_SEGMENT_EF_SDN;
 
 import android.annotation.IntDef;
+import android.annotation.IntRange;
 import android.annotation.NonNull;
 import android.annotation.SystemApi;
 import android.annotation.WorkerThread;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.telephony.SubscriptionInfo;
 import android.telephony.TelephonyManager;
 
@@ -47,8 +45,11 @@ import java.util.Objects;
  * The contract between the provider of contact records on the device's SIM cards and applications.
  * Contains definitions of the supported URIs and columns.
  *
- * <p>This content provider does not support any of the QUERY_ARG_SQL* bundle arguments. An
- * IllegalArgumentException will be thrown if these are included.
+ * <h3>Permissions</h3>
+ * <p>
+ * Querying this provider requires {@link android.Manifest.permission#READ_CONTACTS} and writing
+ * to this provider requires {@link android.Manifest.permission#WRITE_CONTACTS}
+ * </p>
  */
 public final class SimPhonebookContract {
 
@@ -63,7 +64,6 @@ public final class SimPhonebookContract {
      *
      * @hide
      */
-    @SystemApi
     public static final String SUBSCRIPTION_ID_PATH_SEGMENT = "subid";
 
     private SimPhonebookContract() {
@@ -76,21 +76,86 @@ public final class SimPhonebookContract {
      * @hide
      */
     @NonNull
-    @SystemApi
     public static String getEfUriPath(@ElementaryFiles.EfType int efType) {
         switch (efType) {
             case EF_ADN:
-                return EF_ADN_PATH_SEGMENT;
+                return PATH_SEGMENT_EF_ADN;
             case EF_FDN:
-                return EF_FDN_PATH_SEGMENT;
+                return PATH_SEGMENT_EF_FDN;
             case EF_SDN:
-                return EF_SDN_PATH_SEGMENT;
+                return PATH_SEGMENT_EF_SDN;
             default:
                 throw new IllegalArgumentException("Unsupported EfType " + efType);
         }
     }
 
-    /** Constants for the contact records on a SIM card. */
+    /**
+     * Constants for the contact records on a SIM card.
+     *
+     * <h3 id="simrecords-data">Data</h3>
+     * <p>
+     * Data is stored in a specific elementary file on a specific SIM card and these are isolated
+     * from each other. SIM cards are identified by their subscription ID. SIM cards may not support
+     * all or even any of the elementary file types. A SIM will have constraints on
+     * the values of the data that can be stored in each elementary file. The available SIMs,
+     * their supported elementary file types and the constraints on the data can be discovered by
+     * querying {@link ElementaryFiles#CONTENT_URI}. Each elementary file has a fixed capacity
+     * for the number of records that may be stored. This can be determined from the value
+     * of the {@link ElementaryFiles#MAX_RECORDS} column.
+     * </p>
+     * <p>
+     * The {@link SimRecords#PHONE_NUMBER} column can only contain dialable characters and this
+     * applies regardless of the SIM that is being used. See
+     * {@link android.telephony.PhoneNumberUtils#isDialable(char)} for more details. Additionally
+     * the phone number can contain at most {@link ElementaryFiles#PHONE_NUMBER_MAX_LENGTH}
+     * characters. The {@link SimRecords#NAME} column can contain at most
+     * {@link ElementaryFiles#NAME_MAX_LENGTH} bytes when it is encoded for storage on the SIM.
+     * Encoding is done internally and so the name should be provided to these provider APIs as a
+     * Java String but the number of bytes required to encode it for storage will vary depending on
+     * the characters it contains. This length can be determined by calling
+     * {@link SimRecords#getEncodedNameLength(ContentResolver, String)}.
+     * </p>
+     * <h3>Operations </h3>
+     * <dl>
+     * <dd><b>Insert</b></dd>
+     * <p>
+     * Only {@link ElementaryFiles#EF_ADN} supports inserts. {@link SimRecords#PHONE_NUMBER}
+     * is a required column. If the value provided for this column is missing, null, empty
+     * or violates the requirements discussed in the <a href="#simrecords-data">Data</a>
+     * section above an {@link IllegalArgumentException} will be thrown. The
+     * {@link SimRecords#NAME} column may be omitted but if provided and it violates any of
+     * the requirements discussed in the <a href="#simrecords-data">Data</a> section above
+     * an {@link IllegalArgumentException} will be thrown.
+     * </p>
+     * <p>
+     * If an insert is not possible because the elementary file is full then an
+     * {@link IllegalStateException} will be thrown.
+     * </p>
+     * <dd><b>Update</b></dd>
+     * <p>
+     * Updates can only be performed for individual records on {@link ElementaryFiles#EF_ADN}.
+     * A specific record is referenced via the Uri returned by
+     * {@link SimRecords#getItemUri(int, int, int)}. Updates have the same constraints and
+     * behavior for the {@link SimRecords#PHONE_NUMBER} and {@link SimRecords#NAME} as insert.
+     * However, in the case of update the {@link SimRecords#PHONE_NUMBER} may be omitted as
+     * the existing record will already have a valid value.
+     * </p>
+     * <dd><b>Delete</b></dd>
+     * <p>
+     * Delete may only be performed for individual records on {@link ElementaryFiles#EF_ADN}.
+     * Deleting records will free up space for use by future inserts.
+     * </p>
+     * <dd><b>Query</b></dd>
+     * <p>
+     * All the records stored on a specific elementary file can be read via a Uri returned by
+     * {@link SimRecords#getContentUri(int, int)}. This query always returns all records; there
+     * is no support for filtering via a selection. An individual record can be queried via a Uri
+     * returned by {@link SimRecords#getItemUri(int, int, int)}. Queries will throw an
+     * {@link IllegalArgumentException} when the SIM with the subscription ID or the elementary file
+     * type are invalid or unavailable.
+     * </p>
+     * </dl>
+     */
     public static final class SimRecords {
 
         /**
@@ -122,12 +187,12 @@ public final class SimPhonebookContract {
          * The name for this record.
          *
          * <p>An {@link IllegalArgumentException} will be thrown by insert and update if this
-         * exceeds the maximum supported length or contains unsupported characters.
-         * {@link #validateName(ContentResolver, int, int, String)} )} can be used to
-         * check whether the name is supported.
+         * exceeds the maximum supported length. Use
+         * {@link #getEncodedNameLength(ContentResolver, String)} to check how long the name
+         * will be after encoding.
          *
          * @see ElementaryFiles#NAME_MAX_LENGTH
-         * @see #validateName(ContentResolver, int, int, String) )
+         * @see #getEncodedNameLength(ContentResolver, String)
          */
         public static final String NAME = "name";
         /**
@@ -149,24 +214,31 @@ public final class SimPhonebookContract {
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/sim-contact_v2";
 
         /**
-         * The path segment that is appended to {@link #getContentUri(int, int)} which indicates
-         * that the following path segment contains a name to be validated.
-         *
-         * @hide
-         * @see #validateName(ContentResolver, int, int, String)
+         * Value returned from {@link #getEncodedNameLength(ContentResolver, String)} when the name
+         * length could not be determined because the name could not be encoded.
          */
-        @SystemApi
-        public static final String VALIDATE_NAME_PATH_SEGMENT = "validate_name";
+        public static final int ERROR_NAME_UNSUPPORTED = -1;
 
         /**
-         * The key for a cursor extra that contains the result of a validate name query.
+         * The method name used to get the encoded length of a value for {@link SimRecords#NAME}
+         * column.
          *
          * @hide
-         * @see #validateName(ContentResolver, int, int, String)
+         * @see #getEncodedNameLength(ContentResolver, String)
+         * @see ContentResolver#call(String, String, String, Bundle)
          */
-        @SystemApi
-        public static final String EXTRA_NAME_VALIDATION_RESULT =
-                "android.provider.extra.NAME_VALIDATION_RESULT";
+        public static final String GET_ENCODED_NAME_LENGTH_METHOD_NAME = "get_encoded_name_length";
+
+        /**
+         * Extra key used for an integer value that contains the length in bytes of an encoded
+         * name.
+         *
+         * @hide
+         * @see #getEncodedNameLength(ContentResolver, String)
+         * @see #GET_ENCODED_NAME_LENGTH_METHOD_NAME
+         */
+        public static final String EXTRA_ENCODED_NAME_LENGTH =
+                "android.provider.extra.ENCODED_NAME_LENGTH";
 
 
         /**
@@ -195,8 +267,8 @@ public final class SimPhonebookContract {
          * be discovered by querying {@link ElementaryFiles#CONTENT_URI}.
          *
          * <p>If a SIM with the provided subscription ID does not exist or the SIM with the provided
-         * subscription ID doesn't support the specified entity file then queries will return
-         * and empty cursor and inserts will throw an {@link IllegalArgumentException}
+         * subscription ID doesn't support the specified entity file then all operations will
+         * throw an {@link IllegalArgumentException}.
          *
          * @param subscriptionId the subscriptionId of the SIM card that this Uri will reference
          * @param efType         the elementary file on the SIM that this Uri will reference
@@ -231,10 +303,14 @@ public final class SimPhonebookContract {
          *                       must be greater than 0. If there is no record with this record
          *                       number in the specified entity file then it will be treated as a
          *                       non-existent record.
+         * @see ElementaryFiles#SUBSCRIPTION_ID
+         * @see ElementaryFiles#EF_TYPE
+         * @see #RECORD_NUMBER
          */
         @NonNull
         public static Uri getItemUri(
-                int subscriptionId, @ElementaryFiles.EfType int efType, int recordNumber) {
+                int subscriptionId, @ElementaryFiles.EfType int efType,
+                @IntRange(from = 1) int recordNumber) {
             // Elementary file record indices are 1-based.
             Preconditions.checkArgument(recordNumber > 0, "Invalid recordNumber");
 
@@ -244,32 +320,35 @@ public final class SimPhonebookContract {
         }
 
         /**
-         * Validates a value that is being provided for the {@link #NAME} column.
+         * Returns the number of bytes required to encode the specified name when it is stored
+         * on the SIM.
          *
-         * <p>The return value can be used to check if the name is valid. If it is not valid then
-         * inserts and updates to the specified elementary file that use the provided name value
-         * will throw an {@link IllegalArgumentException}.
+         * <p>{@link ElementaryFiles#NAME_MAX_LENGTH} is specified in bytes but the encoded name
+         * may require more than 1 byte per character depending on the characters it contains. So
+         * this method can be used to check whether a name exceeds the max length.
          *
-         * <p>If the specified SIM or elementary file don't exist then
-         * {@link NameValidationResult#getMaxEncodedLength()} will be zero and
-         * {@link NameValidationResult#isValid()} will return false.
+         * @return the number of bytes required by the encoded name or
+         * {@link #ERROR_NAME_UNSUPPORTED} if the name could not be encoded.
+         * @throws IllegalStateException if the provider fails to return the length.
+         * @see SimRecords#NAME
+         * @see ElementaryFiles#NAME_MAX_LENGTH
          */
-        @NonNull
         @WorkerThread
-        public static NameValidationResult validateName(
-                @NonNull ContentResolver resolver, int subscriptionId,
-                @ElementaryFiles.EfType int efType,
-                @NonNull String name) {
-            Bundle queryArgs = new Bundle();
-            queryArgs.putString(SimRecords.NAME, name);
-            try (Cursor cursor =
-                         resolver.query(buildContentUri(subscriptionId, efType)
-                                 .appendPath(VALIDATE_NAME_PATH_SEGMENT)
-                                 .build(), null, queryArgs, null)) {
-                NameValidationResult result = cursor.getExtras()
-                        .getParcelable(EXTRA_NAME_VALIDATION_RESULT);
-                return result != null ? result : new NameValidationResult(name, "", 0, 0);
+        @IntRange(from = 0)
+        public static int getEncodedNameLength(
+                @NonNull ContentResolver resolver, @NonNull String name) {
+            Objects.requireNonNull(name);
+            Bundle result = resolver.call(AUTHORITY, GET_ENCODED_NAME_LENGTH_METHOD_NAME, name,
+                    null);
+            if (result == null || !result.containsKey(EXTRA_ENCODED_NAME_LENGTH)) {
+                throw new IllegalStateException("Provider malfunction: no length was returned.");
             }
+            int length = result.getInt(EXTRA_ENCODED_NAME_LENGTH, ERROR_NAME_UNSUPPORTED);
+            if (length < 0 && length != ERROR_NAME_UNSUPPORTED) {
+                throw new IllegalStateException(
+                        "Provider malfunction: invalid length was returned.");
+            }
+            return length;
         }
 
         private static Uri.Builder buildContentUri(
@@ -281,109 +360,30 @@ public final class SimPhonebookContract {
                     .appendPath(getEfUriPath(efType));
         }
 
-        /** Contains details about the validity of a value provided for the {@link #NAME} column. */
-        public static final class NameValidationResult implements Parcelable {
-
-            @NonNull
-            public static final Creator<NameValidationResult> CREATOR =
-                    new Creator<NameValidationResult>() {
-
-                        @Override
-                        public NameValidationResult createFromParcel(@NonNull Parcel in) {
-                            return new NameValidationResult(in);
-                        }
-
-                        @NonNull
-                        @Override
-                        public NameValidationResult[] newArray(int size) {
-                            return new NameValidationResult[size];
-                        }
-                    };
-
-            private final String mName;
-            private final String mSanitizedName;
-            private final int mEncodedLength;
-            private final int mMaxEncodedLength;
-
-            /** Creates a new instance from the provided values. */
-            public NameValidationResult(@NonNull String name, @NonNull String sanitizedName,
-                    int encodedLength, int maxEncodedLength) {
-                this.mName = Objects.requireNonNull(name);
-                this.mSanitizedName = Objects.requireNonNull(sanitizedName);
-                this.mEncodedLength = encodedLength;
-                this.mMaxEncodedLength = maxEncodedLength;
-            }
-
-            private NameValidationResult(Parcel in) {
-                this(in.readString(), in.readString(), in.readInt(), in.readInt());
-            }
-
-            /** Returns the original name that is being validated. */
-            @NonNull
-            public String getName() {
-                return mName;
-            }
-
-            /**
-             * Returns a sanitized copy of the original name with all unsupported characters
-             * replaced with spaces.
-             */
-            @NonNull
-            public String getSanitizedName() {
-                return mSanitizedName;
-            }
-
-            /**
-             * Returns whether the original name isValid.
-             *
-             * <p>If this returns false then inserts and updates using the name will throw an
-             * {@link IllegalArgumentException}
-             */
-            public boolean isValid() {
-                return mMaxEncodedLength > 0 && mEncodedLength <= mMaxEncodedLength
-                        && Objects.equals(
-                        mName, mSanitizedName);
-            }
-
-            /** Returns whether the character at the specified position is supported by the SIM. */
-            public boolean isSupportedCharacter(int position) {
-                return mName.charAt(position) == mSanitizedName.charAt(position);
-            }
-
-            /**
-             * Returns the number of bytes required to save the name.
-             *
-             * <p>This may be more than the number of characters in the name.
-             */
-            public int getEncodedLength() {
-                return mEncodedLength;
-            }
-
-            /**
-             * Returns the maximum number of bytes that are supported for the name.
-             *
-             * @see ElementaryFiles#NAME_MAX_LENGTH
-             */
-            public int getMaxEncodedLength() {
-                return mMaxEncodedLength;
-            }
-
-            @Override
-            public int describeContents() {
-                return 0;
-            }
-
-            @Override
-            public void writeToParcel(@NonNull Parcel dest, int flags) {
-                dest.writeString(mName);
-                dest.writeString(mSanitizedName);
-                dest.writeInt(mEncodedLength);
-                dest.writeInt(mMaxEncodedLength);
-            }
-        }
     }
 
-    /** Constants for metadata about the elementary files of the SIM cards in the phone. */
+    /**
+     * Constants for metadata about the elementary files of the SIM cards in the phone.
+     *
+     * <h3>Operations </h3>
+     * <dl>
+     * <dd><b>Insert</b></dd>
+     * <p>Insert is not supported for the Uris defined in this class.</p>
+     * <dd><b>Update</b></dd>
+     * <p>Update is not supported for the Uris defined in this class.</p>
+     * <dd><b>Delete</b></dd>
+     * <p>Delete is not supported for the Uris defined in this class.</p>
+     * <dd><b>Query</b></dd>
+     * <p>
+     * The elementary files for all the inserted SIMs can be read via
+     * {@link ElementaryFiles#CONTENT_URI}. Unsupported elementary files are omitted from the
+     * results. This Uri always returns all supported elementary files for all available SIMs; it
+     * does not support filtering via a selection. A specific elementary file can be queried
+     * via a Uri returned by {@link ElementaryFiles#getItemUri(int, int)}. If the elementary file
+     * referenced by this Uri is unsupported by the SIM then the query will return an empty cursor.
+     * </p>
+     * </dl>
+     */
     public static final class ElementaryFiles {
 
         /** {@link SubscriptionInfo#getSimSlotIndex()} of the SIM for this row. */
@@ -445,15 +445,27 @@ public final class SimPhonebookContract {
          * methods operating on this Uri will throw UnsupportedOperationException
          */
         public static final int EF_SDN = 3;
-        /** @hide */
-        @SystemApi
-        public static final String EF_ADN_PATH_SEGMENT = "adn";
-        /** @hide */
-        @SystemApi
-        public static final String EF_FDN_PATH_SEGMENT = "fdn";
-        /** @hide */
-        @SystemApi
-        public static final String EF_SDN_PATH_SEGMENT = "sdn";
+        /**
+         * The Uri path segment used to target the ADN elementary file for SimPhonebookProvider
+         * content operations.
+         *
+         * @hide
+         */
+        public static final String PATH_SEGMENT_EF_ADN = "adn";
+        /**
+         * The Uri path segment used to target the FDN elementary file for SimPhonebookProvider
+         * content operations.
+         *
+         * @hide
+         */
+        public static final String PATH_SEGMENT_EF_FDN = "fdn";
+        /**
+         * The Uri path segment used to target the SDN elementary file for SimPhonebookProvider
+         * content operations.
+         *
+         * @hide
+         */
+        public static final String PATH_SEGMENT_EF_SDN = "sdn";
         /** The MIME type of CONTENT_URI providing a directory of ADN-like elementary files. */
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/sim-elementary-file";
         /** The MIME type of a CONTENT_URI subdirectory of a single ADN-like elementary file. */
@@ -464,7 +476,6 @@ public final class SimPhonebookContract {
          *
          * @hide
          */
-        @SystemApi
         public static final String ELEMENTARY_FILES_PATH_SEGMENT = "elementary_files";
 
         /** Content URI for the ADN-like elementary files available on the device. */
@@ -480,8 +491,7 @@ public final class SimPhonebookContract {
          * Returns a content uri for a specific elementary file.
          *
          * <p>If a SIM with the specified subscriptionId is not present an exception will be thrown.
-         * If the SIM doesn't support the specified elementary file it will have a zero value for
-         * {@link #MAX_RECORDS}.
+         * If the SIM doesn't support the specified elementary file it will return an empty cursor.
          */
         @NonNull
         public static Uri getItemUri(int subscriptionId, @EfType int efType) {

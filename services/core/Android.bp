@@ -1,7 +1,15 @@
+package {
+    // See: http://go/android-license-faq
+    // A large-scale-change added 'default_applicable_licenses' to import
+    // all of the 'license_kinds' from "frameworks_base_license"
+    // to get the below license kinds:
+    //   SPDX-license-identifier-Apache-2.0
+    default_applicable_licenses: ["frameworks_base_license"],
+}
+
 filegroup {
     name: "services.core-sources",
     srcs: ["java/**/*.java"],
-    exclude_srcs: [":connectivity-service-srcs"],
     path: "java",
     visibility: ["//frameworks/base/services"],
 }
@@ -72,9 +80,18 @@ genrule {
     out: ["services.core.protolog.json"],
 }
 
+genrule {
+    name: "statslog-art-java-gen",
+    tools: ["stats-log-api-gen"],
+    cmd: "$(location stats-log-api-gen) --java $(out) --module art" +
+         " --javaPackage com.android.internal.art --javaClass ArtStatsLog --worksource",
+    out: ["com/android/internal/art/ArtStatsLog.java"],
+}
+
 java_library_static {
     name: "services.core.unboosted",
     srcs: [
+        ":statslog-art-java-gen",
         ":services.core.protologsrc",
         ":dumpstate_aidl",
         ":framework_native_aidl",
@@ -98,7 +115,6 @@ java_library_static {
         "android.hardware.power-V1-java",
         "android.hardware.power-V1.0-java",
         "android.hardware.vibrator-V1-java",
-        "android.net.ipsec.ike.stubs.module_lib",
         "app-compat-annotations",
         "framework-tethering.stubs.module_lib",
         "service-permission.stubs.system_server",
@@ -183,32 +199,3 @@ prebuilt_etc {
     src: ":services.core.json.gz",
 }
 
-// TODO: Move connectivity service sources to independent directory.
-filegroup {
-    name: "connectivity-service-srcs",
-    srcs: [
-        "java/com/android/server/ConnectivityService.java",
-        "java/com/android/server/ConnectivityServiceInitializer.java",
-        "java/com/android/server/TestNetworkService.java",
-        "java/com/android/server/connectivity/AutodestructReference.java",
-        "java/com/android/server/connectivity/ConnectivityConstants.java",
-        "java/com/android/server/connectivity/DataConnectionStats.java",
-        "java/com/android/server/connectivity/DnsManager.java",
-        "java/com/android/server/connectivity/KeepaliveTracker.java",
-        "java/com/android/server/connectivity/LingerMonitor.java",
-        "java/com/android/server/connectivity/MockableSystemProperties.java",
-        "java/com/android/server/connectivity/Nat464Xlat.java",
-        "java/com/android/server/connectivity/NetworkAgentInfo.java",
-        "java/com/android/server/connectivity/NetworkDiagnostics.java",
-        "java/com/android/server/connectivity/NetworkNotificationManager.java",
-        "java/com/android/server/connectivity/NetworkRanker.java",
-        "java/com/android/server/connectivity/PermissionMonitor.java",
-        "java/com/android/server/connectivity/ProxyTracker.java",
-        "java/com/android/server/connectivity/QosCallbackAgentConnection.java",
-        "java/com/android/server/connectivity/QosCallbackTracker.java",
-        "java/com/android/server/connectivity/TcpKeepaliveController.java",
-        "java/com/android/server/connectivity/Vpn.java",
-        "java/com/android/server/connectivity/VpnIkev2Utils.java",
-        "java/com/android/server/net/LockdownVpnTracker.java",
-    ],
-}

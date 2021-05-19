@@ -16,11 +16,18 @@
 
 package android.net.vcn;
 
+import static android.net.ipsec.ike.IkeSessionParams.IKE_OPTION_MOBIKE;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import android.net.NetworkCapabilities;
+import android.net.ipsec.ike.IkeSessionParams;
+import android.net.ipsec.ike.IkeTunnelConnectionParams;
+import android.net.vcn.persistablebundleutils.IkeSessionParamsUtilsTest;
+import android.net.vcn.persistablebundleutils.TunnelConnectionParamsUtilsTest;
 
 import androidx.test.filters.SmallTest;
 import androidx.test.runner.AndroidJUnit4;
@@ -57,35 +64,80 @@ public class VcnGatewayConnectionConfigTest {
             };
     public static final int MAX_MTU = 1360;
 
+    public static final IkeTunnelConnectionParams TUNNEL_CONNECTION_PARAMS =
+            TunnelConnectionParamsUtilsTest.buildTestParams();
+
+    public static final String GATEWAY_CONNECTION_NAME_PREFIX = "gatewayConnectionName-";
+    private static int sGatewayConnectionConfigCount = 0;
+
     // Public for use in VcnGatewayConnectionTest
     public static VcnGatewayConnectionConfig buildTestConfig() {
         return buildTestConfigWithExposedCaps(EXPOSED_CAPS);
     }
 
+    private static VcnGatewayConnectionConfig.Builder newBuilder() {
+        // Append a unique identifier to the name prefix to guarantee that all created
+        // VcnGatewayConnectionConfigs have a unique name (required by VcnConfig).
+        return new VcnGatewayConnectionConfig.Builder(
+                GATEWAY_CONNECTION_NAME_PREFIX + sGatewayConnectionConfigCount++,
+                TUNNEL_CONNECTION_PARAMS);
+    }
+
     // Public for use in VcnGatewayConnectionTest
     public static VcnGatewayConnectionConfig buildTestConfigWithExposedCaps(int... exposedCaps) {
         final VcnGatewayConnectionConfig.Builder builder =
-                new VcnGatewayConnectionConfig.Builder()
-                        .setRetryInterval(RETRY_INTERVALS_MS)
-                        .setMaxMtu(MAX_MTU);
+                newBuilder().setRetryIntervalsMillis(RETRY_INTERVALS_MS).setMaxMtu(MAX_MTU);
 
         for (int caps : exposedCaps) {
             builder.addExposedCapability(caps);
-        }
-
-        for (int caps : UNDERLYING_CAPS) {
-            builder.addRequiredUnderlyingCapability(caps);
         }
 
         return builder.build();
     }
 
     @Test
+    public void testBuilderRequiresNonNullGatewayConnectionName() {
+        try {
+            new VcnGatewayConnectionConfig.Builder(
+                            null /* gatewayConnectionName */, TUNNEL_CONNECTION_PARAMS)
+                    .build();
+
+            fail("Expected exception due to invalid gateway connection name");
+        } catch (NullPointerException e) {
+        }
+    }
+
+    @Test
+    public void testBuilderRequiresNonNullTunnelConnectionParams() {
+        try {
+            new VcnGatewayConnectionConfig.Builder(
+                            GATEWAY_CONNECTION_NAME_PREFIX, null /* tunnelConnectionParams */)
+                    .build();
+
+            fail("Expected exception due to the absence of tunnel connection parameters");
+        } catch (NullPointerException e) {
+        }
+    }
+
+    @Test
+    public void testBuilderRequiresMobikeEnabled() {
+        try {
+            final IkeSessionParams ikeParams =
+                    IkeSessionParamsUtilsTest.createBuilderMinimum()
+                            .removeIkeOption(IKE_OPTION_MOBIKE)
+                            .build();
+            final IkeTunnelConnectionParams tunnelParams =
+                    TunnelConnectionParamsUtilsTest.buildTestParams(ikeParams);
+            new VcnGatewayConnectionConfig.Builder(GATEWAY_CONNECTION_NAME_PREFIX, tunnelParams);
+            fail("Expected exception due to MOBIKE not enabled");
+        } catch (IllegalArgumentException e) {
+        }
+    }
+
+    @Test
     public void testBuilderRequiresNonEmptyExposedCaps() {
         try {
-            new VcnGatewayConnectionConfig.Builder()
-                    .addRequiredUnderlyingCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                    .build();
+            newBuilder().build();
 
             fail("Expected exception due to invalid exposed capabilities");
         } catch (IllegalArgumentException e) {
@@ -93,21 +145,9 @@ public class VcnGatewayConnectionConfigTest {
     }
 
     @Test
-    public void testBuilderRequiresNonEmptyUnderlyingCaps() {
-        try {
-            new VcnGatewayConnectionConfig.Builder()
-                    .addExposedCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                    .build();
-
-            fail("Expected exception due to invalid required underlying capabilities");
-        } catch (IllegalArgumentException e) {
-        }
-    }
-
-    @Test
     public void testBuilderRequiresNonNullRetryInterval() {
         try {
-            new VcnGatewayConnectionConfig.Builder().setRetryInterval(null);
+            newBuilder().setRetryIntervalsMillis(null);
             fail("Expected exception due to invalid retryIntervalMs");
         } catch (IllegalArgumentException e) {
         }
@@ -116,7 +156,7 @@ public class VcnGatewayConnectionConfigTest {
     @Test
     public void testBuilderRequiresNonEmptyRetryInterval() {
         try {
-            new VcnGatewayConnectionConfig.Builder().setRetryInterval(new long[0]);
+            newBuilder().setRetryIntervalsMillis(new long[0]);
             fail("Expected exception due to invalid retryIntervalMs");
         } catch (IllegalArgumentException e) {
         }
@@ -125,8 +165,7 @@ public class VcnGatewayConnectionConfigTest {
     @Test
     public void testBuilderRequiresValidMtu() {
         try {
-            new VcnGatewayConnectionConfig.Builder()
-                    .setMaxMtu(VcnGatewayConnectionConfig.MIN_MTU_V6 - 1);
+            newBuilder().setMaxMtu(VcnGatewayConnectionConfig.MIN_MTU_V6 - 1);
             fail("Expected exception due to invalid mtu");
         } catch (IllegalArgumentException e) {
         }
@@ -136,15 +175,15 @@ public class VcnGatewayConnectionConfigTest {
     public void testBuilderAndGetters() {
         final VcnGatewayConnectionConfig config = buildTestConfig();
 
+        assertTrue(config.getGatewayConnectionName().startsWith(GATEWAY_CONNECTION_NAME_PREFIX));
+
         int[] exposedCaps = config.getExposedCapabilities();
         Arrays.sort(exposedCaps);
         assertArrayEquals(EXPOSED_CAPS, exposedCaps);
 
-        int[] underlyingCaps = config.getRequiredUnderlyingCapabilities();
-        Arrays.sort(underlyingCaps);
-        assertArrayEquals(UNDERLYING_CAPS, underlyingCaps);
+        assertEquals(TUNNEL_CONNECTION_PARAMS, config.getTunnelConnectionParams());
 
-        assertArrayEquals(RETRY_INTERVALS_MS, config.getRetryIntervalsMs());
+        assertArrayEquals(RETRY_INTERVALS_MS, config.getRetryIntervalsMillis());
         assertEquals(MAX_MTU, config.getMaxMtu());
     }
 

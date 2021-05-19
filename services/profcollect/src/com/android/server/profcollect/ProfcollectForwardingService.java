@@ -23,13 +23,17 @@ import android.app.job.JobService;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.IBinder.DeathRecipient;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.SystemProperties;
 import android.os.UpdateEngine;
 import android.os.UpdateEngineCallback;
+import android.os.UserHandle;
+import android.os.UserManager;
 import android.provider.DeviceConfig;
 import android.util.Log;
 
@@ -40,6 +44,9 @@ import com.android.server.wm.ActivityMetricsLaunchObserver;
 import com.android.server.wm.ActivityMetricsLaunchObserverRegistry;
 import com.android.server.wm.ActivityTaskManagerInternal;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -73,7 +80,7 @@ public final class ProfcollectForwardingService extends SystemService {
      */
     public static boolean enabled() {
         return DeviceConfig.getBoolean(DeviceConfig.NAMESPACE_PROFCOLLECT_NATIVE_BOOT, "enabled",
-            false);
+            false) || SystemProperties.getBoolean("persist.profcollectd.enabled_override", false);
     }
 
     @Override
@@ -102,7 +109,7 @@ public final class ProfcollectForwardingService extends SystemService {
             return false;
         }
         try {
-            return !mIProfcollect.GetSupportedProvider().isEmpty();
+            return !mIProfcollect.get_supported_provider().isEmpty();
         } catch (RemoteException e) {
             Log.e(LOG_TAG, e.getMessage());
             return false;
@@ -191,7 +198,7 @@ public final class ProfcollectForwardingService extends SystemService {
             }
 
             try {
-                sSelfService.mIProfcollect.ProcessProfile();
+                sSelfService.mIProfcollect.process(false);
             } catch (RemoteException e) {
                 Log.e(LOG_TAG, e.getMessage());
             }
@@ -234,7 +241,7 @@ public final class ProfcollectForwardingService extends SystemService {
                 if (DEBUG) {
                     Log.d(LOG_TAG, "Tracing on app launch event: " + packageName);
                 }
-                mIProfcollect.TraceOnce("applaunch");
+                mIProfcollect.trace_once("applaunch");
             } catch (RemoteException e) {
                 Log.e(LOG_TAG, e.getMessage());
             }
@@ -295,10 +302,58 @@ public final class ProfcollectForwardingService extends SystemService {
             return;
         }
 
-        try {
-            mIProfcollect.CreateProfileReport();
-        } catch (RemoteException e) {
-            Log.e(LOG_TAG, e.getMessage());
+        new Thread(() -> {
+            try {
+                String reportUuid = mIProfcollect.report();
+
+                final int profileId = getBBProfileId();
+                String reportDir = "/data/user/" + profileId
+                        + "/com.google.android.apps.internal.betterbug/cache/";
+                String reportPath = reportDir + reportUuid + ".zip";
+
+                if (!Files.exists(Paths.get(reportDir))) {
+                    Log.i(LOG_TAG, "Destination directory does not exist, abort upload.");
+                    return;
+                }
+
+                Intent uploadIntent =
+                        new Intent("com.google.android.apps.betterbug.intent.action.UPLOAD_PROFILE")
+                        .setPackage("com.google.android.apps.internal.betterbug")
+                        .putExtra("EXTRA_DESTINATION", "PROFCOLLECT")
+                        .putExtra("EXTRA_PACKAGE_NAME", getContext().getPackageName())
+                        .putExtra("EXTRA_PROFILE_PATH", reportPath)
+                        .addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+                Context context = getContext();
+
+                List<ResolveInfo> receivers =
+                        context.getPackageManager().queryBroadcastReceivers(uploadIntent, 0);
+                if (receivers == null || receivers.isEmpty()) {
+                    Log.i(LOG_TAG, "No one to receive upload intent, abort upload.");
+                    return;
+                }
+                mIProfcollect.copy_report_to_bb(profileId, reportUuid);
+                context.sendBroadcast(uploadIntent);
+                mIProfcollect.delete_report(reportUuid);
+            } catch (RemoteException e) {
+                Log.e(LOG_TAG, e.getMessage());
+            }
+        }).start();
+    }
+
+    /**
+     * Get BetterBug's profile ID. It is the work profile ID, if it exists. Otherwise the system
+     * user ID.
+     *
+     * @return BetterBug's profile ID.
+     */
+    private int getBBProfileId() {
+        UserManager userManager = UserManager.get(getContext());
+        int[] profiles = userManager.getProfileIds(UserHandle.USER_SYSTEM, false);
+        for (int p : profiles) {
+            if (userManager.getUserInfo(p).isManagedProfile()) {
+                return p;
+            }
         }
+        return UserHandle.USER_SYSTEM;
     }
 }

@@ -287,7 +287,10 @@ Dvr::~Dvr() {
 jint Dvr::close() {
     Result r = mDvrSp->close();
     if (r == Result::SUCCESS) {
-        EventFlag::deleteEventFlag(&mDvrMQEventFlag);
+        if (mDvrMQEventFlag != nullptr) {
+            EventFlag::deleteEventFlag(&mDvrMQEventFlag);
+        }
+        mDvrMQ = nullptr;
     }
     return (jint) r;
 }
@@ -723,13 +726,15 @@ Filter::~Filter() {
 
     env->DeleteWeakGlobalRef(mFilterObj);
     mFilterObj = NULL;
-    EventFlag::deleteEventFlag(&mFilterMQEventFlag);
 }
 
 int Filter::close() {
     Result r = mFilterSp->close();
     if (r == Result::SUCCESS) {
-        EventFlag::deleteEventFlag(&mFilterMQEventFlag);
+        if (mFilterMQEventFlag != nullptr) {
+            EventFlag::deleteEventFlag(&mFilterMQEventFlag);
+        }
+        mFilterMQ = nullptr;
     }
     return (int)r;
 }
@@ -3050,6 +3055,9 @@ static jint android_media_tv_Tuner_configure_filter(
             filterSp->mFilterMQ = std::make_unique<MQ>(filterMQDesc, true);
             EventFlag::createEventFlag(
                     filterSp->mFilterMQ->getEventFlagWord(), &(filterSp->mFilterMQEventFlag));
+        } else {
+            filterSp->mFilterMQ = nullptr;
+            filterSp->mFilterMQEventFlag = nullptr;
         }
     }
     return (jint) getQueueDescResult;
@@ -3137,13 +3145,12 @@ static jint android_media_tv_Tuner_read_filter_fmq(
 }
 
 static jint android_media_tv_Tuner_close_filter(JNIEnv *env, jobject filter) {
-    sp<IFilter> iFilterSp = getFilter(env, filter)->getIFilter();
-    if (iFilterSp == NULL) {
+    sp<Filter> filterSp = getFilter(env, filter);
+    if (filterSp == NULL) {
         ALOGD("Failed to close filter: filter not found");
         return (jint) Result::NOT_INITIALIZED;
     }
-    Result r = iFilterSp->close();
-    return (jint) r;
+    return filterSp->close();
 }
 
 static sp<TimeFilter> getTimeFilter(JNIEnv *env, jobject filter) {
@@ -3251,7 +3258,7 @@ static jint android_media_tv_Tuner_descrambler_add_pid(
     if (descramblerSp == NULL) {
         return (jint) Result::NOT_INITIALIZED;
     }
-    sp<IFilter> iFilterSp = getFilter(env, filter)->getIFilter();
+    sp<IFilter> iFilterSp = (filter == NULL) ? NULL : getFilter(env, filter)->getIFilter();
     Result result = descramblerSp->addPid(getDemuxPid((int)pidType, (int)pid), iFilterSp);
     return (jint) result;
 }
@@ -3262,7 +3269,7 @@ static jint android_media_tv_Tuner_descrambler_remove_pid(
     if (descramblerSp == NULL) {
         return (jint) Result::NOT_INITIALIZED;
     }
-    sp<IFilter> iFilterSp = getFilter(env, filter)->getIFilter();
+    sp<IFilter> iFilterSp = (filter == NULL) ? NULL : getFilter(env, filter)->getIFilter();
     Result result = descramblerSp->removePid(getDemuxPid((int)pidType, (int)pid), iFilterSp);
     return (jint) result;
 }

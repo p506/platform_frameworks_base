@@ -64,7 +64,7 @@ import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.os.UserHandle;
 import android.os.storage.StorageManager;
-import android.system.Int32Ref;
+import android.system.Int64Ref;
 import android.text.TextUtils;
 import android.util.EventLog;
 import android.util.Log;
@@ -744,7 +744,7 @@ public abstract class ContentResolver implements ContentInterface {
     // Always log queries which take 500ms+; shorter queries are
     // sampled accordingly.
     private static final boolean ENABLE_CONTENT_SAMPLE = false;
-    private static final int SLOW_THRESHOLD_MILLIS = 500;
+    private static final int SLOW_THRESHOLD_MILLIS = 500 * Build.HW_TIMEOUT_MULTIPLIER;
     private final Random mRandom = new Random();  // guarded by itself
 
     /** @hide */
@@ -758,7 +758,8 @@ public abstract class ContentResolver implements ContentInterface {
      * before we decide it must be hung.
      * @hide
      */
-    public static final int CONTENT_PROVIDER_PUBLISH_TIMEOUT_MILLIS = 10 * 1000;
+    public static final int CONTENT_PROVIDER_PUBLISH_TIMEOUT_MILLIS =
+            10 * 1000 * Build.HW_TIMEOUT_MULTIPLIER;
 
     /**
      * How long we wait for an provider to be published. Should be longer than
@@ -766,10 +767,11 @@ public abstract class ContentResolver implements ContentInterface {
      * @hide
      */
     public static final int CONTENT_PROVIDER_READY_TIMEOUT_MILLIS =
-            CONTENT_PROVIDER_PUBLISH_TIMEOUT_MILLIS + 10 * 1000;
+            CONTENT_PROVIDER_PUBLISH_TIMEOUT_MILLIS + 10 * 1000 * Build.HW_TIMEOUT_MULTIPLIER;
 
     // Timeout given a ContentProvider that has already been started and connected to.
-    private static final int CONTENT_PROVIDER_TIMEOUT_MILLIS = 3 * 1000;
+    private static final int CONTENT_PROVIDER_TIMEOUT_MILLIS =
+            3 * 1000 * Build.HW_TIMEOUT_MULTIPLIER;
 
     // Should be >= {@link #CONTENT_PROVIDER_WAIT_TIMEOUT_MILLIS}, because that's how
     // long ActivityManagerService is giving a content provider to get published if a new process
@@ -4040,7 +4042,7 @@ public abstract class ContentResolver implements ContentInterface {
         // Convert to Point, since that's what the API is defined as
         final Bundle opts = new Bundle();
         opts.putParcelable(EXTRA_SIZE, Point.convert(size));
-        final Int32Ref orientation = new Int32Ref(0);
+        final Int64Ref orientation = new Int64Ref(0);
 
         Bitmap bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(() -> {
             final AssetFileDescriptor afd = content.openTypedAssetFile(uri, "image/*", opts,

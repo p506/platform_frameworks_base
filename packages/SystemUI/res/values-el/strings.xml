@@ -477,7 +477,7 @@
     <string name="guest_exit_guest_dialog_title" msgid="5015697561580641422">"Κατάργηση επισκέπτη;"</string>
     <string name="guest_exit_guest_dialog_message" msgid="8183450985628495709">"Όλες οι εφαρμογές και τα δεδομένα αυτής της περιόδου σύνδεσης θα διαγραφούν."</string>
     <string name="guest_exit_guest_dialog_remove" msgid="7505817591242703757">"Κατάργηση"</string>
-    <string name="guest_wipe_session_title" msgid="7147965814683990944">"Επισκέπτη , καλώς όρισες ξανά!"</string>
+    <string name="guest_wipe_session_title" msgid="7147965814683990944">"Kαλώς ορίσατε ξανά!"</string>
     <string name="guest_wipe_session_message" msgid="3393823610257065457">"Θέλετε να συνεχίσετε την περίοδο σύνδεσής σας;"</string>
     <string name="guest_wipe_session_wipe" msgid="8056836584445473309">"Έναρξη από την αρχή"</string>
     <string name="guest_wipe_session_dontwipe" msgid="3211052048269304205">"Ναι, συνέχεια"</string>
@@ -488,7 +488,7 @@
     <string name="user_logout_notification_text" msgid="7441286737342997991">"Αποσύνδεση τρέχοντα χρήστη"</string>
     <string name="user_logout_notification_action" msgid="7974458760719361881">"ΑΠΟΣΥΝΔΕΣΗ ΧΡΗΣΤΗ"</string>
     <string name="user_add_user_title" msgid="4172327541504825032">"Προσθήκη νέου χρήστη;"</string>
-    <string name="user_add_user_message_short" msgid="2599370307878014791">"Κατά την προσθήκη ενός νέου χρήστη, αυτός θα πρέπει να ρυθμίσει το χώρο του.\n\nΟποιοσδήποτε χρήστης μπορεί να ενημερώσει τις εφαρμογές για όλους τους άλλους χρήστες."</string>
+    <string name="user_add_user_message_short" msgid="2599370307878014791">"Κατά την προσθήκη ενός νέου χρήστη, αυτός θα πρέπει να ρυθμίσει τον χώρο του.\n\nΟποιοσδήποτε χρήστης μπορεί να ενημερώσει τις εφαρμογές για όλους τους άλλους χρήστες."</string>
     <string name="user_limit_reached_title" msgid="2429229448830346057">"Συμπληρώθηκε το όριο χρηστών"</string>
     <plurals name="user_limit_reached_message" formatted="false" msgid="2573535787802908398">
       <item quantity="other">Μπορείτε να προσθέσετε έως <xliff:g id="COUNT">%d</xliff:g> χρήστες.</item>
@@ -600,7 +600,7 @@
     <string name="screen_pinning_can_open_other_apps" msgid="7529756813231421455">"Η καρφιτσωμένη εφαρμογή μπορεί να ανοίξει άλλες εφαρμογές."</string>
     <string name="screen_pinning_toast" msgid="8177286912533744328">"Για να ξεκαρφιτσώσετε αυτήν την εφαρμογή, αγγίξτε παρατεταμένα τα κουμπιά Πίσω και Επισκόπηση."</string>
     <string name="screen_pinning_toast_recents_invisible" msgid="6850978077443052594">"Για να ξεκαρφιτσώσετε αυτήν την εφαρμογή, αγγίξτε παρατεταμένα τα κουμπιά Πίσω και Αρχική οθόνη."</string>
-    <string name="screen_pinning_toast_gesture_nav" msgid="170699893395336705">"Για να ξεκαρφιτσώσετε αυτήν την εφαρμογή, σύρετε προς τα πάνω και κρατήστε παρατεταμένα"</string>
+    <string name="screen_pinning_toast_gesture_nav" msgid="170699893395336705">"Για να ξεκαρφ. την εφαρμογή, σύρετε προς τα πάνω και κρατήστε"</string>
     <string name="screen_pinning_positive" msgid="3285785989665266984">"Το κατάλαβα"</string>
     <string name="screen_pinning_negative" msgid="6882816864569211666">"Όχι"</string>
     <string name="screen_pinning_start" msgid="7483998671383371313">"Η εφαρμογή καρφιτσώθηκε."</string>
@@ -1074,6 +1074,7 @@
     <string name="controls_seeding_in_progress" msgid="3033855341410264148">"Φόρτωση προτάσεων"</string>
     <string name="controls_media_title" msgid="1746947284862928133">"Μέσα"</string>
     <string name="controls_media_close_session" msgid="3957093425905475065">"Απόκρυψη της τρέχουσας περιόδου λειτουργίας."</string>
+    <string name="controls_media_active_session" msgid="1984383994625845642">"Δεν είναι δυνατή η απόκρυψη της τρέχουσας περιόδου λειτουργίας."</string>
     <string name="controls_media_dismiss_button" msgid="9081375542265132213">"Παράβλεψη"</string>
     <string name="controls_media_resume" msgid="1933520684481586053">"Συνέχιση"</string>
     <string name="controls_media_settings_button" msgid="5815790345117172504">"Ρυθμίσεις"</string>
@@ -1089,4 +1090,11 @@
     <string name="controls_added_tooltip" msgid="4842812921719153085">"Πατήστε το κουμπί λειτουργίας για να δείτε νέα στοιχεία ελέγχου."</string>
     <string name="controls_menu_add" msgid="4447246119229920050">"Προσθήκη στοιχείων ελέγχου"</string>
     <string name="controls_menu_edit" msgid="890623986951347062">"Επεξεργασία στοιχείων ελέγχου"</string>
+    <string name="media_output_dialog_add_output" msgid="5642703238877329518">"Προσθήκη εξόδων"</string>
+    <string name="media_output_dialog_group" msgid="5571251347877452212">"Ομάδα"</string>
+    <string name="media_output_dialog_single_device" msgid="3102758980643351058">"Επιλέχτηκε 1 συσκευή"</string>
+    <string name="media_output_dialog_multiple_devices" msgid="1093771040315422350">"Επιλέχτηκαν <xliff:g id="COUNT">%1$d</xliff:g> συσκευές"</string>
+    <string name="media_output_dialog_disconnected" msgid="1834473104836986046">"<xliff:g id="DEVICE_NAME">%1$s</xliff:g> (αποσυνδέθηκε)"</string>
+    <string name="media_output_dialog_connect_failed" msgid="3225190634236259010">"Δεν ήταν δυνατή η σύνδεση. Δοκιμάστε ξανά."</string>
+    <string name="media_output_dialog_pairing_new" msgid="9099497976087485862">"Σύζευξη νέας συσκευής"</string>
 </resources>

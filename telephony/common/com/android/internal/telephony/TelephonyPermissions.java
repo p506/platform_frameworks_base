@@ -525,7 +525,7 @@ public final class TelephonyPermissions {
      *
      * @throws SecurityException if the caller does not have the required permission/privileges
      */
-    public static void enforeceCallingOrSelfReadPhoneStatePermissionOrCarrierPrivilege(
+    public static void enforceCallingOrSelfReadPhoneStatePermissionOrCarrierPrivilege(
             Context context, int subId, String message) {
         if (context.checkCallingOrSelfPermission(android.Manifest.permission.READ_PHONE_STATE)
                 == PERMISSION_GRANTED) {
@@ -545,7 +545,7 @@ public final class TelephonyPermissions {
      *
      * @throws SecurityException if the caller does not have the required permission/privileges
      */
-    public static void enforeceCallingOrSelfReadPrivilegedPhoneStatePermissionOrCarrierPrivilege(
+    public static void enforceCallingOrSelfReadPrivilegedPhoneStatePermissionOrCarrierPrivilege(
             Context context, int subId, String message) {
         if (context.checkCallingOrSelfPermission(Manifest.permission.READ_PRIVILEGED_PHONE_STATE)
                 == PERMISSION_GRANTED) {
@@ -567,7 +567,7 @@ public final class TelephonyPermissions {
      *
      * @throws SecurityException if the caller does not have the required permission/privileges
      */
-    public static void enforeceCallingOrSelfReadPrecisePhoneStatePermissionOrCarrierPrivilege(
+    public static void enforceCallingOrSelfReadPrecisePhoneStatePermissionOrCarrierPrivilege(
             Context context, int subId, String message) {
         if (context.checkCallingOrSelfPermission(Manifest.permission.READ_PRIVILEGED_PHONE_STATE)
                 == PERMISSION_GRANTED) {
@@ -637,6 +637,67 @@ public final class TelephonyPermissions {
         } finally {
             Binder.restoreCallingIdentity(identity);
         }
+    }
+
+    /**
+     * Given a list of permissions, check to see if the caller has at least one of them. If the
+     * caller has none of these permissions, throw a SecurityException.
+     */
+    public static void enforceAnyPermissionGranted(Context context, int uid, String message,
+            String... permissions) {
+        if (permissions.length == 0) return;
+        boolean isGranted = false;
+        for (String perm : permissions) {
+            if (context.checkCallingOrSelfPermission(perm) == PERMISSION_GRANTED) {
+                isGranted = true;
+                break;
+            }
+        }
+
+        if (isGranted) return;
+
+        StringBuilder b = new StringBuilder(message);
+        b.append(": Neither user ");
+        b.append(uid);
+        b.append(" nor current process has ");
+        b.append(permissions[0]);
+        for (int i = 1; i < permissions.length; i++) {
+            b.append(" or ");
+            b.append(permissions[i]);
+        }
+        throw new SecurityException(b.toString());
+    }
+
+    /**
+     * Given a list of permissions, check to see if the caller has at least one of them granted. If
+     * not, check to see if the caller has carrier privileges. If the caller does not have any  of
+     * these permissions, throw a SecurityException.
+     */
+    public static void enforceAnyPermissionGrantedOrCarrierPrivileges(Context context, int subId,
+            int uid, String message, String... permissions) {
+        if (permissions.length == 0) return;
+        boolean isGranted = false;
+        for (String perm : permissions) {
+            if (context.checkCallingOrSelfPermission(perm) == PERMISSION_GRANTED) {
+                isGranted = true;
+                break;
+            }
+        }
+
+        if (isGranted) return;
+        if (checkCarrierPrivilegeForSubId(context, subId)) return;
+
+        StringBuilder b = new StringBuilder(message);
+        b.append(": Neither user ");
+        b.append(uid);
+        b.append(" nor current process has ");
+        b.append(permissions[0]);
+        for (int i = 1; i < permissions.length; i++) {
+            b.append(" or ");
+            b.append(permissions[i]);
+        }
+        b.append(" or carrier privileges");
+        throw new SecurityException(b.toString());
     }
 
     /**

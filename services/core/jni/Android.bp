@@ -1,3 +1,12 @@
+package {
+    // See: http://go/android-license-faq
+    // A large-scale-change added 'default_applicable_licenses' to import
+    // all of the 'license_kinds' from "frameworks_base_license"
+    // to get the below license kinds:
+    //   SPDX-license-identifier-Apache-2.0
+    default_applicable_licenses: ["frameworks_base_license"],
+}
+
 cc_library_static {
     name: "libservices.core",
     defaults: ["libservices.core-libs"],
@@ -28,6 +37,7 @@ cc_library_static {
         "com_android_server_am_BatteryStatsService.cpp",
         "com_android_server_ConsumerIrService.cpp",
         "com_android_server_devicepolicy_CryptoTestHelper.cpp",
+        "com_android_server_connectivity_Vpn.cpp",
         "com_android_server_gpu_GpuService.cpp",
         "com_android_server_HardwarePropertiesManagerService.cpp",
         "com_android_server_input_InputManagerService.cpp",
@@ -92,6 +102,7 @@ cc_defaults {
         "libaudioclient",
         "libbase",
         "libappfuse",
+        "libbinder_ndk",
         "libbinder",
         "libcutils",
         "libcrypto",
@@ -100,7 +111,7 @@ cc_defaults {
         "libhardware",
         "libhardware_legacy",
         "libhidlbase",
-        "libkeystore_binder",
+        "libmemtrackproxy",
         "libmtp",
         "libnativehelper",
         "libprocessgroup",
@@ -145,6 +156,7 @@ cc_defaults {
         "android.hardware.input.classifier@1.0",
         "android.hardware.ir@1.0",
         "android.hardware.light@2.0",
+        "android.hardware.memtrack-V1-ndk_platform",
         "android.hardware.power@1.0",
         "android.hardware.power@1.1",
         "android.hardware.power-V1-cpp",

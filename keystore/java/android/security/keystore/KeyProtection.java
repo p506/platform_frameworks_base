@@ -24,6 +24,7 @@ import android.app.KeyguardManager;
 import android.hardware.biometrics.BiometricManager;
 import android.hardware.biometrics.BiometricPrompt;
 import android.security.GateKeeper;
+import android.security.keystore2.KeymasterUtils;
 
 import java.security.Key;
 import java.security.KeyStore.ProtectionParameter;
@@ -588,7 +589,8 @@ public final class KeyProtection implements ProtectionParameter, UserAuthArgs {
         private long mBoundToSecureUserId = GateKeeper.INVALID_SECURE_USER_ID;
         private boolean mCriticalToDeviceEncryption = false;
         private boolean mIsStrongBoxBacked = false;
-        private  int mMaxUsageCount = KeyProperties.UNRESTRICTED_USAGE_COUNT;
+        private int mMaxUsageCount = KeyProperties.UNRESTRICTED_USAGE_COUNT;
+        private String mAttestKeyAlias = null;
 
         /**
          * Creates a new instance of the {@code Builder}.

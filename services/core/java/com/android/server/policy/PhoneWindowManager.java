@@ -1466,8 +1466,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 Settings.Secure.USER_SETUP_COMPLETE, 0, UserHandle.USER_CURRENT) != 0;
         if (mHasFeatureLeanback) {
             isSetupComplete &= isTvUserSetupComplete();
+        } else if (mHasFeatureAuto) {
+            isSetupComplete &= isAutoUserSetupComplete();
         }
         return isSetupComplete;
+    }
+
+    private boolean isAutoUserSetupComplete() {
+        return Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                "android.car.SETUP_WIZARD_IN_PROGRESS", 0, UserHandle.USER_CURRENT) == 0;
     }
 
     private boolean isTvUserSetupComplete() {
@@ -2292,9 +2299,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     /** {@inheritDoc} */
     @Override
-    public StartingSurface addSplashScreen(IBinder appToken, String packageName, int theme,
-            CompatibilityInfo compatInfo, CharSequence nonLocalizedLabel, int labelRes, int icon,
-            int logo, int windowFlags, Configuration overrideConfig, int displayId) {
+    public StartingSurface addSplashScreen(IBinder appToken, int userId, String packageName,
+            int theme, CompatibilityInfo compatInfo, CharSequence nonLocalizedLabel, int labelRes,
+            int icon, int logo, int windowFlags, Configuration overrideConfig, int displayId) {
         if (!SHOW_SPLASH_SCREENS) {
             return null;
         }
@@ -2321,10 +2328,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
             if (theme != context.getThemeResId() || labelRes != 0) {
                 try {
-                    context = context.createPackageContext(packageName, CONTEXT_RESTRICTED);
+                    context = context.createPackageContextAsUser(packageName, CONTEXT_RESTRICTED,
+                            UserHandle.of(userId));
                     context.setTheme(theme);
                 } catch (PackageManager.NameNotFoundException e) {
-                    // Ignore
+                    Slog.w(TAG,  "Failed creating package context with package name "
+                            + packageName + " for user " + userId, e);
                 }
             }
 
@@ -5248,6 +5257,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         long[] pattern;
         switch (effectId) {
             case HapticFeedbackConstants.CONTEXT_CLICK:
+            case HapticFeedbackConstants.GESTURE_END:
                 return VibrationEffect.get(VibrationEffect.EFFECT_TICK);
             case HapticFeedbackConstants.TEXT_HANDLE_MOVE:
                 if (!mHapticTextHandleEnabled) {
@@ -5260,7 +5270,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             case HapticFeedbackConstants.VIRTUAL_KEY_RELEASE:
             case HapticFeedbackConstants.ENTRY_BUMP:
             case HapticFeedbackConstants.DRAG_CROSSING:
-            case HapticFeedbackConstants.GESTURE_END:
                 return VibrationEffect.get(VibrationEffect.EFFECT_TICK, false);
             case HapticFeedbackConstants.KEYBOARD_TAP: // == KEYBOARD_PRESS
             case HapticFeedbackConstants.VIRTUAL_KEY:

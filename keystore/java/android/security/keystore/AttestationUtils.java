@@ -23,7 +23,6 @@ import android.annotation.SystemApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
-import android.security.KeyStore;
 import android.security.keymaster.KeymasterArguments;
 import android.security.keymaster.KeymasterCertificateChain;
 import android.security.keymaster.KeymasterDefs;
@@ -34,9 +33,16 @@ import android.util.ArraySet;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.spec.ECGenParameterSpec;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -256,22 +262,55 @@ public abstract class AttestationUtils {
     @NonNull public static X509Certificate[] attestDeviceIds(Context context,
             @NonNull int[] idTypes, @NonNull byte[] attestationChallenge) throws
             DeviceIdAttestationException {
-        final KeymasterArguments attestArgs = prepareAttestationArgumentsForDeviceId(
-                context, idTypes, attestationChallenge);
+        String keystoreAlias = generateRandomAlias();
+        KeyGenParameterSpec.Builder builder =
+                new KeyGenParameterSpec.Builder(keystoreAlias, KeyProperties.PURPOSE_SIGN)
+                        .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
+                        .setDigests(KeyProperties.DIGEST_SHA256)
+                        .setAttestationChallenge(attestationChallenge);
 
-        // Perform attestation.
-        final KeymasterCertificateChain outChain = new KeymasterCertificateChain();
-        final int errorCode = KeyStore.getInstance().attestDeviceIds(attestArgs, outChain);
-        if (errorCode != KeyStore.NO_ERROR) {
-            throw new DeviceIdAttestationException("Unable to perform attestation",
-                    KeyStore.getKeyStoreException(errorCode));
+        if (idTypes != null) {
+            builder.setAttestationIds(idTypes);
+            builder.setDevicePropertiesAttestationIncluded(true);
         }
 
         try {
-            return parseCertificateChain(outChain);
-        } catch (KeyAttestationException e) {
-            throw new DeviceIdAttestationException(e.getMessage(), e);
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
+                    KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
+            keyPairGenerator.initialize(builder.build());
+            keyPairGenerator.generateKeyPair();
+
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+
+            Certificate[] certs = keyStore.getCertificateChain(keystoreAlias);
+            X509Certificate[] certificateChain =
+                Arrays.copyOf(certs, certs.length, X509Certificate[].class);
+
+            keyStore.deleteEntry(keystoreAlias);
+
+            return certificateChain;
+        } catch (SecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            // If a DeviceIdAttestationException was previously wrapped with some other type,
+            // let's throw the original exception instead of wrapping it yet again.
+            if (e.getCause() instanceof DeviceIdAttestationException) {
+                throw (DeviceIdAttestationException) e.getCause();
+            }
+            throw new DeviceIdAttestationException("Unable to perform attestation", e);
         }
+    }
+
+    private static String generateRandomAlias() {
+        Random random = new SecureRandom();
+        StringBuilder builder = new StringBuilder();
+        // Pick random uppercase letters, A-Z.  20 of them gives us ~94 bits of entropy, which
+        // should prevent any conflicts with app-selected aliases, even for very unlucky users.
+        for (int i = 0; i < 20; ++i) {
+            builder.append(random.nextInt(26) + 'A');
+        }
+        return builder.toString();
     }
 
     /**

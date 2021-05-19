@@ -600,7 +600,7 @@
     <string name="screen_pinning_can_open_other_apps" msgid="7529756813231421455">"L\'application épinglée peut ouvrir d\'autres applications."</string>
     <string name="screen_pinning_toast" msgid="8177286912533744328">"Pour annuler l\'épinglage de cette application, maintenez un doigt sur les touches Retour et Aperçu"</string>
     <string name="screen_pinning_toast_recents_invisible" msgid="6850978077443052594">"Pour annuler l\'épinglage de cette application, maintenez un doigt sur les touches Retour et Accueil"</string>
-    <string name="screen_pinning_toast_gesture_nav" msgid="170699893395336705">"Pour annuler l\'épinglage de cette application, balayez-la vers le haut et gardez le doigt dessus"</string>
+    <string name="screen_pinning_toast_gesture_nav" msgid="170699893395336705">"Pour annuler l\'épinglage de cette application, balayez-la vers le haut et maintenez-la"</string>
     <string name="screen_pinning_positive" msgid="3285785989665266984">"OK"</string>
     <string name="screen_pinning_negative" msgid="6882816864569211666">"Non, merci"</string>
     <string name="screen_pinning_start" msgid="7483998671383371313">"Application épinglée"</string>
@@ -854,7 +854,7 @@
     <string name="left_icon" msgid="5036278531966897006">"Icône à gauche"</string>
     <string name="right_icon" msgid="1103955040645237425">"Icône droite"</string>
     <string name="drag_to_add_tiles" msgid="8933270127508303672">"Sélectionnez et faites glisser les tuiles pour les ajouter"</string>
-    <string name="drag_to_rearrange_tiles" msgid="2143204300089638620">"Maint. doigt sur l\'écran, puis glissez-le pour réorg. tuiles"</string>
+    <string name="drag_to_rearrange_tiles" msgid="2143204300089638620">"Faites glisser les tuiles pour les réorganiser"</string>
     <string name="drag_to_remove_tiles" msgid="4682194717573850385">"Faites glisser les tuiles ici pour les supprimer"</string>
     <string name="drag_to_remove_disabled" msgid="933046987838658850">"Vous avez besoin d\'au moins <xliff:g id="MIN_NUM_TILES">%1$d</xliff:g> tuiles"</string>
     <string name="qs_edit" msgid="5583565172803472437">"Modifier"</string>
@@ -1074,6 +1074,7 @@
     <string name="controls_seeding_in_progress" msgid="3033855341410264148">"Chargement des recommandations…"</string>
     <string name="controls_media_title" msgid="1746947284862928133">"Commandes multimédias"</string>
     <string name="controls_media_close_session" msgid="3957093425905475065">"Masquer la session en cours."</string>
+    <string name="controls_media_active_session" msgid="1984383994625845642">"La session actuelle ne peut pas être masquée."</string>
     <string name="controls_media_dismiss_button" msgid="9081375542265132213">"Fermer"</string>
     <string name="controls_media_resume" msgid="1933520684481586053">"Reprendre"</string>
     <string name="controls_media_settings_button" msgid="5815790345117172504">"Paramètres"</string>
@@ -1089,4 +1090,11 @@
     <string name="controls_added_tooltip" msgid="4842812921719153085">"Maintenez enfoncé l\'interrupteur pour afficher les nouvelles commandes"</string>
     <string name="controls_menu_add" msgid="4447246119229920050">"Ajouter des commandes"</string>
     <string name="controls_menu_edit" msgid="890623986951347062">"Modifier des commandes"</string>
+    <string name="media_output_dialog_add_output" msgid="5642703238877329518">"Ajouter des sorties"</string>
+    <string name="media_output_dialog_group" msgid="5571251347877452212">"Groupe"</string>
+    <string name="media_output_dialog_single_device" msgid="3102758980643351058">"Un appareil sélectionné"</string>
+    <string name="media_output_dialog_multiple_devices" msgid="1093771040315422350">"<xliff:g id="COUNT">%1$d</xliff:g> appareil sélectionné"</string>
+    <string name="media_output_dialog_disconnected" msgid="1834473104836986046">"<xliff:g id="DEVICE_NAME">%1$s</xliff:g> (déconnecté)"</string>
+    <string name="media_output_dialog_connect_failed" msgid="3225190634236259010">"Impossible de se connecter. Réessayez."</string>
+    <string name="media_output_dialog_pairing_new" msgid="9099497976087485862">"Associer un autre appareil"</string>
 </resources>

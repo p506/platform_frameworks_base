@@ -168,7 +168,7 @@
     <string name="tts_play_example_summary" msgid="634044730710636383">"उच्चार संश्लेषणाचे एक छोटेसे प्रात्यक्षिक प्ले करा"</string>
     <string name="tts_install_data_title" msgid="1829942496472751703">"व्हॉइस डेटा इंस्टॉल करा"</string>
     <string name="tts_install_data_summary" msgid="3608874324992243851">"उच्चार संश्लेषणासाठी आवश्यक आवाज डेटा इंस्टॉल करा"</string>
-    <string name="tts_engine_security_warning" msgid="3372432853837988146">"हे उच्चार संश्लेषण इंजिन पासवर्ड आणि क्रेडिट कार्ड नंबर यासारख्या वैयक्तिक मजकुरासह, बोलला जाणारा सर्व मजकूर संकलित करण्यात सक्षम होऊ शकते. हे <xliff:g id="TTS_PLUGIN_ENGINE_NAME">%s</xliff:g> इंजिनवरून येते. या उच्चार संश्लेषण इंजिनचा वापर सक्षम करायचा?"</string>
+    <string name="tts_engine_security_warning" msgid="3372432853837988146">"हे उच्चार संश्लेषण इंजीन पासवर्ड आणि क्रेडिट कार्ड नंबर यासारख्या वैयक्तिक मजकुरासह, बोलला जाणारा सर्व मजकूर संकलित करण्यात सक्षम होऊ शकते. हे <xliff:g id="TTS_PLUGIN_ENGINE_NAME">%s</xliff:g> इंजीनवरून येते. या उच्चार संश्लेषण इंजीनचा वापर सक्षम करायचा?"</string>
     <string name="tts_engine_network_required" msgid="8722087649733906851">"या भाषेस टेक्‍स्‍ट टू स्‍पीचसाठी एका नेटवर्क कनेक्शनची आवश्यकता आहे."</string>
     <string name="tts_default_sample_string" msgid="6388016028292967973">"हे उच्चार संश्लेषणाचे एक उदाहरण आहे"</string>
     <string name="tts_status_title" msgid="8190784181389278640">"डीफॉल्ट भाषा स्थिती"</string>
@@ -177,8 +177,8 @@
     <string name="tts_status_not_supported" msgid="2702997696245523743">"<xliff:g id="LOCALE">%1$s</xliff:g> समर्थित नाही"</string>
     <string name="tts_status_checking" msgid="8026559918948285013">"तपासत आहे..."</string>
     <string name="tts_engine_settings_title" msgid="7849477533103566291">"<xliff:g id="TTS_ENGINE_NAME">%s</xliff:g> साठी सेटिंग्ज"</string>
-    <string name="tts_engine_settings_button" msgid="477155276199968948">"इंजिन सेटिंग्ज लाँच करा"</string>
-    <string name="tts_engine_preference_section_title" msgid="3861562305498624904">"प्राधान्य इंजिन"</string>
+    <string name="tts_engine_settings_button" msgid="477155276199968948">"इंजीन सेटिंग्ज लाँच करा"</string>
+    <string name="tts_engine_preference_section_title" msgid="3861562305498624904">"प्राधान्य इंजीन"</string>
     <string name="tts_general_section_title" msgid="8919671529502364567">"सामान्य"</string>
     <string name="tts_reset_speech_pitch_title" msgid="7149398585468413246">"उच्चार पिच रीसेट करा"</string>
     <string name="tts_reset_speech_pitch_summary" msgid="6822904157021406449">"डीफॉल्टवर मजकूर ज्या पिचवर बोलला जातो तो रीसेट करा."</string>
@@ -344,7 +344,7 @@
     <string name="debug_hw_overdraw" msgid="8944851091008756796">"GPU ओव्हरड्रॉ डीबग करा"</string>
     <string name="disable_overlays" msgid="4206590799671557143">"HW ओव्हरले बंद करा"</string>
     <string name="disable_overlays_summary" msgid="1954852414363338166">"स्क्रीन तयार करण्यासाठी नेहमी GPU वापरा"</string>
-    <string name="simulate_color_space" msgid="1206503300335835151">"रंग स्थानाची बतावणी करा"</string>
+    <string name="simulate_color_space" msgid="1206503300335835151">"रंग स्थान सिम्युलेट करा"</string>
     <string name="enable_opengl_traces_title" msgid="4638773318659125196">"OpenGL ट्रेस सुरू करा"</string>
     <string name="usb_audio_disable_routing" msgid="3367656923544254975">"USB ऑडिओ राउटिंग बंद करा"</string>
     <string name="usb_audio_disable_routing_summary" msgid="8768242894849534699">"USB ऑडिओ परिधीय वरील स्वयंचलित राउटिंग बंद करा"</string>
@@ -446,6 +446,7 @@
     <string name="power_charging" msgid="6727132649743436802">"<xliff:g id="LEVEL">%1$s</xliff:g> - <xliff:g id="STATE">%2$s</xliff:g>"</string>
     <string name="power_remaining_charging_duration_only" msgid="7415639699283965818">"<xliff:g id="TIME">%1$s</xliff:g> पर्यंत पूर्ण चार्ज होईल"</string>
     <string name="power_charging_duration" msgid="5005740040558984057">"<xliff:g id="LEVEL">%1$s</xliff:g> - <xliff:g id="TIME">%2$s</xliff:g> पर्यंत पूर्ण चार्ज होईल"</string>
+    <string name="power_charging_limited" msgid="1956874810658999681">"<xliff:g id="LEVEL">%1$s</xliff:g> - बॅटरीची क्षमता वाढवण्यासाठी ऑप्टिमाइझ करत आहे"</string>
     <string name="battery_info_status_unknown" msgid="268625384868401114">"अज्ञात"</string>
     <string name="battery_info_status_charging" msgid="4279958015430387405">"चार्ज होत आहे"</string>
     <string name="battery_info_status_charging_fast" msgid="8027559755902954885">"वेगाने चार्ज होत आहे"</string>

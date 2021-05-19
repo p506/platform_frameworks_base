@@ -92,7 +92,6 @@ import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.os.Trace;
 import android.os.UserHandle;
-import android.os.storage.StorageManager;
 import android.os.storage.StorageManagerInternal;
 import android.system.Os;
 import android.text.TextUtils;
@@ -126,6 +125,7 @@ import com.android.server.wm.WindowManagerService;
 
 import dalvik.system.VMRuntime;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -317,18 +317,25 @@ public final class ProcessList {
     // LMK_GETKILLCNT
     // LMK_SUBSCRIBE
     // LMK_PROCKILL
+    // LMK_UPDATE_PROPS
+    // LMK_KILL_OCCURRED
+    // LMK_STATE_CHANGED
     static final byte LMK_TARGET = 0;
     static final byte LMK_PROCPRIO = 1;
     static final byte LMK_PROCREMOVE = 2;
     static final byte LMK_PROCPURGE = 3;
     static final byte LMK_GETKILLCNT = 4;
     static final byte LMK_SUBSCRIBE = 5;
-    static final byte LMK_PROCKILL = 6; // Note: this is an unsolicated command
+    static final byte LMK_PROCKILL = 6; // Note: this is an unsolicited command
+    static final byte LMK_UPDATE_PROPS = 7;
+    static final byte LMK_KILL_OCCURRED = 8; // Msg to subscribed clients on kill occurred event
+    static final byte LMK_STATE_CHANGED = 9; // Msg to subscribed clients on state changed
 
     // Low Memory Killer Daemon command codes.
     // These must be kept in sync with async_event_type definitions in lmkd.h
     //
     static final int LMK_ASYNC_EVENT_KILL = 0;
+    static final int LMK_ASYNC_EVENT_STAT = 1;
 
     // lmkd reconnect delay in msecs
     private static final long LMKD_RECONNECT_DELAY_MS = 1000;
@@ -365,6 +372,13 @@ public final class ProcessList {
     @ChangeId
     @Disabled
     private static final long NATIVE_MEMTAG_SYNC = 177438394; // This is a bug id.
+
+    /**
+     * Enable automatic zero-initialization of native heap memory allocations.
+     */
+    @ChangeId
+    @Disabled
+    private static final long NATIVE_HEAP_ZERO_INIT = 178038272; // This is a bug id.
 
     /**
      * Enable sampled memory bug detection in the app.
@@ -770,22 +784,44 @@ public final class ProcessList {
                         }
 
                         @Override
-                        public boolean handleUnsolicitedMessage(ByteBuffer dataReceived,
+                        public boolean handleUnsolicitedMessage(DataInputStream inputData,
                                 int receivedLen) {
                             if (receivedLen < 4) {
                                 return false;
                             }
-                            switch (dataReceived.getInt(0)) {
-                                case LMK_PROCKILL:
-                                    if (receivedLen != 12) {
+
+                            try {
+                                switch (inputData.readInt()) {
+                                    case LMK_PROCKILL:
+                                        if (receivedLen != 12) {
+                                            return false;
+                                        }
+                                        final int pid = inputData.readInt();
+                                        final int uid = inputData.readInt();
+                                        mAppExitInfoTracker.scheduleNoteLmkdProcKilled(pid, uid);
+                                        return true;
+                                    case LMK_KILL_OCCURRED:
+                                        if (receivedLen
+                                                < LmkdStatsReporter.KILL_OCCURRED_MSG_SIZE) {
+                                            return false;
+                                        }
+                                        LmkdStatsReporter.logKillOccurred(inputData);
+                                        return true;
+                                    case LMK_STATE_CHANGED:
+                                        if (receivedLen
+                                                != LmkdStatsReporter.STATE_CHANGED_MSG_SIZE) {
+                                            return false;
+                                        }
+                                        final int state = inputData.readInt();
+                                        LmkdStatsReporter.logStateChanged(state);
+                                        return true;
+                                    default:
                                         return false;
-                                    }
-                                    mAppExitInfoTracker.scheduleNoteLmkdProcKilled(
-                                            dataReceived.getInt(4), dataReceived.getInt(8));
-                                    return true;
-                                default:
-                                    return false;
+                                }
+                            } catch (IOException e) {
+                                Slog.e(TAG, "Invalid buffer data. Failed to log LMK_KILL_OCCURRED");
                             }
+                            return false;
                         }
                     }
             );
@@ -1010,76 +1046,7 @@ public final class ProcessList {
     }
 
     public static String makeProcStateString(int curProcState) {
-        String procState;
-        switch (curProcState) {
-            case ActivityManager.PROCESS_STATE_PERSISTENT:
-                procState = "PER ";
-                break;
-            case ActivityManager.PROCESS_STATE_PERSISTENT_UI:
-                procState = "PERU";
-                break;
-            case ActivityManager.PROCESS_STATE_TOP:
-                procState = "TOP ";
-                break;
-            case ActivityManager.PROCESS_STATE_BOUND_TOP:
-                procState = "BTOP";
-                break;
-            case ActivityManager.PROCESS_STATE_FOREGROUND_SERVICE:
-                procState = "FGS ";
-                break;
-            case ActivityManager.PROCESS_STATE_BOUND_FOREGROUND_SERVICE:
-                procState = "BFGS";
-                break;
-            case ActivityManager.PROCESS_STATE_IMPORTANT_FOREGROUND:
-                procState = "IMPF";
-                break;
-            case ActivityManager.PROCESS_STATE_IMPORTANT_BACKGROUND:
-                procState = "IMPB";
-                break;
-            case ActivityManager.PROCESS_STATE_TRANSIENT_BACKGROUND:
-                procState = "TRNB";
-                break;
-            case ActivityManager.PROCESS_STATE_BACKUP:
-                procState = "BKUP";
-                break;
-            case ActivityManager.PROCESS_STATE_SERVICE:
-                procState = "SVC ";
-                break;
-            case ActivityManager.PROCESS_STATE_RECEIVER:
-                procState = "RCVR";
-                break;
-            case ActivityManager.PROCESS_STATE_TOP_SLEEPING:
-                procState = "TPSL";
-                break;
-            case ActivityManager.PROCESS_STATE_HEAVY_WEIGHT:
-                procState = "HVY ";
-                break;
-            case ActivityManager.PROCESS_STATE_HOME:
-                procState = "HOME";
-                break;
-            case ActivityManager.PROCESS_STATE_LAST_ACTIVITY:
-                procState = "LAST";
-                break;
-            case ActivityManager.PROCESS_STATE_CACHED_ACTIVITY:
-                procState = "CAC ";
-                break;
-            case ActivityManager.PROCESS_STATE_CACHED_ACTIVITY_CLIENT:
-                procState = "CACC";
-                break;
-            case ActivityManager.PROCESS_STATE_CACHED_RECENT:
-                procState = "CRE ";
-                break;
-            case ActivityManager.PROCESS_STATE_CACHED_EMPTY:
-                procState = "CEM ";
-                break;
-            case ActivityManager.PROCESS_STATE_NONEXISTENT:
-                procState = "NONE";
-                break;
-            default:
-                procState = "??";
-                break;
-        }
-        return procState;
+        return ActivityManager.procStateToString(curProcState);
     }
 
     public static int makeProcStateProtoEnum(int curProcState) {
@@ -1496,6 +1463,12 @@ public final class ProcessList {
             buf.putInt(LMK_SUBSCRIBE);
             buf.putInt(LMK_ASYNC_EVENT_KILL);
             ostream.write(buf.array(), 0, buf.position());
+
+            // Subscribe for stats event notifications
+            buf = ByteBuffer.allocate(4 * 2);
+            buf.putInt(LMK_SUBSCRIBE);
+            buf.putInt(LMK_ASYNC_EVENT_STAT);
+            ostream.write(buf.array(), 0, buf.position());
         } catch (IOException ex) {
             return false;
         }
@@ -1687,12 +1660,28 @@ public final class ProcessList {
         return gidArray;
     }
 
-    // Returns the memory tagging level to be enabled. If memory tagging isn't
-    // requested, returns zero.
-    private int getMemtagLevel(ProcessRecord app) {
-        // Ensure the hardware + kernel actually supports MTE.
-        if (!Zygote.nativeSupportsMemoryTagging()) {
-            return 0;
+    private int memtagModeToZygoteMemtagLevel(int memtagMode) {
+        switch (memtagMode) {
+            case ApplicationInfo.MEMTAG_ASYNC:
+                return Zygote.MEMORY_TAG_LEVEL_ASYNC;
+            case ApplicationInfo.MEMTAG_SYNC:
+                return Zygote.MEMORY_TAG_LEVEL_SYNC;
+            default:
+                return Zygote.MEMORY_TAG_LEVEL_NONE;
+        }
+    }
+
+    // Returns the requested memory tagging level.
+    private int getRequestedMemtagLevel(ProcessRecord app) {
+        // Look at the process attribute first.
+        if (app.processInfo != null
+                && app.processInfo.memtagMode != ApplicationInfo.MEMTAG_DEFAULT) {
+            return memtagModeToZygoteMemtagLevel(app.processInfo.memtagMode);
+        }
+
+        // Then at the application attribute.
+        if (app.info.getMemtagMode() != ApplicationInfo.MEMTAG_DEFAULT) {
+            return memtagModeToZygoteMemtagLevel(app.info.getMemtagMode());
         }
 
         if (mPlatformCompat.isChangeEnabled(NATIVE_MEMTAG_SYNC, app.info)) {
@@ -1703,40 +1692,43 @@ public final class ProcessList {
             return Zygote.MEMORY_TAG_LEVEL_ASYNC;
         }
 
-        return 0;
-    }
-
-    private boolean shouldEnableTaggedPointers(ProcessRecord app) {
-        // Ensure we have platform + kernel support for TBI.
-        if (!Zygote.nativeSupportsTaggedPointers()) {
-            return false;
-        }
-
         // Check to ensure the app hasn't explicitly opted-out of TBI via. the manifest attribute.
         if (!app.info.allowsNativeHeapPointerTagging()) {
-            return false;
+            return Zygote.MEMORY_TAG_LEVEL_NONE;
         }
 
         // Check to see that the compat feature for TBI is enabled.
-        if (!mPlatformCompat.isChangeEnabled(NATIVE_HEAP_POINTER_TAGGING, app.info)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private int decideTaggingLevel(ProcessRecord app) {
-        // Check MTE support first, as it should take precedence over TBI.
-        int memtagLevel = getMemtagLevel(app);
-        if (memtagLevel != 0) {
-            return memtagLevel;
-        }
-
-        if (shouldEnableTaggedPointers(app)) {
+        if (mPlatformCompat.isChangeEnabled(NATIVE_HEAP_POINTER_TAGGING, app.info)) {
             return Zygote.MEMORY_TAG_LEVEL_TBI;
         }
 
-        return 0;
+        return Zygote.MEMORY_TAG_LEVEL_NONE;
+    }
+
+    private int decideTaggingLevel(ProcessRecord app) {
+        // Get the desired tagging level (app manifest + compat features).
+        int level = getRequestedMemtagLevel(app);
+
+        // Take into account the hardware capabilities.
+        if (Zygote.nativeSupportsMemoryTagging()) {
+            // MTE devices can not do TBI, because the Zygote process already has live MTE
+            // allocations. Downgrade TBI to NONE.
+            if (level == Zygote.MEMORY_TAG_LEVEL_TBI) {
+                level = Zygote.MEMORY_TAG_LEVEL_NONE;
+            }
+        } else if (Zygote.nativeSupportsTaggedPointers()) {
+            // TBI-but-not-MTE devices downgrade MTE modes to TBI.
+            // The idea is that if an app opts into full hardware tagging (MTE), it must be ok with
+            // the "fake" pointer tagging (TBI).
+            if (level == Zygote.MEMORY_TAG_LEVEL_ASYNC || level == Zygote.MEMORY_TAG_LEVEL_SYNC) {
+                level = Zygote.MEMORY_TAG_LEVEL_TBI;
+            }
+        } else {
+            // Otherwise disable all tagging.
+            level = Zygote.MEMORY_TAG_LEVEL_NONE;
+        }
+
+        return level;
     }
 
     private int decideGwpAsanLevel(ProcessRecord app) {
@@ -1747,7 +1739,7 @@ public final class ProcessList {
                     ? Zygote.GWP_ASAN_LEVEL_ALWAYS
                     : Zygote.GWP_ASAN_LEVEL_NEVER;
         }
-        // Then at the applicaton attribute.
+        // Then at the application attribute.
         if (app.info.getGwpAsanMode() != ApplicationInfo.GWP_ASAN_DEFAULT) {
             return app.info.getGwpAsanMode() == ApplicationInfo.GWP_ASAN_ALWAYS
                     ? Zygote.GWP_ASAN_LEVEL_ALWAYS
@@ -1764,13 +1756,30 @@ public final class ProcessList {
         return Zygote.GWP_ASAN_LEVEL_NEVER;
     }
 
+    private boolean enableNativeHeapZeroInit(ProcessRecord app) {
+        // Look at the process attribute first.
+        if (app.processInfo != null
+                && app.processInfo.nativeHeapZeroInitialized != ApplicationInfo.ZEROINIT_DEFAULT) {
+            return app.processInfo.nativeHeapZeroInitialized == ApplicationInfo.ZEROINIT_ENABLED;
+        }
+        // Then at the application attribute.
+        if (app.info.getNativeHeapZeroInitialized() != ApplicationInfo.ZEROINIT_DEFAULT) {
+            return app.info.getNativeHeapZeroInitialized() == ApplicationInfo.ZEROINIT_ENABLED;
+        }
+        // Compat feature last.
+        if (mPlatformCompat.isChangeEnabled(NATIVE_HEAP_ZERO_INIT, app.info)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @return {@code true} if process start is successful, false otherwise.
      */
     @GuardedBy("mService")
     boolean startProcessLocked(ProcessRecord app, HostingRecord hostingRecord,
-            int zygotePolicyFlags, boolean disableHiddenApiChecks, boolean mountExtStorageFull,
-            String abiOverride) {
+            int zygotePolicyFlags, boolean disableHiddenApiChecks, boolean disableTestApiChecks,
+            boolean mountExtStorageFull, String abiOverride) {
         if (app.pendingStart) {
             return true;
         }
@@ -1812,14 +1821,10 @@ public final class ProcessList {
                     final IPackageManager pm = AppGlobals.getPackageManager();
                     permGids = pm.getPackageGids(app.info.packageName,
                             MATCH_DIRECT_BOOT_AUTO, app.userId);
-                    if (StorageManager.hasIsolatedStorage() && mountExtStorageFull) {
-                        mountExternal = Zygote.MOUNT_EXTERNAL_FULL;
-                    } else {
-                        StorageManagerInternal storageManagerInternal = LocalServices.getService(
-                                StorageManagerInternal.class);
-                        mountExternal = storageManagerInternal.getExternalStorageMountMode(uid,
-                                app.info.packageName);
-                    }
+                    StorageManagerInternal storageManagerInternal = LocalServices.getService(
+                            StorageManagerInternal.class);
+                    mountExternal = storageManagerInternal.getExternalStorageMountMode(uid,
+                            app.info.packageName);
                 } catch (RemoteException e) {
                     throw e.rethrowAsRuntimeException();
                 }
@@ -1914,6 +1919,10 @@ public final class ProcessList {
                     throw new IllegalStateException("Invalid API policy: " + policy);
                 }
                 runtimeFlags |= policyBits;
+
+                if (disableTestApiChecks) {
+                    runtimeFlags |= Zygote.DISABLE_TEST_API_ENFORCEMENT_POLICY;
+                }
             }
 
             String useAppImageCache = SystemProperties.get(
@@ -1965,6 +1974,10 @@ public final class ProcessList {
             // that if tagging is desired, the system server will be 64-bit.
             if (instructionSet == null || instructionSet.equals("arm64")) {
                 runtimeFlags |= decideTaggingLevel(app);
+            }
+
+            if (enableNativeHeapZeroInit(app)) {
+                runtimeFlags |= Zygote.NATIVE_HEAP_ZERO_INIT;
             }
 
             // the per-user SELinux context must be set
@@ -2356,7 +2369,8 @@ public final class ProcessList {
     final boolean startProcessLocked(ProcessRecord app, HostingRecord hostingRecord,
             int zygotePolicyFlags, String abiOverride) {
         return startProcessLocked(app, hostingRecord, zygotePolicyFlags,
-                false /* disableHiddenApiChecks */, false /* mountExtStorageFull */, abiOverride);
+                false /* disableHiddenApiChecks */, false /* disableTestApiChecks */,
+                false /* mountExtStorageFull */, abiOverride);
     }
 
     @GuardedBy("mService")
@@ -3787,10 +3801,13 @@ public final class ProcessList {
     int getBlockStateForUid(UidRecord uidRec) {
         // Denotes whether uid's process state is currently allowed network access.
         final boolean isAllowed =
-                isProcStateAllowedWhileIdleOrPowerSaveMode(uidRec.getCurProcState())
+                isProcStateAllowedWhileIdleOrPowerSaveMode(uidRec.getCurProcState(),
+                        uidRec.curCapability)
                 || isProcStateAllowedWhileOnRestrictBackground(uidRec.getCurProcState());
         // Denotes whether uid's process state was previously allowed network access.
-        final boolean wasAllowed = isProcStateAllowedWhileIdleOrPowerSaveMode(uidRec.setProcState)
+        final boolean wasAllowed =
+                isProcStateAllowedWhileIdleOrPowerSaveMode(uidRec.setProcState,
+                        uidRec.setCapability)
                 || isProcStateAllowedWhileOnRestrictBackground(uidRec.setProcState);
 
         // When the uid is coming to foreground, AMS should inform the app thread that it should

@@ -50,7 +50,7 @@ public final class PhysicalChannelConfig implements Parcelable {
     public static final int CONNECTION_UNKNOWN = -1;
 
     /** Channel number is unknown. */
-    public static final int CHANNEL_NUMBER_UNKNOWN = -1;
+    public static final int CHANNEL_NUMBER_UNKNOWN = Integer.MAX_VALUE;
 
     /** Physical Cell Id is unknown. */
     public static final int PHYSICAL_CELL_ID_UNKNOWN = -1;
@@ -182,16 +182,6 @@ public final class PhysicalChannelConfig implements Parcelable {
     }
 
     /**
-     * @return the absolute radio frequency channel number for this physical channel,
-     * {@link #CHANNEL_NUMBER_UNKNOWN} if unknown.
-     * @deprecated Use {@link #getDownlinkChannelNumber()} to get the channel number.
-     */
-    @Deprecated
-    public int getChannelNumber() {
-        return getDownlinkChannelNumber();
-    }
-
-    /**
      * @return the rough frequency range for this physical channel,
      * {@link ServiceState#FREQUENCY_RANGE_UNKNOWN} if unknown.
      * @see {@link ServiceState#FREQUENCY_RANGE_LOW}
@@ -289,6 +279,14 @@ public final class PhysicalChannelConfig implements Parcelable {
     @ConnectionStatus
     public int getConnectionStatus() {
         return mCellConnectionStatus;
+    }
+
+    /**
+     * Return a copy of this PhysicalChannelConfig object but redact all the location info.
+     * @hide
+     */
+    public PhysicalChannelConfig createLocationInfoSanitizedCopy() {
+        return new Builder(this).setPhysicalCellId(PHYSICAL_CELL_ID_UNKNOWN).build();
     }
 
     /**
@@ -538,6 +536,23 @@ public final class PhysicalChannelConfig implements Parcelable {
             mContextIds = new int[0];
             mPhysicalCellId = PHYSICAL_CELL_ID_UNKNOWN;
             mBand = BAND_UNKNOWN;
+        }
+
+        /**
+         * Builder object constructed from existing PhysicalChannelConfig object.
+         * @hide
+         */
+        public Builder(PhysicalChannelConfig config) {
+            mNetworkType = config.getNetworkType();
+            mFrequencyRange = config.getFrequencyRange();
+            mDownlinkChannelNumber = config.getDownlinkChannelNumber();
+            mUplinkChannelNumber = config.getUplinkChannelNumber();
+            mCellBandwidthDownlinkKhz = config.getCellBandwidthDownlinkKhz();
+            mCellBandwidthUplinkKhz = config.getCellBandwidthUplinkKhz();
+            mCellConnectionStatus = config.getConnectionStatus();
+            mContextIds = Arrays.copyOf(config.getContextIds(), config.getContextIds().length);
+            mPhysicalCellId = config.getPhysicalCellId();
+            mBand = config.getBand();
         }
 
         public PhysicalChannelConfig build() {

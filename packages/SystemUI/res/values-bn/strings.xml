@@ -475,12 +475,12 @@
     <string name="user_add_user" msgid="4336657383006913022">"ব্যবহারকারী জুড়ুন"</string>
     <string name="user_new_user_name" msgid="2019166282704195789">"নতুন ব্যবহারকারী"</string>
     <string name="guest_exit_guest_dialog_title" msgid="5015697561580641422">"অতিথি সরাবেন?"</string>
-    <string name="guest_exit_guest_dialog_message" msgid="8183450985628495709">"এই সেশনের সব অ্যাপ্লিকেশান ও ডেটা মুছে ফেলা হবে।"</string>
+    <string name="guest_exit_guest_dialog_message" msgid="8183450985628495709">"এই সেশনের সব অ্যাপ ও ডেটা মুছে ফেলা হবে।"</string>
     <string name="guest_exit_guest_dialog_remove" msgid="7505817591242703757">"সরান"</string>
     <string name="guest_wipe_session_title" msgid="7147965814683990944">"অতিথি, আপনি ফিরে আসায় আপনাকে স্বাগত!"</string>
-    <string name="guest_wipe_session_message" msgid="3393823610257065457">"আপনি কি আপনার সেশনটি অবিরত রাখতে চান?"</string>
+    <string name="guest_wipe_session_message" msgid="3393823610257065457">"আপনি কি আপনার সেশনটি চালিয়ে যেতে চান?"</string>
     <string name="guest_wipe_session_wipe" msgid="8056836584445473309">"আবার শুরু করুন"</string>
-    <string name="guest_wipe_session_dontwipe" msgid="3211052048269304205">"হ্যাঁ, অবিরত থাকুন"</string>
+    <string name="guest_wipe_session_dontwipe" msgid="3211052048269304205">"হ্যাঁ, চালিয়ে যান"</string>
     <string name="guest_notification_title" msgid="4434456703930764167">"অতিথি ব্যবহারকারী"</string>
     <string name="guest_notification_text" msgid="4202692942089571351">"অ্যাপ্লিকেশান এবং ডেটা মুছে ফেলার জন্য অতিথি ব্যবহারকারী সরান।"</string>
     <string name="guest_notification_remove_action" msgid="4153019027696868099">"অতিথি সরান"</string>
@@ -488,7 +488,7 @@
     <string name="user_logout_notification_text" msgid="7441286737342997991">"বর্তমান ব্যবহারকারীকে লগ-আউট করুন"</string>
     <string name="user_logout_notification_action" msgid="7974458760719361881">"ব্যবহারকারীকে লগ-আউট করুন"</string>
     <string name="user_add_user_title" msgid="4172327541504825032">"নতুন ব্যবহারকারীকে যোগ করবেন?"</string>
-    <string name="user_add_user_message_short" msgid="2599370307878014791">"আপনি একজন নতুন ব্যবহারকারী যোগ করলে তাকে তার জায়গা সেট-আপ করে নিতে হবে৷\n\nযেকোনো ব্যবহারকারী অন্য সব ব্যবহারকারীর জন্য অ্যাপ্লিকেশান আপডেট করতে পারবেন৷"</string>
+    <string name="user_add_user_message_short" msgid="2599370307878014791">"আপনি একজন নতুন ব্যবহারকারী যোগ করলে তাকে তার জায়গা সেট-আপ করে নিতে হবে৷\n\nযেকোনও ব্যবহারকারী অন্য সব ব্যবহারকারীর জন্য অ্যাপ আপডেট করতে পারবেন৷"</string>
     <string name="user_limit_reached_title" msgid="2429229448830346057">"আর কোনও প্রোফাইল যোগ করা যাবে না"</string>
     <plurals name="user_limit_reached_message" formatted="false" msgid="2573535787802908398">
       <item quantity="one">আপনি <xliff:g id="COUNT">%d</xliff:g> জন পর্যন্ত ব্যবহারকারীর প্রোফাইল যোগ করতে পারেন।</item>
@@ -1074,6 +1074,7 @@
     <string name="controls_seeding_in_progress" msgid="3033855341410264148">"সাজেশন লোড করা হচ্ছে"</string>
     <string name="controls_media_title" msgid="1746947284862928133">"মিডিয়া"</string>
     <string name="controls_media_close_session" msgid="3957093425905475065">"বর্তমান সেশন লুকান।"</string>
+    <string name="controls_media_active_session" msgid="1984383994625845642">"বর্তমান সেশন লুকানো যাবে না।"</string>
     <string name="controls_media_dismiss_button" msgid="9081375542265132213">"খারিজ করুন"</string>
     <string name="controls_media_resume" msgid="1933520684481586053">"আবার চালু করুন"</string>
     <string name="controls_media_settings_button" msgid="5815790345117172504">"সেটিংস"</string>
@@ -1089,4 +1090,11 @@
     <string name="controls_added_tooltip" msgid="4842812921719153085">"নতুন কন্ট্রোল দেখতে পাওয়ার বোতাম টিপে ধরে থাকুন"</string>
     <string name="controls_menu_add" msgid="4447246119229920050">"কন্ট্রোল যোগ করুন"</string>
     <string name="controls_menu_edit" msgid="890623986951347062">"কন্ট্রোল এডিট করুন"</string>
+    <string name="media_output_dialog_add_output" msgid="5642703238877329518">"আউটপুট যোগ করুন"</string>
+    <string name="media_output_dialog_group" msgid="5571251347877452212">"গ্রুপ"</string>
+    <string name="media_output_dialog_single_device" msgid="3102758980643351058">"১টি ডিভাইস বেছে নেওয়া হয়েছে"</string>
+    <string name="media_output_dialog_multiple_devices" msgid="1093771040315422350">"<xliff:g id="COUNT">%1$d</xliff:g>টি ডিভাইস বেছে নেওয়া হয়েছে"</string>
+    <string name="media_output_dialog_disconnected" msgid="1834473104836986046">"<xliff:g id="DEVICE_NAME">%1$s</xliff:g> (কানেক্ট করা নেই)"</string>
+    <string name="media_output_dialog_connect_failed" msgid="3225190634236259010">"কানেক্ট করা যায়নি। আবার চেষ্টা করুন।"</string>
+    <string name="media_output_dialog_pairing_new" msgid="9099497976087485862">"নতুন ডিভাইস পেয়ার করুন"</string>
 </resources>

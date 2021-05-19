@@ -16,17 +16,23 @@
 
 package com.android.server.am;
 
+import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED;
+
+import android.annotation.NonNull;
 import android.bluetooth.BluetoothActivityEnergyInfo;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.net.INetworkManagementEventObserver;
+import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.BatteryStats;
 import android.os.BatteryStatsInternal;
 import android.os.Binder;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.INetworkManagementService;
 import android.os.Parcel;
@@ -60,12 +66,15 @@ import com.android.internal.annotations.GuardedBy;
 import com.android.internal.app.IBatteryStats;
 import com.android.internal.os.BatteryStatsHelper;
 import com.android.internal.os.BatteryStatsImpl;
+import com.android.internal.os.BinderCallsStats;
 import com.android.internal.os.PowerProfile;
 import com.android.internal.os.RailStats;
 import com.android.internal.os.RpmStats;
 import com.android.internal.util.DumpUtils;
 import com.android.internal.util.FrameworkStatsLog;
 import com.android.internal.util.ParseUtils;
+import com.android.net.module.util.NetworkCapabilitiesUtils;
+import com.android.net.module.util.PermissionUtils;
 import com.android.server.LocalServices;
 import com.android.server.net.BaseNetworkObserver;
 
@@ -79,6 +88,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -113,6 +123,8 @@ public final class BatteryStatsService extends IBatteryStats.Stub
     private ByteBuffer mUtf8BufferStat = ByteBuffer.allocateDirect(MAX_LOW_POWER_STATS_SIZE);
     private CharBuffer mUtf16BufferStat = CharBuffer.allocate(MAX_LOW_POWER_STATS_SIZE);
     private static final int MAX_LOW_POWER_STATS_SIZE = 4096;
+    private final HandlerThread mHandlerThread;
+    private final Handler mHandler;
 
     @GuardedBy("mStats")
     private int mLastPowerStateFromRadio = DataConnectionRealTimeInfo.DC_POWER_STATE_LOW;
@@ -214,6 +226,23 @@ public final class BatteryStatsService extends IBatteryStats.Stub
         }
     }
 
+    private ConnectivityManager.NetworkCallback mNetworkCallback =
+            new ConnectivityManager.NetworkCallback() {
+        @Override
+        public void onCapabilitiesChanged(@NonNull Network network,
+                @NonNull NetworkCapabilities networkCapabilities) {
+            final String state = networkCapabilities.hasCapability(NET_CAPABILITY_NOT_SUSPENDED)
+                    ? "CONNECTED" : "SUSPENDED";
+            noteConnectivityChanged(NetworkCapabilitiesUtils.getDisplayTransport(
+                    networkCapabilities.getTransportTypes()), state);
+        }
+
+        @Override
+        public void onLost(Network network) {
+            noteConnectivityChanged(-1, "DISCONNECTED");
+        }
+    };
+
     BatteryStatsService(Context context, File systemDir, Handler handler) {
         // BatteryStatsImpl expects the ActivityManagerService handler, so pass that one through.
         mContext = context;
@@ -227,6 +256,10 @@ public final class BatteryStatsService extends IBatteryStats.Stub
                 return (umi != null) ? umi.getUserIds() : null;
             }
         };
+        mHandlerThread = new HandlerThread("batterystats-handler");
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
+
         mStats = new BatteryStatsImpl(systemDir, handler, this,
                 this, mUserManagerUserInfoProvider);
         mWorker = new BatteryExternalStatsWorker(context, mStats);
@@ -244,12 +277,17 @@ public final class BatteryStatsService extends IBatteryStats.Stub
     public void systemServicesReady() {
         final INetworkManagementService nms = INetworkManagementService.Stub.asInterface(
                 ServiceManager.getService(Context.NETWORKMANAGEMENT_SERVICE));
+        final ConnectivityManager cm = mContext.getSystemService(ConnectivityManager.class);
         try {
             nms.registerObserver(mActivityChangeObserver);
+            cm.registerDefaultNetworkCallback(mNetworkCallback);
         } catch (RemoteException e) {
             Slog.e(TAG, "Could not register INetworkManagement event observer " + e);
         }
         mStats.systemServicesReady(mContext);
+
+        final DataConnectionStats dataConnectionStats = new DataConnectionStats(mContext, mHandler);
+        dataConnectionStats.startMonitoring();
     }
 
     private final class LocalService extends BatteryStatsInternal {
@@ -267,6 +305,12 @@ public final class BatteryStatsService extends IBatteryStats.Stub
         public void noteJobsDeferred(int uid, int numDeferred, long sinceLast) {
             if (DBG) Slog.d(TAG, "Jobs deferred " + uid + ": " + numDeferred + " " + sinceLast);
             BatteryStatsService.this.noteJobsDeferred(uid, numDeferred, sinceLast);
+        }
+
+        @Override
+        public void noteBinderCallStats(int workSourceUid,
+                Collection<BinderCallsStats.CallStat> callStats) {
+            mStats.noteBinderCallStats(workSourceUid, callStats);
         }
     }
 
@@ -1067,7 +1111,7 @@ public final class BatteryStatsService extends IBatteryStats.Stub
 
     @Override
     public void noteNetworkInterfaceForTransports(final String iface, int[] transportTypes) {
-        enforceCallingPermission();
+        PermissionUtils.enforceNetworkStackPermission(mContext);
         mStats.noteNetworkInterfaceForTransports(iface, transportTypes);
     }
 
@@ -1735,5 +1779,4 @@ public final class BatteryStatsService extends IBatteryStats.Stub
             Binder.restoreCallingIdentity(ident);
         }
     }
-
 }

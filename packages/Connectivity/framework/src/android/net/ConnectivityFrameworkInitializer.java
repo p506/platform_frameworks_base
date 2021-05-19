@@ -49,17 +49,6 @@ public final class ConnectivityFrameworkInitializer {
                 }
         );
 
-        // TODO: move outside of the connectivity JAR
-        SystemServiceRegistry.registerContextAwareService(
-                Context.VPN_MANAGEMENT_SERVICE,
-                VpnManager.class,
-                (context) -> {
-                    final ConnectivityManager cm = context.getSystemService(
-                            ConnectivityManager.class);
-                    return cm.createVpnManager();
-                }
-        );
-
         SystemServiceRegistry.registerContextAwareService(
                 Context.CONNECTIVITY_DIAGNOSTICS_SERVICE,
                 ConnectivityDiagnosticsManager.class,
@@ -78,6 +67,12 @@ public final class ConnectivityFrameworkInitializer {
                             ConnectivityManager.class);
                     return cm.startOrGetTestNetworkManager();
                 }
+        );
+
+        SystemServiceRegistry.registerContextAwareService(
+                DnsResolverServiceManager.DNS_RESOLVER_SERVICE,
+                DnsResolverServiceManager.class,
+                (context, serviceBinder) -> new DnsResolverServiceManager(serviceBinder)
         );
     }
 }

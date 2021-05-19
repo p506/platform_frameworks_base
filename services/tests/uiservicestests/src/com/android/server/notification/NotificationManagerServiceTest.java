@@ -199,6 +199,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 
@@ -287,18 +288,26 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
             1 << 30);
     @Mock
     StatusBarManagerInternal mStatusBar;
+    private final FakeSystemClock mSystemClock = new FakeSystemClock();
 
     // Use a Testable subclass so we can simulate calls from the system without failing.
     private static class TestableNotificationManagerService extends NotificationManagerService {
         int countSystemChecks = 0;
         boolean isSystemUid = true;
         int countLogSmartSuggestionsVisible = 0;
+        // If true, don't enqueue the PostNotificationRunnables, just trap them
+        boolean trapEnqueuedNotifications = false;
+        final ArrayList<NotificationManagerService.PostNotificationRunnable> trappedRunnables =
+                new ArrayList<>();
         @Nullable
         NotificationAssistantAccessGrantedCallback mNotificationAssistantAccessGrantedCallback;
 
-        TestableNotificationManagerService(Context context, NotificationRecordLogger logger,
+        TestableNotificationManagerService(
+                Context context,
+                NotificationRecordLogger logger,
+                InjectableSystemClock systemClock,
                 InstanceIdSequence notificationInstanceIdSequence) {
-            super(context, logger, notificationInstanceIdSequence);
+            super(context, logger, systemClock, notificationInstanceIdSequence);
         }
 
         RankingHelper getRankingHelper() {
@@ -353,6 +362,23 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
             return new String[] {PKG_O};
         }
 
+        @Override
+        protected void postPostNotificationRunnableMaybeDelayedLocked(NotificationRecord record,
+                PostNotificationRunnable runnable) {
+            if (trapEnqueuedNotifications) {
+                trappedRunnables.add(runnable);
+                return;
+            }
+
+            super.postPostNotificationRunnableMaybeDelayedLocked(record, runnable);
+        }
+
+        void drainTrappedRunnableQueue() {
+            for (Runnable r : trappedRunnables) {
+                getWorkHandler().post(r);
+            }
+        }
+
         private void setNotificationAssistantAccessGrantedCallback(
                 @Nullable NotificationAssistantAccessGrantedCallback callback) {
             this.mNotificationAssistantAccessGrantedCallback = callback;
@@ -402,7 +428,7 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         doNothing().when(mContext).sendBroadcastAsUser(any(), any(), any());
 
         mService = new TestableNotificationManagerService(mContext, mNotificationRecordLogger,
-                mNotificationInstanceIdSequence);
+                mSystemClock, mNotificationInstanceIdSequence);
 
         // Use this testable looper.
         mTestableLooper = TestableLooper.get(this);
@@ -807,10 +833,10 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
 
     @Test
     public void testDefaultAssistant_overrideDefault() {
-        final int userId = 0;
+        final int userId = mContext.getUserId();
         final String testComponent = "package/class";
         final List<UserInfo> userInfos = new ArrayList<>();
-        userInfos.add(new UserInfo(0, "", 0));
+        userInfos.add(new UserInfo(userId, "", 0));
         final ArraySet<ComponentName> validAssistants = new ArraySet<>();
         validAssistants.add(ComponentName.unflattenFromString(testComponent));
         when(mActivityManager.isLowRamDevice()).thenReturn(false);
@@ -1344,10 +1370,10 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         final StatusBarNotification sbn = generateNotificationRecord(null).getSbn();
         mBinderService.enqueueNotificationWithTag(PKG, PKG, "tag", sbn.getId(),
                 sbn.getNotification(), sbn.getUserId());
-        Thread.sleep(1);  // make sure the system clock advances before the next step
+        mSystemClock.advanceTime(1);
         // THEN it is canceled
         mBinderService.cancelNotificationWithTag(PKG, PKG, "tag", sbn.getId(), sbn.getUserId());
-        Thread.sleep(1);  // here too
+        mSystemClock.advanceTime(1);
         // THEN it is posted again (before the cancel has a chance to finish)
         mBinderService.enqueueNotificationWithTag(PKG, PKG, "tag", sbn.getId(),
                 sbn.getNotification(), sbn.getUserId());
@@ -1359,6 +1385,60 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
                 mBinderService.getActiveNotifications(PKG);
         assertEquals(1, notifs.length);
         assertEquals(1, mService.getNotificationRecordCount());
+    }
+
+    @Test
+    public void testChangeSystemTimeAfterPost_thenCancel_noFgs() throws Exception {
+        // GIVEN time X
+        mSystemClock.setCurrentTimeMillis(10000);
+
+        // GIVEN a notification is posted
+        final StatusBarNotification sbn = generateNotificationRecord(null).getSbn();
+        mBinderService.enqueueNotificationWithTag(PKG, PKG, "tag", sbn.getId(),
+                sbn.getNotification(), sbn.getUserId());
+        mSystemClock.advanceTime(1);
+        waitForIdle();
+
+        // THEN the system time is changed to an earlier time
+        mSystemClock.setCurrentTimeMillis(5000);
+
+        // THEN a cancel is requested
+        mBinderService.cancelNotificationWithTag(PKG, PKG, "tag", sbn.getId(), sbn.getUserId());
+        waitForIdle();
+
+        // It should work
+        StatusBarNotification[] notifs =
+                mBinderService.getActiveNotifications(PKG);
+        assertEquals(0, notifs.length);
+        assertEquals(0, mService.getNotificationRecordCount());
+    }
+
+    @Test
+    public void testChangeSystemTimeAfterPost_thenCancel_fgs() throws Exception {
+        // GIVEN time X
+        mSystemClock.setCurrentTimeMillis(10000);
+
+        // GIVEN a notification is posted
+        final StatusBarNotification sbn = generateNotificationRecord(null).getSbn();
+        sbn.getNotification().flags =
+                Notification.FLAG_ONGOING_EVENT | FLAG_FOREGROUND_SERVICE;
+        mBinderService.enqueueNotificationWithTag(PKG, PKG, "tag", sbn.getId(),
+                sbn.getNotification(), sbn.getUserId());
+        mSystemClock.advanceTime(1);
+        waitForIdle();
+
+        // THEN the system time is changed to an earlier time
+        mSystemClock.setCurrentTimeMillis(5000);
+
+        // THEN a cancel is requested
+        mBinderService.cancelNotificationWithTag(PKG, PKG, "tag", sbn.getId(), sbn.getUserId());
+        waitForIdle();
+
+        // It should work
+        StatusBarNotification[] notifs =
+                mBinderService.getActiveNotifications(PKG);
+        assertEquals(0, notifs.length);
+        assertEquals(0, mService.getNotificationRecordCount());
     }
 
     @Test
@@ -1380,6 +1460,56 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         ArgumentCaptor<NotificationStats> captor = ArgumentCaptor.forClass(NotificationStats.class);
         verify(mListeners, times(1)).notifyRemovedLocked(any(), anyInt(), captor.capture());
         assertEquals(NotificationStats.DISMISSAL_OTHER, captor.getValue().getDismissalSurface());
+    }
+
+    @Test
+    public void testDelayCancelWhenEnqueuedHasNotPosted() throws Exception {
+        // Don't allow PostNotificationRunnables to execute so we can set up problematic state
+        mService.trapEnqueuedNotifications = true;
+        // GIVEN an enqueued notification
+        mBinderService.enqueueNotificationWithTag(PKG, PKG,
+                "testDelayCancelWhenEnqueuedHasNotPosted", 0,
+                generateNotificationRecord(null).getNotification(), 0);
+        mSystemClock.advanceTime(1);
+        // WHEN a cancel is requested before it has posted
+        mBinderService.cancelNotificationWithTag(PKG, PKG,
+                "testDelayCancelWhenEnqueuedHasNotPosted", 0, 0);
+
+        waitForIdle();
+
+        // THEN the cancel notification runnable is captured and associated with that record
+        ArrayMap<NotificationRecord,
+                ArrayList<NotificationManagerService.CancelNotificationRunnable>> delayed =
+                        mService.mDelayedCancelations;
+        Set<NotificationRecord> keySet = delayed.keySet();
+        assertEquals(1, keySet.size());
+    }
+
+    @Test
+    public void testDelayedCancelsExecuteAfterPost() throws Exception {
+        // Don't allow PostNotificationRunnables to execute so we can set up problematic state
+        mService.trapEnqueuedNotifications = true;
+        // GIVEN an enqueued notification
+        mBinderService.enqueueNotificationWithTag(PKG, PKG,
+                "testDelayCancelWhenEnqueuedHasNotPosted", 0,
+                generateNotificationRecord(null).getNotification(), 0);
+        mSystemClock.advanceTime(1);
+        // WHEN a cancel is requested before it has posted
+        mBinderService.cancelNotificationWithTag(PKG, PKG,
+                "testDelayCancelWhenEnqueuedHasNotPosted", 0, 0);
+
+        waitForIdle();
+
+        // We're now in a state with an a notification awaiting PostNotificationRunnable to execute
+        // WHEN the PostNotificationRunnable is allowed to execute
+        mService.drainTrappedRunnableQueue();
+        waitForIdle();
+
+        // THEN the cancel executes and the notification is removed
+        StatusBarNotification[] notifs =
+                mBinderService.getActiveNotifications(PKG);
+        assertEquals(0, notifs.length);
+        assertEquals(0, mService.getNotificationRecordCount());
     }
 
     @Test
@@ -2263,7 +2393,7 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
                 .thenReturn(mTestNotificationChannel);
 
         reset(mListeners);
-        mBinderService.updateNotificationChannelForPackage(PKG, 0, mTestNotificationChannel);
+        mBinderService.updateNotificationChannelForPackage(PKG, mUid, mTestNotificationChannel);
         verify(mListeners, times(1)).notifyNotificationChannelChanged(eq(PKG),
                 eq(Process.myUserHandle()), eq(mTestNotificationChannel),
                 eq(NotificationListenerService.NOTIFICATION_CHANNEL_OR_GROUP_UPDATED));
@@ -2529,8 +2659,9 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
 
     @Test
     public void testHasCompanionDevice_noService() {
-        mService = new TestableNotificationManagerService(mContext,  mNotificationRecordLogger,
-                mNotificationInstanceIdSequence);
+        mService =
+                new TestableNotificationManagerService(mContext, mNotificationRecordLogger,
+                mSystemClock, mNotificationInstanceIdSequence);
 
         assertFalse(mService.hasCompanionDevice(mListener));
     }
@@ -2798,7 +2929,7 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
 
     @Test
     public void testSetListenerAccessForUser() throws Exception {
-        UserHandle user = UserHandle.of(10);
+        UserHandle user = UserHandle.of(mContext.getUserId() + 10);
         ComponentName c = ComponentName.unflattenFromString("package/Component");
         mBinderService.setNotificationListenerAccessGrantedForUser(c, user.getIdentifier(), true);
 
@@ -2814,20 +2945,20 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
 
     @Test
     public void testSetAssistantAccessForUser() throws Exception {
-        UserHandle user = UserHandle.of(10);
-        List<UserInfo> uis = new ArrayList<>();
         UserInfo ui = new UserInfo();
-        ui.id = 10;
+        ui.id = mContext.getUserId() + 10;
+        UserHandle user = UserHandle.of(ui.id);
+        List<UserInfo> uis = new ArrayList<>();
         uis.add(ui);
         ComponentName c = ComponentName.unflattenFromString("package/Component");
-        when(mUm.getEnabledProfiles(10)).thenReturn(uis);
+        when(mUm.getEnabledProfiles(ui.id)).thenReturn(uis);
 
         mBinderService.setNotificationAssistantAccessGrantedForUser(c, user.getIdentifier(), true);
 
         verify(mContext, times(1)).sendBroadcastAsUser(any(), eq(user), any());
         verify(mAssistants, times(1)).setPackageOrComponentEnabled(
                 c.flattenToString(), user.getIdentifier(), true, true);
-        verify(mAssistants).setUserSet(10, true);
+        verify(mAssistants).setUserSet(ui.id, true);
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
                 c.flattenToString(), user.getIdentifier(), false, true);
         verify(mListeners, never()).setPackageOrComponentEnabled(
@@ -2836,7 +2967,7 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
 
     @Test
     public void testGetAssistantAllowedForUser() throws Exception {
-        UserHandle user = UserHandle.of(10);
+        UserHandle user = UserHandle.of(mContext.getUserId() + 10);
         try {
             mBinderService.getAllowedNotificationAssistantForUser(user.getIdentifier());
         } catch (IllegalStateException e) {
@@ -2856,12 +2987,12 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
                 throw e;
             }
         }
-        verify(mAssistants, times(1)).getAllowedComponents(0);
+        verify(mAssistants, times(1)).getAllowedComponents(mContext.getUserId());
     }
 
     @Test
     public void testSetDndAccessForUser() throws Exception {
-        UserHandle user = UserHandle.of(10);
+        UserHandle user = UserHandle.of(mContext.getUserId() + 10);
         ComponentName c = ComponentName.unflattenFromString("package/Component");
         mBinderService.setNotificationPolicyAccessGrantedForUser(
                 c.getPackageName(), user.getIdentifier(), true);
@@ -2881,9 +3012,9 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         mBinderService.setNotificationListenerAccessGranted(c, true);
 
         verify(mListeners, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 0, true, true);
+                c.flattenToString(), mContext.getUserId(), true, true);
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 0, false, true);
+                c.flattenToString(), mContext.getUserId(), false, true);
         verify(mAssistants, never()).setPackageOrComponentEnabled(
                 any(), anyInt(), anyBoolean(), anyBoolean());
     }
@@ -2892,7 +3023,7 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
     public void testSetAssistantAccess() throws Exception {
         List<UserInfo> uis = new ArrayList<>();
         UserInfo ui = new UserInfo();
-        ui.id = 0;
+        ui.id = mContext.getUserId();
         uis.add(ui);
         when(mUm.getEnabledProfiles(ui.id)).thenReturn(uis);
         ComponentName c = ComponentName.unflattenFromString("package/Component");
@@ -2900,9 +3031,9 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         mBinderService.setNotificationAssistantAccessGranted(c, true);
 
         verify(mAssistants, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 0, true, true);
+                c.flattenToString(), ui.id, true, true);
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 0, false, true);
+                c.flattenToString(), ui.id, false, true);
         verify(mListeners, never()).setPackageOrComponentEnabled(
                 any(), anyInt(), anyBoolean(), anyBoolean());
     }
@@ -2911,10 +3042,10 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
     public void testSetAssistantAccess_multiProfile() throws Exception {
         List<UserInfo> uis = new ArrayList<>();
         UserInfo ui = new UserInfo();
-        ui.id = 0;
+        ui.id = mContext.getUserId();
         uis.add(ui);
         UserInfo ui10 = new UserInfo();
-        ui10.id = 10;
+        ui10.id = mContext.getUserId() + 10;
         uis.add(ui10);
         when(mUm.getEnabledProfiles(ui.id)).thenReturn(uis);
         ComponentName c = ComponentName.unflattenFromString("package/Component");
@@ -2922,13 +3053,13 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         mBinderService.setNotificationAssistantAccessGranted(c, true);
 
         verify(mAssistants, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 0, true, true);
+                c.flattenToString(), ui.id, true, true);
         verify(mAssistants, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 10, true, true);
+                c.flattenToString(), ui10.id, true, true);
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 0, false, true);
+                c.flattenToString(), ui.id, false, true);
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 10, false, true);
+                c.flattenToString(), ui10.id, false, true);
         verify(mListeners, never()).setPackageOrComponentEnabled(
                 any(), anyInt(), anyBoolean(), anyBoolean());
     }
@@ -2941,16 +3072,16 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         when(mAssistants.getAllowedComponents(anyInt())).thenReturn(componentList);
         List<UserInfo> uis = new ArrayList<>();
         UserInfo ui = new UserInfo();
-        ui.id = 0;
+        ui.id = mContext.getUserId();
         uis.add(ui);
         when(mUm.getEnabledProfiles(ui.id)).thenReturn(uis);
 
         mBinderService.setNotificationAssistantAccessGranted(null, true);
 
         verify(mAssistants, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 0, true, false);
+                c.flattenToString(), ui.id, true, false);
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 0, false,  false);
+                c.flattenToString(), ui.id, false,  false);
         verify(mListeners, never()).setPackageOrComponentEnabled(
                 any(), anyInt(), anyBoolean(), anyBoolean());
     }
@@ -2959,21 +3090,21 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
     public void testSetAssistantAccessForUser_nullWithAllowedAssistant() throws Exception {
         List<UserInfo> uis = new ArrayList<>();
         UserInfo ui = new UserInfo();
-        ui.id = 10;
+        ui.id = mContext.getUserId() + 10;
         uis.add(ui);
         UserHandle user = ui.getUserHandle();
         ArrayList<ComponentName> componentList = new ArrayList<>();
         ComponentName c = ComponentName.unflattenFromString("package/Component");
         componentList.add(c);
         when(mAssistants.getAllowedComponents(anyInt())).thenReturn(componentList);
-        when(mUm.getEnabledProfiles(10)).thenReturn(uis);
+        when(mUm.getEnabledProfiles(ui.id)).thenReturn(uis);
 
         mBinderService.setNotificationAssistantAccessGrantedForUser(
                 null, user.getIdentifier(), true);
 
         verify(mAssistants, times(1)).setPackageOrComponentEnabled(
                 c.flattenToString(), user.getIdentifier(), true, false);
-        verify(mAssistants).setUserSet(10, true);
+        verify(mAssistants).setUserSet(ui.id, true);
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
                 c.flattenToString(), user.getIdentifier(), false,  false);
         verify(mListeners, never()).setPackageOrComponentEnabled(
@@ -2985,10 +3116,10 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
             throws Exception {
         List<UserInfo> uis = new ArrayList<>();
         UserInfo ui = new UserInfo();
-        ui.id = 0;
+        ui.id = mContext.getUserId();
         uis.add(ui);
         UserInfo ui10 = new UserInfo();
-        ui10.id = 10;
+        ui10.id = mContext.getUserId() + 10;
         uis.add(ui10);
         UserHandle user = ui.getUserHandle();
         ArrayList<ComponentName> componentList = new ArrayList<>();
@@ -3004,8 +3135,8 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
                 c.flattenToString(), user.getIdentifier(), true, false);
         verify(mAssistants, times(1)).setPackageOrComponentEnabled(
                 c.flattenToString(), ui10.id, true, false);
-        verify(mAssistants).setUserSet(0, true);
-        verify(mAssistants).setUserSet(10, true);
+        verify(mAssistants).setUserSet(ui.id, true);
+        verify(mAssistants).setUserSet(ui10.id, true);
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
                 c.flattenToString(), user.getIdentifier(), false,  false);
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
@@ -3021,7 +3152,7 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         mBinderService.setNotificationPolicyAccessGranted(c.getPackageName(), true);
 
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
-                c.getPackageName(), 0, true, true);
+                c.getPackageName(), mContext.getUserId(), true, true);
         verify(mAssistants, never()).setPackageOrComponentEnabled(
                 any(), anyInt(), anyBoolean(), anyBoolean());
         verify(mListeners, never()).setPackageOrComponentEnabled(
@@ -3048,7 +3179,7 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         ComponentName c = ComponentName.unflattenFromString("package/Component");
         List<UserInfo> uis = new ArrayList<>();
         UserInfo ui = new UserInfo();
-        ui.id = 0;
+        ui.id = mContext.getUserId();
         uis.add(ui);
         when(mUm.getEnabledProfiles(ui.id)).thenReturn(uis);
 
@@ -3083,9 +3214,9 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         mBinderService.setNotificationListenerAccessGranted(c, true);
 
         verify(mListeners, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 0, true, true);
+                c.flattenToString(), mContext.getUserId(), true, true);
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 0, false, true);
+                c.flattenToString(), mContext.getUserId(), false, true);
         verify(mAssistants, never()).setPackageOrComponentEnabled(
                 any(), anyInt(), anyBoolean(), anyBoolean());
     }
@@ -3097,7 +3228,7 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         ComponentName c = ComponentName.unflattenFromString("package/Component");
         List<UserInfo> uis = new ArrayList<>();
         UserInfo ui = new UserInfo();
-        ui.id = 0;
+        ui.id = mContext.getUserId();
         uis.add(ui);
         when(mUm.getEnabledProfiles(ui.id)).thenReturn(uis);
 
@@ -3106,9 +3237,9 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         verify(mListeners, never()).setPackageOrComponentEnabled(
                 anyString(), anyInt(), anyBoolean(), anyBoolean());
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 0, false, true);
+                c.flattenToString(), ui.id, false, true);
         verify(mAssistants, times(1)).setPackageOrComponentEnabled(
-                c.flattenToString(), 0, true, true);
+                c.flattenToString(), ui.id, true, true);
     }
 
     @Test
@@ -3122,7 +3253,7 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         verify(mListeners, never()).setPackageOrComponentEnabled(
                 anyString(), anyInt(), anyBoolean(), anyBoolean());
         verify(mConditionProviders, times(1)).setPackageOrComponentEnabled(
-                c.getPackageName(), 0, true, true);
+                c.getPackageName(), mContext.getUserId(), true, true);
         verify(mAssistants, never()).setPackageOrComponentEnabled(
                 any(), anyInt(), anyBoolean(), anyBoolean());
     }

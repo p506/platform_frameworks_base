@@ -57,7 +57,7 @@
     <string name="imei" msgid="2157082351232630390">"IMEI"</string>
     <string name="meid" msgid="3291227361605924674">"MEID"</string>
     <string name="ClipMmi" msgid="4110549342447630629">"Số gọi đến"</string>
-    <string name="ClirMmi" msgid="4702929460236547156">"Số gọi đi"</string>
+    <string name="ClirMmi" msgid="6752346475055446417">"Ẩn tên và số điện thoại của người gọi đi"</string>
     <string name="ColpMmi" msgid="4736462893284419302">"ID đường kết nối"</string>
     <string name="ColrMmi" msgid="5889782479745764278">"Giới hạn ID đường kết nối"</string>
     <string name="CfMmi" msgid="8390012691099787178">"Chuyển tiếp cuộc gọi"</string>
@@ -349,6 +349,8 @@
     <string name="permdesc_receiveMms" msgid="958102423732219710">"Cho phép ứng dụng nhận và xử lý tin nhắn MMS. Điều này có nghĩa là ứng dụng có thể theo dõi hoặc xóa tin nhắn được gửi đến thiết bị của bạn mà không hiển thị chúng cho bạn."</string>
     <string name="permlab_bindCellBroadcastService" msgid="586746677002040651">"Chuyển tiếp tin nhắn truyền phát trên di động"</string>
     <string name="permdesc_bindCellBroadcastService" msgid="6540910200973641606">"Cho phép ứng dụng liên kết với mô-đun truyền phát trên di động để chuyển tiếp tin nhắn truyền phát trên di động ngay khi nhận được. Ở một số vị trí, thông báo truyền phát trên di động sẽ được gửi nhằm cảnh báo cho bạn về các tình huống khẩn cấp. Các ứng dụng độc hại có thể ảnh hưởng đến hiệu suất hoặc hoạt động của thiết bị khi nhận được tin nhắn truyền phát trên di động lúc khẩn cấp."</string>
+    <string name="permlab_manageOngoingCalls" msgid="281244770664231782">"Quản lý cuộc gọi đang diễn ra"</string>
+    <string name="permdesc_manageOngoingCalls" msgid="7003138133829915265">"Cho phép một ứng dụng xem thông tin chi tiết về các cuộc gọi đang diễn ra trên thiết bị và kiểm soát các cuộc gọi này."</string>
     <string name="permlab_readCellBroadcasts" msgid="5869884450872137693">"đọc tin nhắn quảng bá"</string>
     <string name="permdesc_readCellBroadcasts" msgid="672513437331980168">"Cho phép ứng dụng đọc tin nhắn quảng bá mà thiết bị của bạn nhận được. Tin nhắn quảng bá cảnh báo được gửi ở một số địa điểm nhằm cảnh báo cho bạn về các tình huống khẩn cấp. Các ứng dụng độc hại có thể gây ảnh hưởng đến hiệu suất hoặc hoạt động của thiết bị của bạn khi nhận được tin nhắn quảng bá khẩn cấp."</string>
     <string name="permlab_subscribedFeedsRead" msgid="217624769238425461">"đọc nguồn cấp dữ liệu đã đăng ký"</string>
@@ -385,7 +387,7 @@
     <string name="permdesc_foregroundService" msgid="8720071450020922795">"Cho phép ứng dụng sử dụng các dịch vụ trên nền trước."</string>
     <string name="permlab_getPackageSize" msgid="375391550792886641">"đo dung lượng lưu trữ ứng dụng"</string>
     <string name="permdesc_getPackageSize" msgid="742743530909966782">"Cho phép ứng dụng truy xuất mã, dữ liệu và kích thước bộ nhớ đệm của chính ứng dụng"</string>
-    <string name="permlab_writeSettings" msgid="8057285063719277394">"sửa đổi các tùy chọn cài đặt hệ thống"</string>
+    <string name="permlab_writeSettings" msgid="8057285063719277394">"sửa đổi các chế độ cài đặt hệ thống"</string>
     <string name="permdesc_writeSettings" msgid="8293047411196067188">"Cho phép ứng dụng sửa đổi dữ liệu cài đặt của hệ thống. Ứng dụng độc hại có thể làm hỏng cấu hình hệ thống của bạn."</string>
     <string name="permlab_receiveBootCompleted" msgid="6643339400247325379">"chạy khi khởi động"</string>
     <string name="permdesc_receiveBootCompleted" product="tablet" msgid="5565659082718177484">"Cho phép ứng dụng tự chạy ngay khi hệ thống khởi động xong. Quyền này có thể khiến máy tính bảng mất nhiều thời gian khởi động hơn và cho phép ứng dụng làm chậm toàn bộ máy tính bảng do ứng dụng luôn chạy."</string>
@@ -511,9 +513,9 @@
     <string name="permdesc_changeWimaxState" product="tv" msgid="5373274458799425276">"Cho phép ứng dụng kết nối và ngắt kết nối thiết bị Android TV khỏi mạng WiMAX."</string>
     <string name="permdesc_changeWimaxState" product="default" msgid="1551666203780202101">"Cho phép ứng dụng kết nối điện thoại và ngắt kết nối điện thoại khỏi mạng WiMAX."</string>
     <string name="permlab_bluetooth" msgid="586333280736937209">"ghép nối với thiết bị Bluetooth"</string>
-    <string name="permdesc_bluetooth" product="tablet" msgid="3053222571491402635">"Cho phép ứng dụng xem cấu hình của Bluetooth trên máy tính bảng và tạo và chấp nhận các kết nối với các thiết bị được ghép nối."</string>
-    <string name="permdesc_bluetooth" product="tv" msgid="8851534496561034998">"Cho phép ứng dụng xem cấu hình của Bluetooth trên thiết bị Android TV, đồng thời tạo và chấp nhận các kết nối với thiết bị được ghép nối."</string>
-    <string name="permdesc_bluetooth" product="default" msgid="2779606714091276746">"Cho phép ứng dụng xem cấu hình của Bluetooth trên điện thoại, tạo và chấp nhận các kết nối với các thiết bị được ghép nối."</string>
+    <string name="permdesc_bluetooth" product="tablet" msgid="3053222571491402635">"Cho phép ứng dụng xem cấu hình của Bluetooth trên máy tính bảng và tạo và chấp nhận các kết nối với các thiết bị đã ghép nối."</string>
+    <string name="permdesc_bluetooth" product="tv" msgid="8851534496561034998">"Cho phép ứng dụng xem cấu hình của Bluetooth trên thiết bị Android TV, đồng thời tạo và chấp nhận các kết nối với thiết bị đã ghép nối."</string>
+    <string name="permdesc_bluetooth" product="default" msgid="2779606714091276746">"Cho phép ứng dụng xem cấu hình của Bluetooth trên điện thoại, tạo và chấp nhận các kết nối với các thiết bị đã ghép nối."</string>
     <string name="permlab_preferredPaymentInfo" msgid="5274423844767445054">"Thông tin về dịch vụ thanh toán qua công nghệ giao tiếp tầm gần (NFC) được ưu tiên"</string>
     <string name="permdesc_preferredPaymentInfo" msgid="8583552469807294967">"Cho phép ứng dụng nhận thông tin về dịch vụ thanh toán qua công nghệ giao tiếp tầm gần mà bạn ưu tiên, chẳng hạn như các hình thức hỗ trợ đã đăng ký và điểm đến trong hành trình."</string>
     <string name="permlab_nfc" msgid="1904455246837674977">"kiểm soát Liên lạc trường gần"</string>
@@ -665,7 +667,7 @@
     <string name="permdesc_bindCarrierMessagingService" msgid="6316457028173478345">"Cho phép chủ sở hữu liên kết với giao diện cấp cao nhất của dịch vụ nhắn tin của nhà cung cấp dịch vụ. Không cần thiết cho các ứng dụng thông thường."</string>
     <string name="permlab_bindCarrierServices" msgid="2395596978626237474">"liên kết với dịch vụ của nhà cung cấp"</string>
     <string name="permdesc_bindCarrierServices" msgid="9185614481967262900">"Cho phép chủ sở hữu liên kết với các dịch vụ của nhà cung cấp. Không bao giờ cần cho các ứng dụng thông thường."</string>
-    <string name="permlab_access_notification_policy" msgid="5524112842876975537">"truy cập Không làm phiền"</string>
+    <string name="permlab_access_notification_policy" msgid="5524112842876975537">"quyền truy cập chế độ Không làm phiền"</string>
     <string name="permdesc_access_notification_policy" msgid="8538374112403845013">"Cho phép ứng dụng đọc và ghi cấu hình Không làm phiền."</string>
     <string name="permlab_startViewPermissionUsage" msgid="1504564328641112341">"cấp quyền xem"</string>
     <string name="permdesc_startViewPermissionUsage" msgid="2820325605959586538">"Cho phép chủ sở hữu cấp quyền cho một ứng dụng. Các ứng dụng thông thường sẽ không bao giờ cần quyền này."</string>
@@ -967,7 +969,7 @@
     <string name="save_password_remember" msgid="6490888932657708341">"Nhớ"</string>
     <string name="save_password_never" msgid="6776808375903410659">"Chưa bao giờ"</string>
     <string name="open_permission_deny" msgid="5136793905306987251">"Bạn không được phép mở trang này."</string>
-    <string name="text_copied" msgid="2531420577879738860">"Đã sao chép văn bản vào khay nhớ tạm thời."</string>
+    <string name="text_copied" msgid="2531420577879738860">"Đã sao chép văn bản vào bảng nhớ tạm thời."</string>
     <string name="copied" msgid="4675902854553014676">"Đã sao chép"</string>
     <string name="more_item_label" msgid="7419249600215749115">"Thêm"</string>
     <string name="prepend_shortcut_label" msgid="1743716737502867951">"Trình đơn+"</string>
@@ -1092,14 +1094,14 @@
     <string name="selectAll" msgid="1532369154488982046">"Chọn tất cả"</string>
     <string name="cut" msgid="2561199725874745819">"Cắt"</string>
     <string name="copy" msgid="5472512047143665218">"Sao chép"</string>
-    <string name="failed_to_copy_to_clipboard" msgid="725919885138539875">"Không sao chép được vào khay nhớ tạm"</string>
+    <string name="failed_to_copy_to_clipboard" msgid="725919885138539875">"Không sao chép được vào bảng nhớ tạm"</string>
     <string name="paste" msgid="461843306215520225">"Dán"</string>
     <string name="paste_as_plain_text" msgid="7664800665823182587">"Dán dưới dạng văn bản thuần túy"</string>
     <string name="replace" msgid="7842675434546657444">"Thay thế..."</string>
     <string name="delete" msgid="1514113991712129054">"Xóa"</string>
     <string name="copyUrl" msgid="6229645005987260230">"Sao chép URL"</string>
     <string name="selectTextMode" msgid="3225108910999318778">"Chọn văn bản"</string>
-    <string name="undo" msgid="3175318090002654673">"Hoàn tác"</string>
+    <string name="undo" msgid="3175318090002654673">"Hủy"</string>
     <string name="redo" msgid="7231448494008532233">"Làm lại"</string>
     <string name="autofill" msgid="511224882647795296">"Tự động điền"</string>
     <string name="textSelectionCABTitle" msgid="5151441579532476940">"Lựa chọn văn bản"</string>
@@ -1327,8 +1329,8 @@
     <string name="share_remote_bugreport_action" msgid="7630880678785123682">"CHIA SẺ"</string>
     <string name="decline_remote_bugreport_action" msgid="4040894777519784346">"TỪ CHỐI"</string>
     <string name="select_input_method" msgid="3971267998568587025">"Chọn phương thức nhập"</string>
-    <string name="show_ime" msgid="6406112007347443383">"Hiển thị bàn phím ảo trên màn hình trong khi bàn phím vật lý đang hoạt động"</string>
-    <string name="hardware" msgid="1800597768237606953">"Hiển thị bàn phím ảo"</string>
+    <string name="show_ime" msgid="6406112007347443383">"Hiện bàn phím ảo trên màn hình trong khi bàn phím vật lý đang hoạt động"</string>
+    <string name="hardware" msgid="1800597768237606953">"Hiện bàn phím ảo"</string>
     <string name="select_keyboard_layout_notification_title" msgid="4427643867639774118">"Định cấu hình bàn phím vật lý"</string>
     <string name="select_keyboard_layout_notification_message" msgid="8835158247369158154">"Nhấn để chọn ngôn ngữ và bố cục"</string>
     <string name="fast_scroll_alphabet" msgid="8854435958703888376">" ABCDEFGHIJKLMNOPQRSTUVWXYZ"</string>
@@ -1340,11 +1342,14 @@
     <string name="alert_windows_notification_turn_off_action" msgid="7805857234839123780">"Tắt"</string>
     <string name="ext_media_checking_notification_title" msgid="8299199995416510094">"Đang kiểm tra <xliff:g id="NAME">%s</xliff:g>…"</string>
     <string name="ext_media_checking_notification_message" msgid="2231566971425375542">"Đang xem lại nội dung hiện tại"</string>
+    <string name="ext_media_checking_notification_message" product="tv" msgid="7986154434946021415">"Đang phân tích dung lượng nội dung nghe nhìn"</string>
     <string name="ext_media_new_notification_title" msgid="3517407571407687677">"<xliff:g id="NAME">%s</xliff:g> mới"</string>
     <string name="ext_media_new_notification_title" product="automotive" msgid="9085349544984742727">"<xliff:g id="NAME">%s</xliff:g> không hoạt động"</string>
     <string name="ext_media_new_notification_message" msgid="6095403121990786986">"Hãy nhấn để thiết lập"</string>
+    <string name="ext_media_new_notification_message" product="tv" msgid="216863352100263668">"Chọn để thiết lập"</string>
     <string name="ext_media_new_notification_message" product="automotive" msgid="5140127881613227162">"Bạn có thể phải định dạng lại thiết bị. Nhấn để ngắt kết nối."</string>
     <string name="ext_media_ready_notification_message" msgid="777258143284919261">"Để chuyển ảnh và phương tiện"</string>
+    <string name="ext_media_ready_notification_message" product="tv" msgid="8847134811163165935">"Duyệt xem các tệp nội dung nghe nhìn"</string>
     <string name="ext_media_unmountable_notification_title" msgid="4895444667278979910">"Vấn đề với <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_unmountable_notification_title" product="automotive" msgid="3142723758949023280">"<xliff:g id="NAME">%s</xliff:g> không hoạt động"</string>
     <string name="ext_media_unmountable_notification_message" msgid="3256290114063126205">"Hãy nhấn để sửa"</string>
@@ -1353,7 +1358,7 @@
     <string name="ext_media_unsupported_notification_title" msgid="4358280700537030333">"<xliff:g id="NAME">%s</xliff:g> không được hỗ trợ"</string>
     <string name="ext_media_unsupported_notification_title" product="automotive" msgid="6004193172658722381">"<xliff:g id="NAME">%s</xliff:g> không hoạt động"</string>
     <string name="ext_media_unsupported_notification_message" msgid="917738524888367560">"Thiết bị này không hỗ trợ <xliff:g id="NAME">%s</xliff:g> này. Nhấn để thiết lập ở định dạng được hỗ trợ."</string>
-    <string name="ext_media_unsupported_notification_message" product="tv" msgid="7744945987775645685">"Thiết bị này không hỗ trợ <xliff:g id="NAME">%s</xliff:g> này. Chọn để thiết lập ở định dạng được hỗ trợ."</string>
+    <string name="ext_media_unsupported_notification_message" product="tv" msgid="1595482802187036532">"Chọn để thiết lập <xliff:g id="NAME">%s</xliff:g> ở một định dạng được hỗ trợ."</string>
     <string name="ext_media_unsupported_notification_message" product="automotive" msgid="3412494732736336330">"Bạn có thể phải định dạng lại thiết bị"</string>
     <string name="ext_media_badremoval_notification_title" msgid="4114625551266196872">"Đã tháo đột ngột <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_badremoval_notification_message" msgid="1986514704499809244">"Hãy ngắt kết nối phương tiện trước khi tháo để tránh mất nội dung"</string>
@@ -1713,6 +1718,28 @@
     <string name="mediasize_na_monarch" msgid="4396943937986136896">"Monarch"</string>
     <string name="mediasize_na_quarto" msgid="2119101847712239885">"Quarto"</string>
     <string name="mediasize_na_foolscap" msgid="5011612828564394648">"Giấy khổ rộng"</string>
+    <!-- no translation found for mediasize_na_ansi_c (3104916921818289618) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_d (254005964819282724) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_e (4424174989686785675) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_f (146980362213260987) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_a (5280681822380032361) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_b (2113344093437297427) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_c (971002546186856623) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_d (6450996075335049806) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e (6782708486949266519) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e1 (4707138568738504275) -->
+    <skip />
+    <!-- no translation found for mediasize_na_super_b (6964127155618393178) -->
+    <skip />
     <string name="mediasize_chinese_roc_8k" msgid="411670106572707544">"ROC 8K"</string>
     <string name="mediasize_chinese_roc_16k" msgid="7496706798725321898">"ROC 16K"</string>
     <string name="mediasize_chinese_prc_1" msgid="946949835711037253">"PRC 1"</string>
@@ -1749,6 +1776,8 @@
     <string name="mediasize_japanese_kahu" msgid="7290232592648122042">"Kahu"</string>
     <string name="mediasize_japanese_kaku2" msgid="7477551750461028312">"Kaku2"</string>
     <string name="mediasize_japanese_you4" msgid="5552111912684384833">"You4"</string>
+    <!-- no translation found for mediasize_japanese_l (1326765321473431817) -->
+    <skip />
     <string name="mediasize_unknown_portrait" msgid="3817016220446495613">"Khổ dọc không xác định"</string>
     <string name="mediasize_unknown_landscape" msgid="1584741567225095325">"Khổ ngang không xác định"</string>
     <string name="write_fail_reason_cancelled" msgid="2344081488493969190">"Đã hủy"</string>
@@ -2029,7 +2058,7 @@
       <item quantity="other"><xliff:g id="FILE_NAME_2">%s</xliff:g> + <xliff:g id="COUNT_3">%d</xliff:g> tệp</item>
       <item quantity="one"><xliff:g id="FILE_NAME_0">%s</xliff:g> + <xliff:g id="COUNT_1">%d</xliff:g> tệp</item>
     </plurals>
-    <string name="chooser_no_direct_share_targets" msgid="1511722103987329028">"Không có gợi ý về người để chia sẻ"</string>
+    <string name="chooser_no_direct_share_targets" msgid="1511722103987329028">"Không có gợi ý nào về người mà bạn có thể chia sẻ"</string>
     <string name="chooser_all_apps_button_label" msgid="3230427756238666328">"Danh sách ứng dụng"</string>
     <string name="usb_device_resolve_prompt_warn" msgid="325871329788064199">"Ứng dụng này chưa được cấp quyền ghi âm nhưng vẫn có thể ghi âm thông qua thiết bị USB này."</string>
     <string name="accessibility_system_action_home_label" msgid="3234748160850301870">"Màn hình chính"</string>

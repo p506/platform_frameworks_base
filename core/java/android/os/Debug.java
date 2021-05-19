@@ -74,8 +74,9 @@ public final class Debug
      *
      * @deprecated Accurate counting is a burden on the runtime and may be removed.
      */
+    // This must match VMDebug.TRACE_COUNT_ALLOCS.
     @Deprecated
-    public static final int TRACE_COUNT_ALLOCS  = VMDebug.TRACE_COUNT_ALLOCS;
+    public static final int TRACE_COUNT_ALLOCS  = 1;
 
     /**
      * Flags for printLoadedClasses().  Default behavior is to only show
@@ -623,7 +624,7 @@ public final class Debug
        *         </tr>
        *         <tr>
        *             <td>summary.total-pss</td>
-       *             <td>Total PPS memory usage in kB.</td>
+       *             <td>Total PSS memory usage in kB.</td>
        *             <td>{@code 1442}</td>
        *             <td>23</td>
        *         </tr>
@@ -1902,7 +1903,8 @@ public final class Debug
      * Retrieves the PSS memory used by the process as given by the smaps. Optionally supply a long
      * array of up to 3 entries to also receive (up to 3 values in order): the Uss and SwapPss and
      * Rss (only filled in as of {@link android.os.Build.VERSION_CODES#P}) of the process, and
-     * another array to also retrieve the separate memtrack size.
+     * another array to also retrieve the separate memtrack sizes (up to 4 values in order): the
+     * total memtrack reported size, memtrack graphics, memtrack gl and memtrack other.
      *
      * @return The PSS memory usage, or 0 if failed to retrieve (i.e., given pid has gone).
      * @hide
@@ -2551,12 +2553,36 @@ public final class Debug
     public static native long getZramFreeKb();
 
     /**
+     * Return total memory size in kilobytes for exported DMA-BUFs or -1 if
+     * the DMA-BUF sysfs stats at /sys/kernel/dmabuf/buffers could not be read.
+     *
+     * @hide
+     */
+    public static native long getDmabufTotalExportedKb();
+
+    /**
+     * Return total memory size in kilobytes for DMA-BUFs exported from the DMA-BUF
+     * heaps frameworks or -1 in the case of an error.
+     *
+     * @hide
+     */
+    public static native long getDmabufHeapTotalExportedKb();
+
+    /**
      * Return memory size in kilobytes allocated for ION heaps or -1 if
      * /sys/kernel/ion/total_heaps_kb could not be read.
      *
      * @hide
      */
     public static native long getIonHeapsSizeKb();
+
+    /**
+     * Return memory size in kilobytes allocated for DMA-BUF heap pools or -1 if
+     * /sys/kernel/dma_heap/total_pools_kb could not be read.
+     *
+     * @hide
+     */
+    public static native long getDmabufHeapPoolsSizeKb();
 
     /**
      * Return memory size in kilobytes allocated for ION pools or -1 if
@@ -2567,13 +2593,20 @@ public final class Debug
     public static native long getIonPoolsSizeKb();
 
     /**
-     * Return ION memory mapped by processes in kB.
+     * Return GPU DMA buffer usage in kB or -1 on error.
+     *
+     * @hide
+     */
+    public static native long getGpuDmaBufUsageKb();
+
+    /**
+     * Return DMA-BUF memory mapped by processes in kB.
      * Notes:
      *  * Warning: Might impact performance as it reads /proc/<pid>/maps files for each process.
      *
      * @hide
      */
-    public static native long getIonMappedSizeKb();
+    public static native long getDmabufMappedSizeKb();
 
     /**
      * Return memory size in kilobytes used by GPU.

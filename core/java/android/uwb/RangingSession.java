@@ -16,8 +16,10 @@
 
 package android.uwb;
 
+import android.Manifest;
 import android.annotation.IntDef;
 import android.annotation.NonNull;
+import android.annotation.RequiresPermission;
 import android.annotation.SystemApi;
 import android.os.Binder;
 import android.os.PersistableBundle;
@@ -189,8 +191,11 @@ public final class RangingSession implements AutoCloseable {
 
         /**
          * Invoked when a request to stop the session succeeds
+         *
+         * @param reason reason for the session stop
+         * @param parameters protocol specific parameters related to the stop reason
          */
-        void onStopped();
+        void onStopped(@Reason int reason, @NonNull PersistableBundle parameters);
 
         /**
          * Invoked when a request to stop the session fails
@@ -247,6 +252,7 @@ public final class RangingSession implements AutoCloseable {
      *
      * @param params configuration parameters for starting the session
      */
+    @RequiresPermission(Manifest.permission.UWB_PRIVILEGED)
     public void start(@NonNull PersistableBundle params) {
         if (mState != State.IDLE) {
             throw new IllegalStateException();
@@ -271,6 +277,7 @@ public final class RangingSession implements AutoCloseable {
      *
      * @param params the parameters to reconfigure and their new values
      */
+    @RequiresPermission(Manifest.permission.UWB_PRIVILEGED)
     public void reconfigure(@NonNull PersistableBundle params) {
         if (mState != State.ACTIVE && mState != State.IDLE) {
             throw new IllegalStateException();
@@ -302,6 +309,7 @@ public final class RangingSession implements AutoCloseable {
      * <p>On failure to stop the session,
      * {@link RangingSession.Callback#onStopFailed(int, PersistableBundle)} is invoked.
      */
+    @RequiresPermission(Manifest.permission.UWB_PRIVILEGED)
     public void stop() {
         if (mState != State.ACTIVE) {
             throw new IllegalStateException();
@@ -333,6 +341,7 @@ public final class RangingSession implements AutoCloseable {
      * {@link #close()}, even if the {@link RangingSession} is already closed.
      */
     @Override
+    @RequiresPermission(Manifest.permission.UWB_PRIVILEGED)
     public void close() {
         if (mState == State.CLOSED) {
             mExecutor.execute(() -> mCallback.onClosed(
@@ -428,14 +437,15 @@ public final class RangingSession implements AutoCloseable {
     /**
      * @hide
      */
-    public void onRangingStopped() {
+    public void onRangingStopped(@Callback.Reason int reason,
+            @NonNull PersistableBundle params) {
         if (mState == State.CLOSED) {
             Log.w(TAG, "onRangingStopped invoked for a closed session");
             return;
         }
 
         mState = State.IDLE;
-        executeCallback(() -> mCallback.onStopped());
+        executeCallback(() -> mCallback.onStopped(reason, params));
     }
 
     /**

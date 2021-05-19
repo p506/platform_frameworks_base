@@ -23,14 +23,13 @@ import android.content.Context;
 import android.net.NetworkProvider;
 import android.net.NetworkRequest;
 import android.os.Looper;
-import android.util.ArrayMap;
 import android.util.ArraySet;
 import android.util.Slog;
 
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.annotations.VisibleForTesting.Visibility;
+import com.android.internal.util.IndentingPrintWriter;
 
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -47,11 +46,11 @@ public class VcnNetworkProvider extends NetworkProvider {
     private final Set<NetworkRequestListener> mListeners = new ArraySet<>();
 
     /**
-     * Cache of NetworkRequest(s), scores and network providers, keyed by NetworkRequest
+     * Cache of NetworkRequest(s).
      *
      * <p>NetworkRequests are immutable once created, and therefore can be used as stable keys.
      */
-    private final ArrayMap<NetworkRequest, NetworkRequestEntry> mRequests = new ArrayMap<>();
+    private final Set<NetworkRequest> mRequests = new ArraySet<>();
 
     public VcnNetworkProvider(Context context, Looper looper) {
         super(context, looper, VcnNetworkProvider.class.getSimpleName());
@@ -67,9 +66,7 @@ public class VcnNetworkProvider extends NetworkProvider {
         mListeners.add(listener);
 
         // Send listener all cached requests
-        for (NetworkRequestEntry entry : mRequests.values()) {
-            notifyListenerForEvent(listener, entry);
-        }
+        resendAllRequests(listener);
     }
 
     /** Unregisters the specified listener from receiving future NetworkRequests. */
@@ -78,33 +75,31 @@ public class VcnNetworkProvider extends NetworkProvider {
         mListeners.remove(listener);
     }
 
+    /** Sends all cached NetworkRequest(s) to the specified listener. */
+    @VisibleForTesting(visibility = Visibility.PACKAGE)
+    public void resendAllRequests(@NonNull NetworkRequestListener listener) {
+        for (NetworkRequest request : mRequests) {
+            notifyListenerForEvent(listener, request);
+        }
+    }
+
     private void notifyListenerForEvent(
-            @NonNull NetworkRequestListener listener, @NonNull NetworkRequestEntry entry) {
-        listener.onNetworkRequested(entry.mRequest, entry.mScore, entry.mProviderId);
+            @NonNull NetworkRequestListener listener, @NonNull NetworkRequest request) {
+        listener.onNetworkRequested(request);
     }
 
     @Override
     public void onNetworkRequested(@NonNull NetworkRequest request, int score, int providerId) {
         if (VDBG) {
-            Slog.v(
-                    TAG,
-                    "Network requested: Request = "
-                            + request
-                            + ", score = "
-                            + score
-                            + ", providerId = "
-                            + providerId);
+            Slog.v(TAG, "Network requested: Request = " + request);
         }
 
-        final NetworkRequestEntry entry = new NetworkRequestEntry(request, score, providerId);
-
-        // NetworkRequests are immutable once created, and therefore can be used as stable keys.
-        mRequests.put(request, entry);
+        mRequests.add(request);
 
         // TODO(b/176939047): Intelligently route requests to prioritized VcnInstances (based on
         // Default Data Sub, or similar)
         for (NetworkRequestListener listener : mListeners) {
-            notifyListenerForEvent(listener, entry);
+            notifyListenerForEvent(listener, request);
         }
     }
 
@@ -113,20 +108,36 @@ public class VcnNetworkProvider extends NetworkProvider {
         mRequests.remove(request);
     }
 
-    private static class NetworkRequestEntry {
-        public final NetworkRequest mRequest;
-        public final int mScore;
-        public final int mProviderId;
-
-        private NetworkRequestEntry(@NonNull NetworkRequest request, int score, int providerId) {
-            mRequest = Objects.requireNonNull(request, "Missing request");
-            mScore = score;
-            mProviderId = providerId;
-        }
-    }
-
     // package-private
     interface NetworkRequestListener {
-        void onNetworkRequested(@NonNull NetworkRequest request, int score, int providerId);
+        void onNetworkRequested(@NonNull NetworkRequest request);
+    }
+
+    /**
+     * Dumps the state of this VcnNetworkProvider for logging and debugging purposes.
+     *
+     * <p>PII and credentials MUST NEVER be dumped here.
+     */
+    public void dump(IndentingPrintWriter pw) {
+        pw.println("VcnNetworkProvider:");
+        pw.increaseIndent();
+
+        pw.println("mListeners:");
+        pw.increaseIndent();
+        for (NetworkRequestListener listener : mListeners) {
+            pw.println(listener);
+        }
+        pw.decreaseIndent();
+        pw.println();
+
+        pw.println("mRequests:");
+        pw.increaseIndent();
+        for (NetworkRequest request : mRequests) {
+            pw.println(request);
+        }
+        pw.decreaseIndent();
+        pw.println();
+
+        pw.decreaseIndent();
     }
 }

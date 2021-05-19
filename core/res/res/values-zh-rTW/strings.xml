@@ -57,7 +57,7 @@
     <string name="imei" msgid="2157082351232630390">"IMEI"</string>
     <string name="meid" msgid="3291227361605924674">"MEID"</string>
     <string name="ClipMmi" msgid="4110549342447630629">"來電顯示"</string>
-    <string name="ClirMmi" msgid="4702929460236547156">"本機號碼"</string>
+    <string name="ClirMmi" msgid="6752346475055446417">"撥出時隱藏「來電顯示」資訊"</string>
     <string name="ColpMmi" msgid="4736462893284419302">"連接的線路 ID"</string>
     <string name="ColrMmi" msgid="5889782479745764278">"連接的線路 ID 限制"</string>
     <string name="CfMmi" msgid="8390012691099787178">"來電轉接"</string>
@@ -305,7 +305,7 @@
     <string name="permgroupdesc_storage" msgid="6351503740613026600">"存取裝置中的相片、媒體和檔案"</string>
     <string name="permgrouplab_microphone" msgid="2480597427667420076">"麥克風"</string>
     <string name="permgroupdesc_microphone" msgid="1047786732792487722">"錄音"</string>
-    <string name="permgrouplab_activityRecognition" msgid="3324466667921775766">"體能活動記錄"</string>
+    <string name="permgrouplab_activityRecognition" msgid="3324466667921775766">"體能活動"</string>
     <string name="permgroupdesc_activityRecognition" msgid="4725624819457670704">"存取你的體能活動記錄"</string>
     <string name="permgrouplab_camera" msgid="9090413408963547706">"相機"</string>
     <string name="permgroupdesc_camera" msgid="7585150538459320326">"拍照及錄製影片"</string>
@@ -336,9 +336,9 @@
     <string name="permlab_expandStatusBar" msgid="1184232794782141698">"展開/收攏狀態列"</string>
     <string name="permdesc_expandStatusBar" msgid="7180756900448498536">"允許應用程式展開或收合狀態列。"</string>
     <string name="permlab_install_shortcut" msgid="7451554307502256221">"安裝捷徑"</string>
-    <string name="permdesc_install_shortcut" msgid="4476328467240212503">"允許應用程式自動新增主螢幕捷徑。"</string>
+    <string name="permdesc_install_shortcut" msgid="4476328467240212503">"允許應用程式自動新增主畫面捷徑。"</string>
     <string name="permlab_uninstall_shortcut" msgid="295263654781900390">"解除安裝捷徑"</string>
-    <string name="permdesc_uninstall_shortcut" msgid="1924735350988629188">"允許應用程式自動移除主螢幕捷徑。"</string>
+    <string name="permdesc_uninstall_shortcut" msgid="1924735350988629188">"允許應用程式自動移除主畫面捷徑。"</string>
     <string name="permlab_processOutgoingCalls" msgid="4075056020714266558">"重設撥號路徑"</string>
     <string name="permdesc_processOutgoingCalls" msgid="7833149750590606334">"允許應用程式在撥打電話期間查看撥出的電話號碼，並可選擇改撥其他號碼或中斷通話。"</string>
     <string name="permlab_answerPhoneCalls" msgid="4131324833663725855">"接聽電話"</string>
@@ -349,6 +349,8 @@
     <string name="permdesc_receiveMms" msgid="958102423732219710">"允許應用程式接收和處理多媒體訊息。這項設定可讓應用程式監控傳送至你裝置的訊息，或在你閱讀訊息前擅自刪除訊息。"</string>
     <string name="permlab_bindCellBroadcastService" msgid="586746677002040651">"轉送區域廣播訊息"</string>
     <string name="permdesc_bindCellBroadcastService" msgid="6540910200973641606">"允許應用程式繫結至區域廣播模組，以便轉送收到的區域廣播訊息。某些地點會發出區域廣播警示，警告你有緊急狀況發生。請注意，惡意應用程式可能會在裝置收到緊急區域廣播時，干擾裝置的效能或運作。"</string>
+    <string name="permlab_manageOngoingCalls" msgid="281244770664231782">"管理進行中的通話"</string>
+    <string name="permdesc_manageOngoingCalls" msgid="7003138133829915265">"允許應用程式查看裝置上進行中通話的詳細資料，並控制這些通話。"</string>
     <string name="permlab_readCellBroadcasts" msgid="5869884450872137693">"讀取區域廣播訊息"</string>
     <string name="permdesc_readCellBroadcasts" msgid="672513437331980168">"允許應用程式讀取你裝置收到的區域廣播訊息。某些地點會發出區域廣播警示，警告你有緊急狀況發生。請注意，惡意應用程式可能會在裝置收到緊急區域廣播時，干擾裝置的效能或運作。"</string>
     <string name="permlab_subscribedFeedsRead" msgid="217624769238425461">"讀取訂閱資訊提供"</string>
@@ -1143,7 +1145,7 @@
     <string name="whichSendToApplicationNamed" msgid="3385686512014670003">"透過「%1$s」傳送"</string>
     <string name="whichSendToApplicationLabel" msgid="3543240188816513303">"傳送"</string>
     <string name="whichHomeApplication" msgid="8276350727038396616">"選取主畫面應用程式"</string>
-    <string name="whichHomeApplicationNamed" msgid="5855990024847433794">"使用「%1$s」做為主螢幕"</string>
+    <string name="whichHomeApplicationNamed" msgid="5855990024847433794">"使用「%1$s」做為主畫面"</string>
     <string name="whichHomeApplicationLabel" msgid="8907334282202933959">"擷取圖片"</string>
     <string name="whichImageCaptureApplication" msgid="2737413019463215284">"使用以下應用程式擷取圖片："</string>
     <string name="whichImageCaptureApplicationNamed" msgid="8820702441847612202">"使用「%1$s」擷取圖片"</string>
@@ -1327,7 +1329,7 @@
     <string name="share_remote_bugreport_action" msgid="7630880678785123682">"分享"</string>
     <string name="decline_remote_bugreport_action" msgid="4040894777519784346">"拒絕"</string>
     <string name="select_input_method" msgid="3971267998568587025">"選擇輸入法"</string>
-    <string name="show_ime" msgid="6406112007347443383">"連接實體鍵盤時保持顯示"</string>
+    <string name="show_ime" msgid="6406112007347443383">"使用實體鍵盤時仍繼續顯示虛擬鍵盤"</string>
     <string name="hardware" msgid="1800597768237606953">"顯示虛擬鍵盤"</string>
     <string name="select_keyboard_layout_notification_title" msgid="4427643867639774118">"設定實體鍵盤"</string>
     <string name="select_keyboard_layout_notification_message" msgid="8835158247369158154">"輕觸即可選取語言和版面配置"</string>
@@ -1340,11 +1342,14 @@
     <string name="alert_windows_notification_turn_off_action" msgid="7805857234839123780">"關閉"</string>
     <string name="ext_media_checking_notification_title" msgid="8299199995416510094">"正在檢查 <xliff:g id="NAME">%s</xliff:g>…"</string>
     <string name="ext_media_checking_notification_message" msgid="2231566971425375542">"正在檢查目前的內容"</string>
+    <string name="ext_media_checking_notification_message" product="tv" msgid="7986154434946021415">"正在分析媒體儲存空間"</string>
     <string name="ext_media_new_notification_title" msgid="3517407571407687677">"新的 <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_new_notification_title" product="automotive" msgid="9085349544984742727">"「<xliff:g id="NAME">%s</xliff:g>」無法運作"</string>
     <string name="ext_media_new_notification_message" msgid="6095403121990786986">"輕觸即可進行設定"</string>
+    <string name="ext_media_new_notification_message" product="tv" msgid="216863352100263668">"選取即可設定"</string>
     <string name="ext_media_new_notification_message" product="automotive" msgid="5140127881613227162">"你可能要將裝置重新格式化。輕觸即可退出裝置。"</string>
     <string name="ext_media_ready_notification_message" msgid="777258143284919261">"可用於傳輸相片和媒體"</string>
+    <string name="ext_media_ready_notification_message" product="tv" msgid="8847134811163165935">"瀏覽媒體檔案"</string>
     <string name="ext_media_unmountable_notification_title" msgid="4895444667278979910">"<xliff:g id="NAME">%s</xliff:g>發生問題"</string>
     <string name="ext_media_unmountable_notification_title" product="automotive" msgid="3142723758949023280">"「<xliff:g id="NAME">%s</xliff:g>」無法運作"</string>
     <string name="ext_media_unmountable_notification_message" msgid="3256290114063126205">"輕觸即可修正問題"</string>
@@ -1353,7 +1358,7 @@
     <string name="ext_media_unsupported_notification_title" msgid="4358280700537030333">"不支援的「<xliff:g id="NAME">%s</xliff:g>」"</string>
     <string name="ext_media_unsupported_notification_title" product="automotive" msgid="6004193172658722381">"「<xliff:g id="NAME">%s</xliff:g>」無法運作"</string>
     <string name="ext_media_unsupported_notification_message" msgid="917738524888367560">"此裝置不支援這個 <xliff:g id="NAME">%s</xliff:g>。輕觸即可使用支援的格式進行設定。"</string>
-    <string name="ext_media_unsupported_notification_message" product="tv" msgid="7744945987775645685">"此裝置不支援這個 <xliff:g id="NAME">%s</xliff:g>。選取即可使用支援的格式進行設定。"</string>
+    <string name="ext_media_unsupported_notification_message" product="tv" msgid="1595482802187036532">"選取即可使用支援的格式設定「<xliff:g id="NAME">%s</xliff:g>」。"</string>
     <string name="ext_media_unsupported_notification_message" product="automotive" msgid="3412494732736336330">"你可能要將裝置重新格式化"</string>
     <string name="ext_media_badremoval_notification_title" msgid="4114625551266196872">"意外移除「<xliff:g id="NAME">%s</xliff:g>」"</string>
     <string name="ext_media_badremoval_notification_message" msgid="1986514704499809244">"請先退出媒體，再將其移除，以免內容遺失"</string>
@@ -1629,8 +1634,8 @@
     <string name="accessibility_shortcut_single_service_warning" msgid="6363127705112844257">"同時按住音量調高鍵和調低鍵數秒，即可開啟「<xliff:g id="SERVICE">%1$s</xliff:g>」無障礙功能。這麼做可能會改變裝置的運作方式。\n\n你可以在 [設定] &gt; [無障礙設定] 中變更這個快速鍵觸發的功能。"</string>
     <string name="accessibility_shortcut_on" msgid="5463618449556111344">"開啟"</string>
     <string name="accessibility_shortcut_off" msgid="3651336255403648739">"不要開啟"</string>
-    <string name="accessibility_shortcut_menu_item_status_on" msgid="6608392117189732543">"已開啟"</string>
-    <string name="accessibility_shortcut_menu_item_status_off" msgid="5531598275559472393">"已關閉"</string>
+    <string name="accessibility_shortcut_menu_item_status_on" msgid="6608392117189732543">"開啟"</string>
+    <string name="accessibility_shortcut_menu_item_status_off" msgid="5531598275559472393">"關閉"</string>
     <string name="accessibility_enable_service_title" msgid="3931558336268541484">"要將裝置的完整控制權授予「<xliff:g id="SERVICE">%1$s</xliff:g>」嗎？"</string>
     <string name="accessibility_enable_service_encryption_warning" msgid="8603532708618236909">"如果你開啟「<xliff:g id="SERVICE">%1$s</xliff:g>」，裝置將無法使用螢幕鎖定功能強化資料加密。"</string>
     <string name="accessibility_service_warning_description" msgid="291674995220940133">"如果你有無障礙服務需求，可以將完整控制權授予具有相關功能的應用程式，但請勿將完整控制權授予大多數的應用程式。"</string>
@@ -1656,7 +1661,7 @@
     <string name="accessibility_button_prompt_text" msgid="8343213623338605305">"輕觸無障礙工具按鈕後，選擇你想使用的功能："</string>
     <string name="accessibility_gesture_prompt_text" msgid="8742535972130563952">"選擇要搭配無障礙手勢 (用兩指從螢幕底部向上滑動) 使用的功能："</string>
     <string name="accessibility_gesture_3finger_prompt_text" msgid="5211827854510660203">"選擇要搭配無障礙手勢 (用三指從螢幕底部向上滑動) 使用的功能："</string>
-    <string name="accessibility_button_instructional_text" msgid="8853928358872550500">"如要切換不同的功能，請輕觸並按住無障礙工具按鈕。"</string>
+    <string name="accessibility_button_instructional_text" msgid="8853928358872550500">"如要切換不同的功能，請按住無障礙工具按鈕。"</string>
     <string name="accessibility_gesture_instructional_text" msgid="9196230728837090497">"如要切換不同的功能，請用兩指向上滑動並按住。"</string>
     <string name="accessibility_gesture_3finger_instructional_text" msgid="3425123684990193765">"如要切換不同的功能，請用三指向上滑動並按住。"</string>
     <string name="accessibility_magnification_chooser_text" msgid="1502075582164931596">"放大"</string>
@@ -1713,6 +1718,28 @@
     <string name="mediasize_na_monarch" msgid="4396943937986136896">"Monarch"</string>
     <string name="mediasize_na_quarto" msgid="2119101847712239885">"Quarto"</string>
     <string name="mediasize_na_foolscap" msgid="5011612828564394648">"Foolscap"</string>
+    <!-- no translation found for mediasize_na_ansi_c (3104916921818289618) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_d (254005964819282724) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_e (4424174989686785675) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_f (146980362213260987) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_a (5280681822380032361) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_b (2113344093437297427) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_c (971002546186856623) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_d (6450996075335049806) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e (6782708486949266519) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e1 (4707138568738504275) -->
+    <skip />
+    <!-- no translation found for mediasize_na_super_b (6964127155618393178) -->
+    <skip />
     <string name="mediasize_chinese_roc_8k" msgid="411670106572707544">"ROC 8K"</string>
     <string name="mediasize_chinese_roc_16k" msgid="7496706798725321898">"ROC 16K"</string>
     <string name="mediasize_chinese_prc_1" msgid="946949835711037253">"PRC 1"</string>
@@ -1749,6 +1776,8 @@
     <string name="mediasize_japanese_kahu" msgid="7290232592648122042">"Kahu"</string>
     <string name="mediasize_japanese_kaku2" msgid="7477551750461028312">"Kaku2"</string>
     <string name="mediasize_japanese_you4" msgid="5552111912684384833">"You4"</string>
+    <!-- no translation found for mediasize_japanese_l (1326765321473431817) -->
+    <skip />
     <string name="mediasize_unknown_portrait" msgid="3817016220446495613">"不明縱向紙張"</string>
     <string name="mediasize_unknown_landscape" msgid="1584741567225095325">"不明橫向紙張"</string>
     <string name="write_fail_reason_cancelled" msgid="2344081488493969190">"已取消"</string>
@@ -1792,8 +1821,8 @@
     <string name="package_updated_device_owner" msgid="7560272363805506941">"已由你的管理員更新"</string>
     <string name="package_deleted_device_owner" msgid="2292335928930293023">"已由你的管理員刪除"</string>
     <string name="confirm_battery_saver" msgid="5247976246208245754">"確定"</string>
-    <string name="battery_saver_description_with_learn_more" msgid="4424488535318105801">"為了延長電池續航力，節約耗電量模式會執行以下動作：\n\n• 開啟深色主題\n• 關閉或限制背景活動、某些視覺效果和其他功能，例如「Ok Google」啟動字詞\n\n"<annotation id="url">"瞭解詳情"</annotation></string>
-    <string name="battery_saver_description" msgid="6794188153647295212">"為了延長電池續航力，節約耗電量模式會執行以下動作：\n\n• 開啟深色主題\n• 關閉或限制背景活動、某些視覺效果和其他功能，例如「Ok Google」啟動字詞"</string>
+    <string name="battery_saver_description_with_learn_more" msgid="4424488535318105801">"為了延長電池續航力，省電模式會執行以下動作：\n\n• 開啟深色主題\n• 關閉或限制背景活動、某些視覺效果和其他功能，例如「Ok Google」啟動字詞\n\n"<annotation id="url">"瞭解詳情"</annotation></string>
+    <string name="battery_saver_description" msgid="6794188153647295212">"為了延長電池續航力，省電模式會執行以下動作：\n\n• 開啟深色主題\n• 關閉或限制背景活動、某些視覺效果和其他功能，例如「Ok Google」啟動字詞"</string>
     <string name="data_saver_description" msgid="4995164271550590517">"「數據節省模式」可防止部分應用程式在背景收發資料，以節省數據用量。你目前使用的應用程式可以存取資料，但存取頻率可能不如平時高。舉例來說，圖片可能不會自動顯示，在你輕觸後才會顯示。"</string>
     <string name="data_saver_enable_title" msgid="7080620065745260137">"要開啟數據節省模式嗎？"</string>
     <string name="data_saver_enable_button" msgid="4399405762586419726">"開啟"</string>
@@ -2032,7 +2061,7 @@
     <string name="chooser_no_direct_share_targets" msgid="1511722103987329028">"沒有建議的分享對象"</string>
     <string name="chooser_all_apps_button_label" msgid="3230427756238666328">"應用程式清單"</string>
     <string name="usb_device_resolve_prompt_warn" msgid="325871329788064199">"這個應用程式未取得錄製內容的權限，但可以透過這部 USB 裝置錄製音訊。"</string>
-    <string name="accessibility_system_action_home_label" msgid="3234748160850301870">"主螢幕"</string>
+    <string name="accessibility_system_action_home_label" msgid="3234748160850301870">"主畫面"</string>
     <string name="accessibility_system_action_back_label" msgid="4205361367345537608">"返回"</string>
     <string name="accessibility_system_action_recents_label" msgid="4782875610281649728">"最近使用的應用程式"</string>
     <string name="accessibility_system_action_notifications_label" msgid="6083767351772162010">"通知"</string>

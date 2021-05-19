@@ -320,20 +320,21 @@ class InstallationAsyncTask extends AsyncTask<String, InstallationAsyncTask.Prog
         }
     }
 
-    private void installScratch() throws IOException, InterruptedException {
-        final long scratchSize = mDynSystem.suggestScratchSize();
+    private void installWritablePartition(final String partitionName, final long partitionSize)
+            throws IOException {
+        Log.d(TAG, "Creating writable partition: " + partitionName + ", size: " + partitionSize);
+
         Thread thread = new Thread() {
             @Override
             public void run() {
                 mInstallationSession =
-                        mDynSystem.createPartition("scratch", scratchSize, /* readOnly= */ false);
+                        mDynSystem.createPartition(
+                                partitionName, partitionSize, /* readOnly= */ false);
             }
         };
 
-        Log.d(TAG, "Creating partition: scratch, size = " + scratchSize);
         thread.start();
-
-        Progress progress = new Progress("scratch", scratchSize, mNumInstalledPartitions++);
+        Progress progress = new Progress(partitionName, partitionSize, mNumInstalledPartitions++);
 
         while (thread.isAlive()) {
             if (isCancelled()) {
@@ -347,58 +348,34 @@ class InstallationAsyncTask extends AsyncTask<String, InstallationAsyncTask.Prog
                 publishProgress(progress);
             }
 
-            Thread.sleep(100);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                // Ignore the error.
+            }
         }
 
         if (mInstallationSession == null) {
             throw new IOException(
-                    "Failed to start installation with requested size: " + scratchSize);
+                    "Failed to start installation with requested size: " + partitionSize);
         }
+
         // Reset installation session and verify that installation completes successfully.
         mInstallationSession = null;
         if (!mDynSystem.closePartition()) {
-            throw new IOException("Failed to complete partition installation: scratch");
+            throw new IOException("Failed to complete partition installation: " + partitionName);
         }
     }
 
-    private void installUserdata() throws IOException, InterruptedException {
-        Thread thread = new Thread(() -> {
-            mInstallationSession = mDynSystem.createPartition("userdata", mUserdataSize, false);
-        });
-
-        Log.d(TAG, "Creating partition: userdata, size = " + mUserdataSize);
-        thread.start();
-
-        Progress progress = new Progress("userdata", mUserdataSize, mNumInstalledPartitions++);
-
-        while (thread.isAlive()) {
-            if (isCancelled()) {
-                return;
-            }
-
-            final long installedSize = mDynSystem.getInstallationProgress().bytes_processed;
-
-            if (installedSize > progress.installedSize + MIN_PROGRESS_TO_PUBLISH) {
-                progress.installedSize = installedSize;
-                publishProgress(progress);
-            }
-
-            Thread.sleep(100);
-        }
-
-        if (mInstallationSession == null) {
-            throw new IOException(
-                    "Failed to start installation with requested size: " + mUserdataSize);
-        }
-        // Reset installation session and verify that installation completes successfully.
-        mInstallationSession = null;
-        if (!mDynSystem.closePartition()) {
-            throw new IOException("Failed to complete partition installation: userdata");
-        }
+    private void installScratch() throws IOException {
+        installWritablePartition("scratch", mDynSystem.suggestScratchSize());
     }
 
-    private void installImages()
-            throws IOException, InterruptedException, ImageValidationException {
+    private void installUserdata() throws IOException {
+        installWritablePartition("userdata", mUserdataSize);
+    }
+
+    private void installImages() throws IOException, ImageValidationException {
         if (mStream != null) {
             if (mIsZip) {
                 installStreamingZipUpdate();
@@ -410,14 +387,12 @@ class InstallationAsyncTask extends AsyncTask<String, InstallationAsyncTask.Prog
         }
     }
 
-    private void installStreamingGzUpdate()
-            throws IOException, InterruptedException, ImageValidationException {
+    private void installStreamingGzUpdate() throws IOException, ImageValidationException {
         Log.d(TAG, "To install a streaming GZ update");
         installImage("system", mSystemSize, new GZIPInputStream(mStream));
     }
 
-    private void installStreamingZipUpdate()
-            throws IOException, InterruptedException, ImageValidationException {
+    private void installStreamingZipUpdate() throws IOException, ImageValidationException {
         Log.d(TAG, "To install a streaming ZIP update");
 
         ZipInputStream zis = new ZipInputStream(mStream);
@@ -432,8 +407,7 @@ class InstallationAsyncTask extends AsyncTask<String, InstallationAsyncTask.Prog
         }
     }
 
-    private void installLocalZipUpdate()
-            throws IOException, InterruptedException, ImageValidationException {
+    private void installLocalZipUpdate() throws IOException, ImageValidationException {
         Log.d(TAG, "To install a local ZIP update");
 
         Enumeration<? extends ZipEntry> entries = mZipFile.entries();
@@ -449,7 +423,7 @@ class InstallationAsyncTask extends AsyncTask<String, InstallationAsyncTask.Prog
     }
 
     private boolean installImageFromAnEntry(ZipEntry entry, InputStream is)
-            throws IOException, InterruptedException, ImageValidationException {
+            throws IOException, ImageValidationException {
         String name = entry.getName();
 
         Log.d(TAG, "ZipEntry: " + name);
@@ -473,7 +447,7 @@ class InstallationAsyncTask extends AsyncTask<String, InstallationAsyncTask.Prog
     }
 
     private void installImage(String partitionName, long uncompressedSize, InputStream is)
-            throws IOException, InterruptedException, ImageValidationException {
+            throws IOException, ImageValidationException {
 
         SparseInputStream sis = new SparseInputStream(new BufferedInputStream(is));
 
@@ -504,7 +478,11 @@ class InstallationAsyncTask extends AsyncTask<String, InstallationAsyncTask.Prog
                 return;
             }
 
-            Thread.sleep(100);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                // Ignore the error.
+            }
         }
 
         if (mInstallationSession == null) {

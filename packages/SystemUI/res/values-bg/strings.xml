@@ -487,7 +487,7 @@
     <string name="user_logout_notification_title" msgid="3644848998053832589">"Излизане на потребителя"</string>
     <string name="user_logout_notification_text" msgid="7441286737342997991">"Излезте от профила на текущия потребител"</string>
     <string name="user_logout_notification_action" msgid="7974458760719361881">"ИЗЛИЗАНЕ НА ПОТРЕБИТЕЛЯ"</string>
-    <string name="user_add_user_title" msgid="4172327541504825032">"Да се добави ли нов потреб.?"</string>
+    <string name="user_add_user_title" msgid="4172327541504825032">"Да се добави ли нов потребител?"</string>
     <string name="user_add_user_message_short" msgid="2599370307878014791">"Когато добавите нов потребител, той трябва да настрои работното си пространство.\n\nВсеки потребител може да актуализира приложенията за всички останали потребители."</string>
     <string name="user_limit_reached_title" msgid="2429229448830346057">"Достигнахте огранич. за потребители"</string>
     <plurals name="user_limit_reached_message" formatted="false" msgid="2573535787802908398">
@@ -1050,7 +1050,7 @@
     <string name="accessibility_control_change_unfavorite" msgid="6997408061750740327">"за премахване на означаването като любимо"</string>
     <string name="accessibility_control_move" msgid="8980344493796647792">"Преместете на позиция <xliff:g id="NUMBER">%d</xliff:g>"</string>
     <string name="controls_favorite_default_title" msgid="967742178688938137">"Контроли"</string>
-    <string name="controls_favorite_subtitle" msgid="6604402232298443956">"Избиране на контроли, които да са достъпни в менюто за захранване"</string>
+    <string name="controls_favorite_subtitle" msgid="6604402232298443956">"Избиране на контроли, които да са достъпни в менюто за вкл./изкл."</string>
     <string name="controls_favorite_rearrange" msgid="5616952398043063519">"Задръжте и плъзнете, за да пренаредите контролите"</string>
     <string name="controls_favorite_removed" msgid="5276978408529217272">"Всички контроли са премахнати"</string>
     <string name="controls_favorite_toast_no_changes" msgid="7094494210840877931">"Промените не са запазени"</string>
@@ -1074,6 +1074,7 @@
     <string name="controls_seeding_in_progress" msgid="3033855341410264148">"Препоръките се зареждат"</string>
     <string name="controls_media_title" msgid="1746947284862928133">"Мултимедия"</string>
     <string name="controls_media_close_session" msgid="3957093425905475065">"Скриване на текущата сесия."</string>
+    <string name="controls_media_active_session" msgid="1984383994625845642">"Текущата сесия не може да бъде скрита."</string>
     <string name="controls_media_dismiss_button" msgid="9081375542265132213">"Отхвърляне"</string>
     <string name="controls_media_resume" msgid="1933520684481586053">"Възобновяване"</string>
     <string name="controls_media_settings_button" msgid="5815790345117172504">"Настройки"</string>
@@ -1089,4 +1090,11 @@
     <string name="controls_added_tooltip" msgid="4842812921719153085">"Задръжте бутона за захранване, за да видите новите контроли"</string>
     <string name="controls_menu_add" msgid="4447246119229920050">"Добавяне на контроли"</string>
     <string name="controls_menu_edit" msgid="890623986951347062">"Редактиране на контролите"</string>
+    <string name="media_output_dialog_add_output" msgid="5642703238877329518">"Добавяне на изходящи устройства"</string>
+    <string name="media_output_dialog_group" msgid="5571251347877452212">"Група"</string>
+    <string name="media_output_dialog_single_device" msgid="3102758980643351058">"1 избрано устройство"</string>
+    <string name="media_output_dialog_multiple_devices" msgid="1093771040315422350">"<xliff:g id="COUNT">%1$d</xliff:g> избрани устройства"</string>
+    <string name="media_output_dialog_disconnected" msgid="1834473104836986046">"<xliff:g id="DEVICE_NAME">%1$s</xliff:g> (връзката е прекратена)"</string>
+    <string name="media_output_dialog_connect_failed" msgid="3225190634236259010">"Неуспешно свързване. Опитайте отново."</string>
+    <string name="media_output_dialog_pairing_new" msgid="9099497976087485862">"Сдвояване на ново устройство"</string>
 </resources>

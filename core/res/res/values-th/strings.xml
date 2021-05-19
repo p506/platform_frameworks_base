@@ -57,7 +57,7 @@
     <string name="imei" msgid="2157082351232630390">"IMEI"</string>
     <string name="meid" msgid="3291227361605924674">"MEID"</string>
     <string name="ClipMmi" msgid="4110549342447630629">"หมายเลขผู้โทรเข้า"</string>
-    <string name="ClirMmi" msgid="4702929460236547156">"หมายเลขผู้โทรออก"</string>
+    <string name="ClirMmi" msgid="6752346475055446417">"ซ่อนหมายเลขผู้โทรออก"</string>
     <string name="ColpMmi" msgid="4736462893284419302">"รหัสสายที่เชื่อมต่อ"</string>
     <string name="ColrMmi" msgid="5889782479745764278">"ข้อจำกัดรหัสสายที่เชื่อมต่อ"</string>
     <string name="CfMmi" msgid="8390012691099787178">"การโอนสาย"</string>
@@ -349,6 +349,8 @@
     <string name="permdesc_receiveMms" msgid="958102423732219710">"อนุญาตให้แอปพลิเคชันรับและประมวลผลข้อความ MMS ซึ่งหมายความว่าแอปพลิเคชันจะสามารถตรวจสอบหรือลบข้อความที่ส่งมายังอุปกรณ์ของคุณได้โดยไม่ต้องแสดงให้คุณเห็น"</string>
     <string name="permlab_bindCellBroadcastService" msgid="586746677002040651">"ส่งต่อข้อความจากการส่งข้อมูลเตือนภัยทางมือถือ (CB)"</string>
     <string name="permdesc_bindCellBroadcastService" msgid="6540910200973641606">"อนุญาตให้แอปเชื่อมโยงกับโมดูลการส่งข้อมูลเตือนภัยทางมือถือ (CB) เพื่อส่งต่อข้อความจากการส่งข้อมูลเตือนภัยทางมือถือ (CB) ทันทีที่ได้รับ ระบบจะส่งการแจ้งเตือนจากการส่งข้อมูลเตือนภัยทางมือถือ (CB) ในบางตำแหน่งเพื่อแจ้งเตือนคุณเกี่ยวกับสถานการณ์ฉุกเฉิน แอปที่เป็นอันตรายอาจรบกวนประสิทธิภาพหรือการทำงานของอุปกรณ์เมื่อได้รับการส่งข้อมูลเตือนภัยทางมือถือ (CB) ในกรณีฉุกเฉิน"</string>
+    <string name="permlab_manageOngoingCalls" msgid="281244770664231782">"จัดการสายที่สนทนา"</string>
+    <string name="permdesc_manageOngoingCalls" msgid="7003138133829915265">"อนุญาตแอปเพื่อดูรายละเอียดเกี่ยวกับสายที่สนทนาอยู่บนโทรศัพท์และเพื่อควบคุมสายสนทนาเหล่านี้"</string>
     <string name="permlab_readCellBroadcasts" msgid="5869884450872137693">"อ่านข้อความที่ได้รับจากสถานีมือถือ"</string>
     <string name="permdesc_readCellBroadcasts" msgid="672513437331980168">"อนุญาตให้แอปอ่านข้อความจากสถานีมือถือที่อุปกรณ์ได้รับ การแจ้งเตือนทางมือถือมีให้บริการในบางพื้นที่ โดยจะแจ้งเตือนคุณเกี่ยวกับสถานการณ์ฉุกเฉิน แอปที่เป็นอันตรายอาจเข้าแทรกแซงการทำงานของอุปกรณ์เมื่อได้รับข้อความแจ้งเตือนฉุกเฉิน"</string>
     <string name="permlab_subscribedFeedsRead" msgid="217624769238425461">"อ่านฟีดข้อมูลที่สมัครไว้"</string>
@@ -1340,11 +1342,14 @@
     <string name="alert_windows_notification_turn_off_action" msgid="7805857234839123780">"ปิด"</string>
     <string name="ext_media_checking_notification_title" msgid="8299199995416510094">"กำลังตรวจสอบ <xliff:g id="NAME">%s</xliff:g>…"</string>
     <string name="ext_media_checking_notification_message" msgid="2231566971425375542">"กำลังตรวจสอบเนื้อหาปัจจุบัน"</string>
+    <string name="ext_media_checking_notification_message" product="tv" msgid="7986154434946021415">"กำลังวิเคราะห์พื้นที่เก็บข้อมูลสื่อ"</string>
     <string name="ext_media_new_notification_title" msgid="3517407571407687677">"<xliff:g id="NAME">%s</xliff:g> ใหม่"</string>
     <string name="ext_media_new_notification_title" product="automotive" msgid="9085349544984742727">"<xliff:g id="NAME">%s</xliff:g> ใช้งานไม่ได้"</string>
     <string name="ext_media_new_notification_message" msgid="6095403121990786986">"แตะเพื่อตั้งค่า"</string>
+    <string name="ext_media_new_notification_message" product="tv" msgid="216863352100263668">"เลือกเพื่อตั้งค่า"</string>
     <string name="ext_media_new_notification_message" product="automotive" msgid="5140127881613227162">"คุณอาจต้องฟอร์แมตอุปกรณ์นี้ใหม่ แตะเพื่อนำอุปกรณ์ออก"</string>
     <string name="ext_media_ready_notification_message" msgid="777258143284919261">"สำหรับการโอนรูปภาพและสื่อ"</string>
+    <string name="ext_media_ready_notification_message" product="tv" msgid="8847134811163165935">"เรียกดูไฟล์สื่อ"</string>
     <string name="ext_media_unmountable_notification_title" msgid="4895444667278979910">"ปัญหาเกี่ยวกับ <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_unmountable_notification_title" product="automotive" msgid="3142723758949023280">"<xliff:g id="NAME">%s</xliff:g> ใช้งานไม่ได้"</string>
     <string name="ext_media_unmountable_notification_message" msgid="3256290114063126205">"แตะเพื่อแก้ไข"</string>
@@ -1353,7 +1358,7 @@
     <string name="ext_media_unsupported_notification_title" msgid="4358280700537030333">"ไม่สนับสนุน <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_unsupported_notification_title" product="automotive" msgid="6004193172658722381">"<xliff:g id="NAME">%s</xliff:g> ใช้งานไม่ได้"</string>
     <string name="ext_media_unsupported_notification_message" msgid="917738524888367560">"อุปกรณ์นี้ไม่สนับสนุน <xliff:g id="NAME">%s</xliff:g> นี้ แตะเพื่อตั้งค่าในรูปแบบที่สนับสนุน"</string>
-    <string name="ext_media_unsupported_notification_message" product="tv" msgid="7744945987775645685">"อุปกรณ์นี้ไม่รองรับ <xliff:g id="NAME">%s</xliff:g> นี้ เลือกเพื่อตั้งค่าในรูปแบบที่รองรับ"</string>
+    <string name="ext_media_unsupported_notification_message" product="tv" msgid="1595482802187036532">"เลือกเพื่อตั้งค่า<xliff:g id="NAME">%s</xliff:g> ในรูปแบบที่รองรับ"</string>
     <string name="ext_media_unsupported_notification_message" product="automotive" msgid="3412494732736336330">"คุณอาจต้องฟอร์แมตอุปกรณ์นี้ใหม่"</string>
     <string name="ext_media_badremoval_notification_title" msgid="4114625551266196872">"<xliff:g id="NAME">%s</xliff:g> ถูกนำออกไปโดยไม่คาดคิด"</string>
     <string name="ext_media_badremoval_notification_message" msgid="1986514704499809244">"ยกเลิกการต่อเชื่อมสื่อก่อนที่จะนำออกเพื่อหลีกเลี่ยงไม่ให้เนื้อหาสูญหาย"</string>
@@ -1713,6 +1718,28 @@
     <string name="mediasize_na_monarch" msgid="4396943937986136896">"Monarch"</string>
     <string name="mediasize_na_quarto" msgid="2119101847712239885">"Quarto"</string>
     <string name="mediasize_na_foolscap" msgid="5011612828564394648">"กระดาษฟุลสแก๊ป"</string>
+    <!-- no translation found for mediasize_na_ansi_c (3104916921818289618) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_d (254005964819282724) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_e (4424174989686785675) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_f (146980362213260987) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_a (5280681822380032361) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_b (2113344093437297427) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_c (971002546186856623) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_d (6450996075335049806) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e (6782708486949266519) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e1 (4707138568738504275) -->
+    <skip />
+    <!-- no translation found for mediasize_na_super_b (6964127155618393178) -->
+    <skip />
     <string name="mediasize_chinese_roc_8k" msgid="411670106572707544">"ROC 8K"</string>
     <string name="mediasize_chinese_roc_16k" msgid="7496706798725321898">"ROC 16K"</string>
     <string name="mediasize_chinese_prc_1" msgid="946949835711037253">"PRC 1"</string>
@@ -1749,6 +1776,8 @@
     <string name="mediasize_japanese_kahu" msgid="7290232592648122042">"Kahu"</string>
     <string name="mediasize_japanese_kaku2" msgid="7477551750461028312">"Kaku2"</string>
     <string name="mediasize_japanese_you4" msgid="5552111912684384833">"You4"</string>
+    <!-- no translation found for mediasize_japanese_l (1326765321473431817) -->
+    <skip />
     <string name="mediasize_unknown_portrait" msgid="3817016220446495613">"แนวตั้งไม่ทราบขนาด"</string>
     <string name="mediasize_unknown_landscape" msgid="1584741567225095325">"แนวนอนไม่ทราบขนาด"</string>
     <string name="write_fail_reason_cancelled" msgid="2344081488493969190">"ยกเลิก"</string>
@@ -1786,7 +1815,7 @@
     <string name="managed_profile_label_badge_2" msgid="5673187309555352550">"<xliff:g id="LABEL">%1$s</xliff:g> งานที่ 2"</string>
     <string name="managed_profile_label_badge_3" msgid="6882151970556391957">"<xliff:g id="LABEL">%1$s</xliff:g> งานที่ 3"</string>
     <string name="lock_to_app_unlock_pin" msgid="3890940811866290782">"ขอ PIN ก่อนเลิกตรึง"</string>
-    <string name="lock_to_app_unlock_pattern" msgid="2694204070499712503">"ขอรูปแบบการปลดล็อกก่อนเลิกตรึง"</string>
+    <string name="lock_to_app_unlock_pattern" msgid="2694204070499712503">"ขอรูปแบบการปลดล็อกก่อนเลิกปักหมุด"</string>
     <string name="lock_to_app_unlock_password" msgid="9126722403506560473">"ขอรหัสผ่านก่อนเลิกตรึง"</string>
     <string name="package_installed_device_owner" msgid="7035926868974878525">"ติดตั้งโดยผู้ดูแลระบบ"</string>
     <string name="package_updated_device_owner" msgid="7560272363805506941">"อัปเดตโดยผู้ดูแลระบบ"</string>

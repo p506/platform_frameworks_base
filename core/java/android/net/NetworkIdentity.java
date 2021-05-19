@@ -26,8 +26,10 @@ import android.service.NetworkIdentityProto;
 import android.telephony.Annotation.NetworkType;
 import android.util.proto.ProtoOutputStream;
 
+import com.android.net.module.util.NetworkCapabilitiesUtils;
 import com.android.net.module.util.NetworkIdentityUtils;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -41,6 +43,22 @@ public class NetworkIdentity implements Comparable<NetworkIdentity> {
 
     public static final int SUBTYPE_COMBINED = -1;
 
+    /**
+     * Network has no {@code NetworkCapabilities#NET_CAPABILITY_OEM_*}.
+     * @hide
+     */
+    public static final int OEM_NONE = 0x0;
+    /**
+     * Network has {@link NetworkCapabilities#NET_CAPABILITY_OEM_PAID}.
+     * @hide
+     */
+    public static final int OEM_PAID = 0x1;
+    /**
+     * Network has {@link NetworkCapabilities#NET_CAPABILITY_OEM_PRIVATE}.
+     * @hide
+     */
+    public static final int OEM_PRIVATE = 0x2;
+
     final int mType;
     final int mSubType;
     final String mSubscriberId;
@@ -48,10 +66,11 @@ public class NetworkIdentity implements Comparable<NetworkIdentity> {
     final boolean mRoaming;
     final boolean mMetered;
     final boolean mDefaultNetwork;
+    final int mOemManaged;
 
     public NetworkIdentity(
             int type, int subType, String subscriberId, String networkId, boolean roaming,
-            boolean metered, boolean defaultNetwork) {
+            boolean metered, boolean defaultNetwork, int oemManaged) {
         mType = type;
         mSubType = subType;
         mSubscriberId = subscriberId;
@@ -59,12 +78,13 @@ public class NetworkIdentity implements Comparable<NetworkIdentity> {
         mRoaming = roaming;
         mMetered = metered;
         mDefaultNetwork = defaultNetwork;
+        mOemManaged = oemManaged;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(mType, mSubType, mSubscriberId, mNetworkId, mRoaming, mMetered,
-                mDefaultNetwork);
+                mDefaultNetwork, mOemManaged);
     }
 
     @Override
@@ -75,7 +95,8 @@ public class NetworkIdentity implements Comparable<NetworkIdentity> {
                     && Objects.equals(mSubscriberId, ident.mSubscriberId)
                     && Objects.equals(mNetworkId, ident.mNetworkId)
                     && mMetered == ident.mMetered
-                    && mDefaultNetwork == ident.mDefaultNetwork;
+                    && mDefaultNetwork == ident.mDefaultNetwork
+                    && mOemManaged == ident.mOemManaged;
         }
         return false;
     }
@@ -102,7 +123,35 @@ public class NetworkIdentity implements Comparable<NetworkIdentity> {
         }
         builder.append(", metered=").append(mMetered);
         builder.append(", defaultNetwork=").append(mDefaultNetwork);
+        builder.append(", oemManaged=").append(getOemManagedNames(mOemManaged));
         return builder.append("}").toString();
+    }
+
+    /**
+     * Get the human readable representation of a bitfield representing the OEM managed state of a
+     * network.
+     */
+    static String getOemManagedNames(int oemManaged) {
+        if (oemManaged == OEM_NONE) {
+            return "OEM_NONE";
+        }
+        final int[] bitPositions = NetworkCapabilitiesUtils.unpackBits(oemManaged);
+        final ArrayList<String> oemManagedNames = new ArrayList<String>();
+        for (int position : bitPositions) {
+            oemManagedNames.add(nameOfOemManaged(1 << position));
+        }
+        return String.join(",", oemManagedNames);
+    }
+
+    private static String nameOfOemManaged(int oemManagedBit) {
+        switch (oemManagedBit) {
+            case OEM_PAID:
+                return "OEM_PAID";
+            case OEM_PRIVATE:
+                return "OEM_PRIVATE";
+            default:
+                return "Invalid(" + oemManagedBit + ")";
+        }
     }
 
     public void dumpDebug(ProtoOutputStream proto, long tag) {
@@ -120,6 +169,7 @@ public class NetworkIdentity implements Comparable<NetworkIdentity> {
         proto.write(NetworkIdentityProto.ROAMING, mRoaming);
         proto.write(NetworkIdentityProto.METERED, mMetered);
         proto.write(NetworkIdentityProto.DEFAULT_NETWORK, mDefaultNetwork);
+        proto.write(NetworkIdentityProto.OEM_MANAGED_NETWORK, mOemManaged);
 
         proto.end(start);
     }
@@ -152,40 +202,57 @@ public class NetworkIdentity implements Comparable<NetworkIdentity> {
         return mDefaultNetwork;
     }
 
-    /**
-     * Build a {@link NetworkIdentity} from the given {@link NetworkState} and {@code subType},
-     * assuming that any mobile networks are using the current IMSI. The subType if applicable,
-     * should be set as one of the TelephonyManager.NETWORK_TYPE_* constants, or
-     * {@link android.telephony.TelephonyManager#NETWORK_TYPE_UNKNOWN} if not.
-     */
-    public static NetworkIdentity buildNetworkIdentity(Context context, NetworkState state,
-            boolean defaultNetwork, @NetworkType int subType) {
-        final int legacyType = state.legacyNetworkType;
+    public int getOemManaged() {
+        return mOemManaged;
+    }
 
-        String subscriberId = null;
+    /**
+     * Build a {@link NetworkIdentity} from the given {@link NetworkStateSnapshot} and
+     * {@code subType}, assuming that any mobile networks are using the current IMSI.
+     * The subType if applicable, should be set as one of the TelephonyManager.NETWORK_TYPE_*
+     * constants, or {@link android.telephony.TelephonyManager#NETWORK_TYPE_UNKNOWN} if not.
+     */
+    public static NetworkIdentity buildNetworkIdentity(Context context,
+            NetworkStateSnapshot snapshot, boolean defaultNetwork, @NetworkType int subType) {
+        final int legacyType = snapshot.getLegacyType();
+
+        final String subscriberId = snapshot.getSubscriberId();
         String networkId = null;
-        boolean roaming = !state.networkCapabilities.hasCapability(
+        boolean roaming = !snapshot.getNetworkCapabilities().hasCapability(
                 NetworkCapabilities.NET_CAPABILITY_NOT_ROAMING);
-        boolean metered = !state.networkCapabilities.hasCapability(
+        boolean metered = !snapshot.getNetworkCapabilities().hasCapability(
                 NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
 
-        subscriberId = state.subscriberId;
+        final int oemManaged = getOemBitfield(snapshot.getNetworkCapabilities());
 
         if (legacyType == TYPE_WIFI) {
-            if (state.networkCapabilities.getSsid() != null) {
-                networkId = state.networkCapabilities.getSsid();
-                if (networkId == null) {
-                    // TODO: Figure out if this code path never runs. If so, remove them.
-                    final WifiManager wifi = (WifiManager) context.getSystemService(
-                            Context.WIFI_SERVICE);
-                    final WifiInfo info = wifi.getConnectionInfo();
-                    networkId = info != null ? info.getSSID() : null;
-                }
+            networkId = snapshot.getNetworkCapabilities().getSsid();
+            if (networkId == null) {
+                final WifiManager wifi = context.getSystemService(WifiManager.class);
+                final WifiInfo info = wifi.getConnectionInfo();
+                networkId = info != null ? info.getSSID() : null;
             }
         }
 
         return new NetworkIdentity(legacyType, subType, subscriberId, networkId, roaming, metered,
-                defaultNetwork);
+                defaultNetwork, oemManaged);
+    }
+
+    /**
+     * Builds a bitfield of {@code NetworkIdentity.OEM_*} based on {@link NetworkCapabilities}.
+     * @hide
+     */
+    public static int getOemBitfield(NetworkCapabilities nc) {
+        int oemManaged = OEM_NONE;
+
+        if (nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_OEM_PAID)) {
+            oemManaged |= OEM_PAID;
+        }
+        if (nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_OEM_PRIVATE)) {
+            oemManaged |= OEM_PRIVATE;
+        }
+
+        return oemManaged;
     }
 
     @Override
@@ -208,6 +275,9 @@ public class NetworkIdentity implements Comparable<NetworkIdentity> {
         }
         if (res == 0) {
             res = Boolean.compare(mDefaultNetwork, another.mDefaultNetwork);
+        }
+        if (res == 0) {
+            res = Integer.compare(mOemManaged, another.mOemManaged);
         }
         return res;
     }

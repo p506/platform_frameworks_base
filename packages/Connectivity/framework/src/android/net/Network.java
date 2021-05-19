@@ -27,13 +27,12 @@ import android.os.Parcelable;
 import android.system.ErrnoException;
 import android.system.Os;
 import android.system.OsConstants;
-import android.util.proto.ProtoOutputStream;
 
 import com.android.internal.annotations.GuardedBy;
-import com.android.okhttp.internalandroidapi.Dns;
-import com.android.okhttp.internalandroidapi.HttpURLConnectionFactory;
 
 import libcore.io.IoUtils;
+import libcore.net.http.Dns;
+import libcore.net.http.HttpURLConnectionFactory;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -142,7 +141,7 @@ public class Network implements Parcelable {
      * @throws UnknownHostException if the address lookup fails.
      */
     public InetAddress[] getAllByName(String host) throws UnknownHostException {
-        return InetAddress.getAllByNameOnNet(host, getNetIdForResolv());
+        return InetAddressCompat.getAllByNameOnNet(host, getNetIdForResolv());
     }
 
     /**
@@ -155,7 +154,7 @@ public class Network implements Parcelable {
      *             if the address lookup fails.
      */
     public InetAddress getByName(String host) throws UnknownHostException {
-        return InetAddress.getByNameOnNet(host, getNetIdForResolv());
+        return InetAddressCompat.getByNameOnNet(host, getNetIdForResolv());
     }
 
     /**
@@ -299,7 +298,7 @@ public class Network implements Parcelable {
         // Set configuration on the HttpURLConnectionFactory that will be good for all
         // connections created by this Network. Configuration that might vary is left
         // until openConnection() and passed as arguments.
-        HttpURLConnectionFactory urlConnectionFactory = new HttpURLConnectionFactory();
+        HttpURLConnectionFactory urlConnectionFactory = HttpURLConnectionFactory.createInstance();
         urlConnectionFactory.setDns(dnsLookup); // Let traffic go via dnsLookup
         // A private connection pool just for this Network.
         urlConnectionFactory.setNewConnectionPool(httpMaxConnections,
@@ -525,12 +524,5 @@ public class Network implements Parcelable {
     @Override
     public String toString() {
         return Integer.toString(netId);
-    }
-
-    /** @hide */
-    public void dumpDebug(ProtoOutputStream proto, long fieldId) {
-        final long token = proto.start(fieldId);
-        proto.write(NetworkProto.NET_ID, netId);
-        proto.end(token);
     }
 }

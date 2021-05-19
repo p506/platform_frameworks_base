@@ -26,6 +26,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -41,12 +42,14 @@ import android.net.NetworkRequest;
 import android.net.TelephonyNetworkSpecifier;
 import android.os.ParcelUuid;
 import android.os.test.TestLooper;
+import android.telephony.CarrierConfigManager;
 import android.telephony.SubscriptionInfo;
+import android.telephony.TelephonyManager;
 import android.util.ArraySet;
 
 import com.android.server.vcn.TelephonySubscriptionTracker.TelephonySubscriptionSnapshot;
 import com.android.server.vcn.UnderlyingNetworkTracker.NetworkBringupCallback;
-import com.android.server.vcn.UnderlyingNetworkTracker.RouteSelectionCallback;
+import com.android.server.vcn.UnderlyingNetworkTracker.UnderlyingNetworkListener;
 import com.android.server.vcn.UnderlyingNetworkTracker.UnderlyingNetworkRecord;
 import com.android.server.vcn.UnderlyingNetworkTracker.UnderlyingNetworkTrackerCallback;
 
@@ -58,7 +61,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
@@ -97,11 +99,13 @@ public class UnderlyingNetworkTrackerTest {
     @Mock private Context mContext;
     @Mock private VcnNetworkProvider mVcnNetworkProvider;
     @Mock private ConnectivityManager mConnectivityManager;
+    @Mock private TelephonyManager mTelephonyManager;
+    @Mock private CarrierConfigManager mCarrierConfigManager;
     @Mock private TelephonySubscriptionSnapshot mSubscriptionSnapshot;
     @Mock private UnderlyingNetworkTrackerCallback mNetworkTrackerCb;
     @Mock private Network mNetwork;
 
-    @Captor private ArgumentCaptor<RouteSelectionCallback> mRouteSelectionCallbackCaptor;
+    @Captor private ArgumentCaptor<UnderlyingNetworkListener> mUnderlyingNetworkListenerCaptor;
 
     private TestLooper mTestLooper;
     private VcnContext mVcnContext;
@@ -112,14 +116,27 @@ public class UnderlyingNetworkTrackerTest {
         MockitoAnnotations.initMocks(this);
 
         mTestLooper = new TestLooper();
-        mVcnContext = spy(new VcnContext(mContext, mTestLooper.getLooper(), mVcnNetworkProvider));
-        doNothing().when(mVcnContext).ensureRunningOnLooperThread();
+        mVcnContext =
+                spy(
+                        new VcnContext(
+                                mContext,
+                                mTestLooper.getLooper(),
+                                mVcnNetworkProvider,
+                                false /* isInTestMode */));
+        resetVcnContext();
 
         setupSystemService(
                 mContext,
                 mConnectivityManager,
                 Context.CONNECTIVITY_SERVICE,
                 ConnectivityManager.class);
+        setupSystemService(
+                mContext, mTelephonyManager, Context.TELEPHONY_SERVICE, TelephonyManager.class);
+        setupSystemService(
+                mContext,
+                mCarrierConfigManager,
+                Context.CARRIER_CONFIG_SERVICE,
+                CarrierConfigManager.class);
 
         when(mSubscriptionSnapshot.getAllSubIdsInGroup(eq(SUB_GROUP))).thenReturn(INITIAL_SUB_IDS);
 
@@ -128,8 +145,12 @@ public class UnderlyingNetworkTrackerTest {
                         mVcnContext,
                         SUB_GROUP,
                         mSubscriptionSnapshot,
-                        Collections.singleton(NetworkCapabilities.NET_CAPABILITY_INTERNET),
                         mNetworkTrackerCb);
+    }
+
+    private void resetVcnContext() {
+        reset(mVcnContext);
+        doNothing().when(mVcnContext).ensureRunningOnLooperThread();
     }
 
     private static LinkProperties getLinkPropertiesWithName(String iface) {
@@ -146,40 +167,67 @@ public class UnderlyingNetworkTrackerTest {
 
     @Test
     public void testNetworkCallbacksRegisteredOnStartup() {
-        // verify NetworkCallbacks registered when instantiated
-        verify(mConnectivityManager)
-                .requestBackgroundNetwork(
-                        eq(getWifiRequest()),
-                        any(),
-                        any(NetworkBringupCallback.class));
-        verifyBackgroundCellRequests(mSubscriptionSnapshot, SUB_GROUP, INITIAL_SUB_IDS);
-
-        verify(mConnectivityManager)
-                .requestBackgroundNetwork(
-                        eq(getRouteSelectionRequest()),
-                        any(),
-                        any(RouteSelectionCallback.class));
+        verifyNetworkRequestsRegistered(INITIAL_SUB_IDS);
     }
 
-    private void verifyBackgroundCellRequests(
-            TelephonySubscriptionSnapshot snapshot,
-            ParcelUuid subGroup,
-            Set<Integer> expectedSubIds) {
-        verify(snapshot).getAllSubIdsInGroup(eq(subGroup));
+    @Test
+    public void testNetworkCallbacksRegisteredOnStartupForTestMode() {
+        final ConnectivityManager cm = mock(ConnectivityManager.class);
+        setupSystemService(mContext, cm, Context.CONNECTIVITY_SERVICE, ConnectivityManager.class);
+        final VcnContext vcnContext =
+                new VcnContext(
+                        mContext,
+                        mTestLooper.getLooper(),
+                        mVcnNetworkProvider,
+                        true /* isInTestMode */);
 
+        new UnderlyingNetworkTracker(
+                vcnContext,
+                SUB_GROUP,
+                mSubscriptionSnapshot,
+                mNetworkTrackerCb);
+
+        verify(cm)
+                .registerNetworkCallback(
+                        eq(getTestNetworkRequest(INITIAL_SUB_IDS)),
+                        any(UnderlyingNetworkListener.class),
+                        any());
+    }
+
+    private void verifyNetworkRequestsRegistered(Set<Integer> expectedSubIds) {
+        verify(mConnectivityManager)
+                .requestBackgroundNetwork(
+                        eq(getWifiRequest(expectedSubIds)),
+                        any(NetworkBringupCallback.class),
+                        any());
         for (final int subId : expectedSubIds) {
             verify(mConnectivityManager)
                     .requestBackgroundNetwork(
                             eq(getCellRequestForSubId(subId)),
-                            any(),
-                            any(NetworkBringupCallback.class));
+                            any(NetworkBringupCallback.class), any());
         }
+
+        verify(mConnectivityManager)
+                .registerNetworkCallback(
+                        eq(getRouteSelectionRequest(expectedSubIds)),
+                        any(UnderlyingNetworkListener.class),
+                        any());
+        verify(mConnectivityManager)
+                .registerNetworkCallback(
+                        eq(getWifiEntryRssiThresholdRequest(expectedSubIds)),
+                        any(NetworkBringupCallback.class),
+                        any());
+        verify(mConnectivityManager)
+                .registerNetworkCallback(
+                        eq(getWifiExitRssiThresholdRequest(expectedSubIds)),
+                        any(NetworkBringupCallback.class),
+                        any());
     }
 
     @Test
     public void testUpdateSubscriptionSnapshot() {
         // Verify initial cell background requests filed
-        verifyBackgroundCellRequests(mSubscriptionSnapshot, SUB_GROUP, INITIAL_SUB_IDS);
+        verifyNetworkRequestsRegistered(INITIAL_SUB_IDS);
 
         TelephonySubscriptionSnapshot subscriptionUpdate =
                 mock(TelephonySubscriptionSnapshot.class);
@@ -187,15 +235,36 @@ public class UnderlyingNetworkTrackerTest {
 
         mUnderlyingNetworkTracker.updateSubscriptionSnapshot(subscriptionUpdate);
 
-        // verify that initially-filed bringup requests are unregistered
-        verify(mConnectivityManager, times(INITIAL_SUB_IDS.size()))
+        // verify that initially-filed bringup requests are unregistered (cell + wifi)
+        verify(mConnectivityManager, times(INITIAL_SUB_IDS.size() + 3))
                 .unregisterNetworkCallback(any(NetworkBringupCallback.class));
-        verifyBackgroundCellRequests(subscriptionUpdate, SUB_GROUP, UPDATED_SUB_IDS);
+        verify(mConnectivityManager)
+                .unregisterNetworkCallback(any(UnderlyingNetworkListener.class));
+        verifyNetworkRequestsRegistered(UPDATED_SUB_IDS);
     }
 
-    private NetworkRequest getWifiRequest() {
+    private NetworkRequest getWifiRequest(Set<Integer> netCapsSubIds) {
         return getExpectedRequestBase()
                 .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .setSubscriptionIds(netCapsSubIds)
+                .build();
+    }
+
+    private NetworkRequest getWifiEntryRssiThresholdRequest(Set<Integer> netCapsSubIds) {
+        // TODO (b/187991063): Add tests for carrier-config based thresholds
+        return getExpectedRequestBase()
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .setSubscriptionIds(netCapsSubIds)
+                .setSignalStrength(UnderlyingNetworkTracker.WIFI_ENTRY_RSSI_THRESHOLD_DEFAULT)
+                .build();
+    }
+
+    private NetworkRequest getWifiExitRssiThresholdRequest(Set<Integer> netCapsSubIds) {
+        // TODO (b/187991063): Add tests for carrier-config based thresholds
+        return getExpectedRequestBase()
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .setSubscriptionIds(netCapsSubIds)
+                .setSignalStrength(UnderlyingNetworkTracker.WIFI_EXIT_RSSI_THRESHOLD_DEFAULT)
                 .build();
     }
 
@@ -206,28 +275,43 @@ public class UnderlyingNetworkTrackerTest {
                 .build();
     }
 
-    private NetworkRequest getRouteSelectionRequest() {
-        return getExpectedRequestBase().build();
+    private NetworkRequest getRouteSelectionRequest(Set<Integer> netCapsSubIds) {
+        return getExpectedRequestBase()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)
+                .setSubscriptionIds(netCapsSubIds)
+                .build();
+    }
+
+    private NetworkRequest getTestNetworkRequest(Set<Integer> netCapsSubIds) {
+        return new NetworkRequest.Builder()
+                .clearCapabilities()
+                .addTransportType(NetworkCapabilities.TRANSPORT_TEST)
+                .setSubscriptionIds(netCapsSubIds)
+                .build();
     }
 
     private NetworkRequest.Builder getExpectedRequestBase() {
-        return new NetworkRequest.Builder()
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                .removeCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-                .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-                .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VCN_MANAGED)
-                .addUnwantedCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VCN_MANAGED);
+        final NetworkRequest.Builder builder =
+                new NetworkRequest.Builder()
+                        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                        .removeCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+                        .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+                        .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VCN_MANAGED);
+
+        return builder;
     }
 
     @Test
     public void testTeardown() {
         mUnderlyingNetworkTracker.teardown();
 
-        // Expect 3 NetworkBringupCallbacks to be unregistered: 1 for WiFi and 2 for Cellular (1x
-        // for each subId)
-        verify(mConnectivityManager, times(3))
+        // Expect 5 NetworkBringupCallbacks to be unregistered: 1 for WiFi, 2 for Cellular (1x for
+        // each subId), and 1 for each of the Wifi signal strength thresholds
+        verify(mConnectivityManager, times(5))
                 .unregisterNetworkCallback(any(NetworkBringupCallback.class));
-        verify(mConnectivityManager).unregisterNetworkCallback(any(RouteSelectionCallback.class));
+        verify(mConnectivityManager)
+                .unregisterNetworkCallback(any(UnderlyingNetworkListener.class));
     }
 
     @Test
@@ -260,19 +344,19 @@ public class UnderlyingNetworkTrackerTest {
         verifyRegistrationOnAvailableAndGetCallback();
     }
 
-    private RouteSelectionCallback verifyRegistrationOnAvailableAndGetCallback() {
+    private UnderlyingNetworkListener verifyRegistrationOnAvailableAndGetCallback() {
         return verifyRegistrationOnAvailableAndGetCallback(INITIAL_NETWORK_CAPABILITIES);
     }
 
-    private RouteSelectionCallback verifyRegistrationOnAvailableAndGetCallback(
+    private UnderlyingNetworkListener verifyRegistrationOnAvailableAndGetCallback(
             NetworkCapabilities networkCapabilities) {
         verify(mConnectivityManager)
-                .requestBackgroundNetwork(
-                        eq(getRouteSelectionRequest()),
-                        any(),
-                        mRouteSelectionCallbackCaptor.capture());
+                .registerNetworkCallback(
+                        eq(getRouteSelectionRequest(INITIAL_SUB_IDS)),
+                        mUnderlyingNetworkListenerCaptor.capture(),
+                        any());
 
-        RouteSelectionCallback cb = mRouteSelectionCallbackCaptor.getValue();
+        UnderlyingNetworkListener cb = mUnderlyingNetworkListenerCaptor.getValue();
         cb.onAvailable(mNetwork);
         cb.onCapabilitiesChanged(mNetwork, networkCapabilities);
         cb.onLinkPropertiesChanged(mNetwork, INITIAL_LINK_PROPERTIES);
@@ -290,7 +374,7 @@ public class UnderlyingNetworkTrackerTest {
 
     @Test
     public void testRecordTrackerCallbackNotifiedForNetworkCapabilitiesChange() {
-        RouteSelectionCallback cb = verifyRegistrationOnAvailableAndGetCallback();
+        UnderlyingNetworkListener cb = verifyRegistrationOnAvailableAndGetCallback();
 
         cb.onCapabilitiesChanged(mNetwork, UPDATED_NETWORK_CAPABILITIES);
 
@@ -305,7 +389,7 @@ public class UnderlyingNetworkTrackerTest {
 
     @Test
     public void testRecordTrackerCallbackNotifiedForLinkPropertiesChange() {
-        RouteSelectionCallback cb = verifyRegistrationOnAvailableAndGetCallback();
+        UnderlyingNetworkListener cb = verifyRegistrationOnAvailableAndGetCallback();
 
         cb.onLinkPropertiesChanged(mNetwork, UPDATED_LINK_PROPERTIES);
 
@@ -320,9 +404,9 @@ public class UnderlyingNetworkTrackerTest {
 
     @Test
     public void testRecordTrackerCallbackNotifiedForNetworkSuspended() {
-        RouteSelectionCallback cb = verifyRegistrationOnAvailableAndGetCallback();
+        UnderlyingNetworkListener cb = verifyRegistrationOnAvailableAndGetCallback();
 
-        cb.onNetworkSuspended(mNetwork);
+        cb.onCapabilitiesChanged(mNetwork, SUSPENDED_NETWORK_CAPABILITIES);
 
         UnderlyingNetworkRecord expectedRecord =
                 new UnderlyingNetworkRecord(
@@ -330,15 +414,19 @@ public class UnderlyingNetworkTrackerTest {
                         SUSPENDED_NETWORK_CAPABILITIES,
                         INITIAL_LINK_PROPERTIES,
                         false /* isBlocked */);
-        verify(mNetworkTrackerCb).onSelectedUnderlyingNetworkChanged(eq(expectedRecord));
+        verify(mNetworkTrackerCb, times(1)).onSelectedUnderlyingNetworkChanged(eq(expectedRecord));
+        // onSelectedUnderlyingNetworkChanged() won't be fired twice if network capabilities doesn't
+        // change.
+        cb.onCapabilitiesChanged(mNetwork, SUSPENDED_NETWORK_CAPABILITIES);
+        verify(mNetworkTrackerCb, times(1)).onSelectedUnderlyingNetworkChanged(eq(expectedRecord));
     }
 
     @Test
     public void testRecordTrackerCallbackNotifiedForNetworkResumed() {
-        RouteSelectionCallback cb =
+        UnderlyingNetworkListener cb =
                 verifyRegistrationOnAvailableAndGetCallback(SUSPENDED_NETWORK_CAPABILITIES);
 
-        cb.onNetworkResumed(mNetwork);
+        cb.onCapabilitiesChanged(mNetwork, INITIAL_NETWORK_CAPABILITIES);
 
         UnderlyingNetworkRecord expectedRecord =
                 new UnderlyingNetworkRecord(
@@ -346,12 +434,16 @@ public class UnderlyingNetworkTrackerTest {
                         INITIAL_NETWORK_CAPABILITIES,
                         INITIAL_LINK_PROPERTIES,
                         false /* isBlocked */);
-        verify(mNetworkTrackerCb).onSelectedUnderlyingNetworkChanged(eq(expectedRecord));
+        verify(mNetworkTrackerCb, times(1)).onSelectedUnderlyingNetworkChanged(eq(expectedRecord));
+        // onSelectedUnderlyingNetworkChanged() won't be fired twice if network capabilities doesn't
+        // change.
+        cb.onCapabilitiesChanged(mNetwork, INITIAL_NETWORK_CAPABILITIES);
+        verify(mNetworkTrackerCb, times(1)).onSelectedUnderlyingNetworkChanged(eq(expectedRecord));
     }
 
     @Test
     public void testRecordTrackerCallbackNotifiedForBlocked() {
-        RouteSelectionCallback cb = verifyRegistrationOnAvailableAndGetCallback();
+        UnderlyingNetworkListener cb = verifyRegistrationOnAvailableAndGetCallback();
 
         cb.onBlockedStatusChanged(mNetwork, true /* isBlocked */);
 
@@ -366,7 +458,7 @@ public class UnderlyingNetworkTrackerTest {
 
     @Test
     public void testRecordTrackerCallbackNotifiedForNetworkLoss() {
-        RouteSelectionCallback cb = verifyRegistrationOnAvailableAndGetCallback();
+        UnderlyingNetworkListener cb = verifyRegistrationOnAvailableAndGetCallback();
 
         cb.onLost(mNetwork);
 
@@ -375,7 +467,7 @@ public class UnderlyingNetworkTrackerTest {
 
     @Test
     public void testRecordTrackerCallbackIgnoresDuplicateRecord() {
-        RouteSelectionCallback cb = verifyRegistrationOnAvailableAndGetCallback();
+        UnderlyingNetworkListener cb = verifyRegistrationOnAvailableAndGetCallback();
 
         cb.onCapabilitiesChanged(mNetwork, INITIAL_NETWORK_CAPABILITIES);
 
@@ -383,4 +475,6 @@ public class UnderlyingNetworkTrackerTest {
         // UnderlyingNetworkRecord does not actually change
         verifyNoMoreInteractions(mNetworkTrackerCb);
     }
+
+    // TODO (b/187991063): Add tests for network prioritization
 }

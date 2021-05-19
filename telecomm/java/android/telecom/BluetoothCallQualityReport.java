@@ -24,6 +24,8 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Objects;
+
 /**
  * This class represents the quality report that bluetooth framework sends
  * whenever there's a bad voice quality is detected from their side.
@@ -64,7 +66,9 @@ public final class BluetoothCallQualityReport implements Parcelable {
     }
 
     /**
-     * @return {@code true} if bluetooth hardware detects voice is choppy
+     * When the bluetooth controller detects factors that cause choppy voice,
+     * the controller reports an (e)SCO Voice Choppy event to the host
+     * @return {@code true} when we receive (e)SCO Voice Choppy event from the controller
      */
     public boolean isChoppyVoice() {
         return mChoppyVoice;
@@ -144,6 +148,26 @@ public final class BluetoothCallQualityReport implements Parcelable {
                     return new BluetoothCallQualityReport[size];
                 }
             };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BluetoothCallQualityReport that = (BluetoothCallQualityReport) o;
+        return mSentTimestampMillis == that.mSentTimestampMillis
+                && mChoppyVoice == that.mChoppyVoice && mRssiDbm == that.mRssiDbm
+                && mSnrDb == that.mSnrDb
+                && mRetransmittedPacketsCount == that.mRetransmittedPacketsCount
+                && mPacketsNotReceivedCount == that.mPacketsNotReceivedCount
+                && mNegativeAcknowledgementCount == that.mNegativeAcknowledgementCount;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mSentTimestampMillis, mChoppyVoice, mRssiDbm, mSnrDb,
+                mRetransmittedPacketsCount, mPacketsNotReceivedCount,
+                mNegativeAcknowledgementCount);
+    }
 
     /**
      * Builder class for {@link ConnectionRequest}

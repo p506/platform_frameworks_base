@@ -115,8 +115,18 @@ class CompatConfigBuilder {
         return this;
     }
 
-    CompatConfigBuilder addOverridableChangeWithId(long id) {
-        mChanges.add(new CompatChange(id, "", -1, -1, false, true, "", true));
+    CompatConfigBuilder addEnabledOverridableChangeWithId(long id) {
+        mChanges.add(new CompatChange(id, "", -1, -1, false, false, "", true));
+        return this;
+    }
+
+    CompatConfigBuilder addDisabledOverridableChangeWithId(long id) {
+        mChanges.add(new CompatChange(id, "", -1, -1, true, false, "", true));
+        return this;
+    }
+
+    CompatConfigBuilder addEnabledSinceApexChangeWithId(int sdk, long id) {
+        mChanges.add(new CompatChange(id, "", -1, sdk, false, false, "", false));
         return this;
     }
 

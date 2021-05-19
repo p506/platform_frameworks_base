@@ -57,7 +57,7 @@
     <string name="imei" msgid="2157082351232630390">"IMEI"</string>
     <string name="meid" msgid="3291227361605924674">"MEID"</string>
     <string name="ClipMmi" msgid="4110549342447630629">"ID Pemanggil Masuk"</string>
-    <string name="ClirMmi" msgid="4702929460236547156">"ID Pemanggil Keluar"</string>
+    <string name="ClirMmi" msgid="6752346475055446417">"Sembunyikan ID Pemanggil Keluar"</string>
     <string name="ColpMmi" msgid="4736462893284419302">"ID Laluan yang disambungkan"</string>
     <string name="ColrMmi" msgid="5889782479745764278">"Sekatan ID Laluan yang disambungkan"</string>
     <string name="CfMmi" msgid="8390012691099787178">"Pemajuan panggilan"</string>
@@ -317,7 +317,7 @@
     <string name="permgroupdesc_sensors" msgid="2610631290633747752">"akses data penderia tentang tanda vital anda"</string>
     <string name="capability_title_canRetrieveWindowContent" msgid="7554282892101587296">"Dapatkan kembali kandungan tetingkap"</string>
     <string name="capability_desc_canRetrieveWindowContent" msgid="6195610527625237661">"Periksa kandungan tetingkap yang berinteraksi dengan anda."</string>
-    <string name="capability_title_canRequestTouchExploration" msgid="327598364696316213">"Hidupkan Jelajah melalui Sentuhan"</string>
+    <string name="capability_title_canRequestTouchExploration" msgid="327598364696316213">"Hidupkan Teroka melalui Sentuhan"</string>
     <string name="capability_desc_canRequestTouchExploration" msgid="4394677060796752976">"Item yang diketik akan dituturkan dengan lantang dan skrin boleh dijelajah menggunakan gerak isyarat."</string>
     <string name="capability_title_canRequestFilterKeyEvents" msgid="2772371671541753254">"Perhatikan teks yang anda taip"</string>
     <string name="capability_desc_canRequestFilterKeyEvents" msgid="2381315802405773092">"Termasuk data peribadi seperti nombor kad kredit dan kata laluan."</string>
@@ -349,6 +349,8 @@
     <string name="permdesc_receiveMms" msgid="958102423732219710">"Membenarkan apl menerima dan memproses mesej MMS. Ini bermakna apl boleh memantau atau memadam mesej yang dihantar ke peranti anda tanpa menunjukkannya kepada anda."</string>
     <string name="permlab_bindCellBroadcastService" msgid="586746677002040651">"Kirim semula mesej siaran sel"</string>
     <string name="permdesc_bindCellBroadcastService" msgid="6540910200973641606">"Membenarkan apl terikat pada modul siaran sel untuk mengirim semula mesej siaran sel apabila diterima. Makluman siaran sel dihantar di sesetengah lokasi untuk memberi amaran kepada anda tentang situasi kecemasan. Apl hasad boleh mengganggu prestasi atau operasi peranti anda apabila siaran sel kecemasan diterima."</string>
+    <string name="permlab_manageOngoingCalls" msgid="281244770664231782">"Urus panggilan yang sedang berjalan"</string>
+    <string name="permdesc_manageOngoingCalls" msgid="7003138133829915265">"Benarkan apl melihat butiran panggilan yang sedang berjalan pada peranti anda dan mengawal panggilan ini."</string>
     <string name="permlab_readCellBroadcasts" msgid="5869884450872137693">"baca mesej siaran sel"</string>
     <string name="permdesc_readCellBroadcasts" msgid="672513437331980168">"Membolehkan apl membaca mesej siaran sel yang diterima oleh peranti anda. Isyarat siaran sel dihantar di beberapa lokasi untuk memberi amaran kepada anda tentang situasi kecemasan. Apl hasad boleh mengganggu prestasi atau operasi peranti anda apabila siaran sel kecemasan diterima."</string>
     <string name="permlab_subscribedFeedsRead" msgid="217624769238425461">"baca suapan langganan"</string>
@@ -987,9 +989,9 @@
     <string name="searchview_description_clear" msgid="1989371719192982900">"Pertanyaan jelas"</string>
     <string name="searchview_description_submit" msgid="6771060386117334686">"Serah pertanyaan"</string>
     <string name="searchview_description_voice" msgid="42360159504884679">"Carian suara"</string>
-    <string name="enable_explore_by_touch_warning_title" msgid="5095399706284943314">"Dayakan Jelajah melalui Sentuhan?"</string>
-    <string name="enable_explore_by_touch_warning_message" product="tablet" msgid="1037295476738940824">"<xliff:g id="ACCESSIBILITY_SERVICE_NAME">%1$s</xliff:g> ingin mendayakan Jelajah melalui Sentuhan. Apabila Jelajah melalui Sentuhan didayakan, anda boleh mendengar atau melihat penerangan tentang apa di bawah jari anda atau melakukan gerak isyarat untuk berinteraksi dengan tablet."</string>
-    <string name="enable_explore_by_touch_warning_message" product="default" msgid="4312979647356179250">"<xliff:g id="ACCESSIBILITY_SERVICE_NAME">%1$s</xliff:g> ingin mendayakan Jelajah melalui Sentuhan. Apabila Jelajah melalui Sentuhan didayakan, anda boleh mendengar atau melihat penerangan tentang apa di bawah jari anda atau melakukan gerak isyarat untuk berinteraksi dengan telefon."</string>
+    <string name="enable_explore_by_touch_warning_title" msgid="5095399706284943314">"Dayakan Teroka melalui Sentuhan?"</string>
+    <string name="enable_explore_by_touch_warning_message" product="tablet" msgid="1037295476738940824">"<xliff:g id="ACCESSIBILITY_SERVICE_NAME">%1$s</xliff:g> ingin mendayakan Teroka melalui Sentuhan. Apabila Teroka melalui Sentuhan didayakan, anda boleh mendengar atau melihat penerangan tentang apa-apa di bawah jari anda atau melakukan gerak isyarat untuk berinteraksi dengan tablet."</string>
+    <string name="enable_explore_by_touch_warning_message" product="default" msgid="4312979647356179250">"<xliff:g id="ACCESSIBILITY_SERVICE_NAME">%1$s</xliff:g> ingin mendayakan Teroka melalui Sentuhan. Apabila Teroka melalui Sentuhan didayakan, anda boleh mendengar atau melihat penerangan tentang apa-apa di bawah jari anda atau melakukan gerak isyarat untuk berinteraksi dengan telefon."</string>
     <string name="oneMonthDurationPast" msgid="4538030857114635777">"1 bulan yang lalu"</string>
     <string name="beforeOneMonthDurationPast" msgid="8315149541372065392">"Sebelum 1 bulan yang lalu"</string>
     <plurals name="last_num_days" formatted="false" msgid="687443109145393632">
@@ -1103,7 +1105,7 @@
     <string name="redo" msgid="7231448494008532233">"Buat semula"</string>
     <string name="autofill" msgid="511224882647795296">"Autolengkap"</string>
     <string name="textSelectionCABTitle" msgid="5151441579532476940">"Pemilihan teks"</string>
-    <string name="addToDictionary" msgid="8041821113480950096">"Tambah ke kamus"</string>
+    <string name="addToDictionary" msgid="8041821113480950096">"Tambahkan pada kamus"</string>
     <string name="deleteText" msgid="4200807474529938112">"Padam"</string>
     <string name="inputMethod" msgid="1784759500516314751">"Kaedah input"</string>
     <string name="editTextMenuTitle" msgid="857666911134482176">"Tindakan teks"</string>
@@ -1183,7 +1185,7 @@
     <string name="unsupported_display_size_show" msgid="980129850974919375">"Sentiasa tunjukkan"</string>
     <string name="unsupported_compile_sdk_message" msgid="7326293500707890537">"<xliff:g id="APP_NAME">%1$s</xliff:g> telah dibina untuk versi yang tidak serasi dengan OS Android dan mungkin menunjukkan gelagat yang tidak dijangka. Versi kemas kini apl mungkin tersedia."</string>
     <string name="unsupported_compile_sdk_show" msgid="1601210057960312248">"Sentiasa tunjukkan"</string>
-    <string name="unsupported_compile_sdk_check_update" msgid="1103639989147664456">"Semak kemas kini"</string>
+    <string name="unsupported_compile_sdk_check_update" msgid="1103639989147664456">"Semak kemaskinian"</string>
     <string name="smv_application" msgid="3775183542777792638">"Apl <xliff:g id="APPLICATION">%1$s</xliff:g> (proses <xliff:g id="PROCESS">%2$s</xliff:g>) telah melanggar dasar Mod Tegasnya sendiri."</string>
     <string name="smv_process" msgid="1398801497130695446">"Proses <xliff:g id="PROCESS">%1$s</xliff:g> telah melanggar dasar Mod Tegasnya sendiri."</string>
     <string name="android_upgrading_title" product="default" msgid="7279077384220829683">"Telefon sedang mengemas kini…"</string>
@@ -1340,11 +1342,14 @@
     <string name="alert_windows_notification_turn_off_action" msgid="7805857234839123780">"Matikan"</string>
     <string name="ext_media_checking_notification_title" msgid="8299199995416510094">"Menyemak <xliff:g id="NAME">%s</xliff:g>…"</string>
     <string name="ext_media_checking_notification_message" msgid="2231566971425375542">"Menyemak kandungan semasa"</string>
+    <string name="ext_media_checking_notification_message" product="tv" msgid="7986154434946021415">"Menganalisis storan media"</string>
     <string name="ext_media_new_notification_title" msgid="3517407571407687677">"<xliff:g id="NAME">%s</xliff:g> baharu"</string>
     <string name="ext_media_new_notification_title" product="automotive" msgid="9085349544984742727">"<xliff:g id="NAME">%s</xliff:g> tidak berfungsi"</string>
     <string name="ext_media_new_notification_message" msgid="6095403121990786986">"Ketik untuk menyediakan"</string>
+    <string name="ext_media_new_notification_message" product="tv" msgid="216863352100263668">"Pilih untuk penyediaan"</string>
     <string name="ext_media_new_notification_message" product="automotive" msgid="5140127881613227162">"Anda mungkin perlu memformatkan semula peranti. Ketik untuk mengeluarkan media."</string>
     <string name="ext_media_ready_notification_message" msgid="777258143284919261">"Untuk memindahkan foto dan media"</string>
+    <string name="ext_media_ready_notification_message" product="tv" msgid="8847134811163165935">"Semak imbas fail media"</string>
     <string name="ext_media_unmountable_notification_title" msgid="4895444667278979910">"Isu dengan <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_unmountable_notification_title" product="automotive" msgid="3142723758949023280">"<xliff:g id="NAME">%s</xliff:g> tidak berfungsi"</string>
     <string name="ext_media_unmountable_notification_message" msgid="3256290114063126205">"Ketik untuk menyelesaikan masalah"</string>
@@ -1353,7 +1358,7 @@
     <string name="ext_media_unsupported_notification_title" msgid="4358280700537030333">"<xliff:g id="NAME">%s</xliff:g> tidak disokong"</string>
     <string name="ext_media_unsupported_notification_title" product="automotive" msgid="6004193172658722381">"<xliff:g id="NAME">%s</xliff:g> tidak berfungsi"</string>
     <string name="ext_media_unsupported_notification_message" msgid="917738524888367560">"Peranti ini tidak menyokong <xliff:g id="NAME">%s</xliff:g> ini. Ketik untuk menyediakannya dalam format yang disokong."</string>
-    <string name="ext_media_unsupported_notification_message" product="tv" msgid="7744945987775645685">"Peranti ini tidak menyokong <xliff:g id="NAME">%s</xliff:g> ini. Pilih untuk menyediakan media dalam format yang disokong."</string>
+    <string name="ext_media_unsupported_notification_message" product="tv" msgid="1595482802187036532">"Pilih untuk menyediakan <xliff:g id="NAME">%s</xliff:g> dalam format yang disokong."</string>
     <string name="ext_media_unsupported_notification_message" product="automotive" msgid="3412494732736336330">"Anda mungkin perlu memformatkan semula peranti"</string>
     <string name="ext_media_badremoval_notification_title" msgid="4114625551266196872">"<xliff:g id="NAME">%s</xliff:g> ditanggalkan tanpa dijangka"</string>
     <string name="ext_media_badremoval_notification_message" msgid="1986514704499809244">"Keluarkan media sebelum menanggalkan media itu untuk mengelakkan kehilangan kandungan"</string>
@@ -1713,6 +1718,28 @@
     <string name="mediasize_na_monarch" msgid="4396943937986136896">"Monarki"</string>
     <string name="mediasize_na_quarto" msgid="2119101847712239885">"Quarto"</string>
     <string name="mediasize_na_foolscap" msgid="5011612828564394648">"Kertas kajang"</string>
+    <!-- no translation found for mediasize_na_ansi_c (3104916921818289618) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_d (254005964819282724) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_e (4424174989686785675) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_f (146980362213260987) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_a (5280681822380032361) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_b (2113344093437297427) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_c (971002546186856623) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_d (6450996075335049806) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e (6782708486949266519) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e1 (4707138568738504275) -->
+    <skip />
+    <!-- no translation found for mediasize_na_super_b (6964127155618393178) -->
+    <skip />
     <string name="mediasize_chinese_roc_8k" msgid="411670106572707544">"ROC 8K"</string>
     <string name="mediasize_chinese_roc_16k" msgid="7496706798725321898">"ROC 16K"</string>
     <string name="mediasize_chinese_prc_1" msgid="946949835711037253">"PRC 1"</string>
@@ -1749,6 +1776,8 @@
     <string name="mediasize_japanese_kahu" msgid="7290232592648122042">"Kahu"</string>
     <string name="mediasize_japanese_kaku2" msgid="7477551750461028312">"Kaku2"</string>
     <string name="mediasize_japanese_you4" msgid="5552111912684384833">"You4"</string>
+    <!-- no translation found for mediasize_japanese_l (1326765321473431817) -->
+    <skip />
     <string name="mediasize_unknown_portrait" msgid="3817016220446495613">"Potret tidak diketahui"</string>
     <string name="mediasize_unknown_landscape" msgid="1584741567225095325">"Landskap tidak diketahui"</string>
     <string name="write_fail_reason_cancelled" msgid="2344081488493969190">"Dibatalkan"</string>
@@ -1794,7 +1823,7 @@
     <string name="confirm_battery_saver" msgid="5247976246208245754">"OK"</string>
     <string name="battery_saver_description_with_learn_more" msgid="4424488535318105801">"Untuk melanjutkan hayat bateri, Penjimat Bateri:\n\n• Menghidupkan Tema gelap\n• Mematikan atau mengehadkan aktiviti latar belakang, sesetengah kesan visual dan ciri lain seperti “Ok Google”\n\n"<annotation id="url">"Ketahui lebih lanjut"</annotation></string>
     <string name="battery_saver_description" msgid="6794188153647295212">"Untuk melanjutkan hayat bateri, Penjimat Bateri:\n\n•Menghidupkan Tema gelap\n• Mematikan atau mengehadkan aktiviti latar belakang, sesetengah kesan visual dan ciri-ciri lain seperti “Ok Google”"</string>
-    <string name="data_saver_description" msgid="4995164271550590517">"Untuk membantu mengurangkan penggunaan data, Penjimat Data menghalang sesetengah apl daripada menghantar atau menerima data di latar. Apl yang sedang digunakan boleh mengakses data tetapi mungkin tidak secara kerap. Perkara ini mungkin bermaksud bahawa imej tidak dipaparkan sehingga anda mengetik pada imej itu, contohnya."</string>
+    <string name="data_saver_description" msgid="4995164271550590517">"Untuk membantu penggunaan data dikurangkan, Penjimat Data menghalang sesetengah apl daripada menghantar atau menerima data di latar. Apl yang sedang digunakan boleh mengakses data tetapi mungkin tidak secara kerap. Perkara ini mungkin bermaksud bahawa imej tidak dipaparkan sehingga anda mengetik pada imej itu, contohnya."</string>
     <string name="data_saver_enable_title" msgid="7080620065745260137">"Hidupkan Penjimat Data?"</string>
     <string name="data_saver_enable_button" msgid="4399405762586419726">"Hidupkan"</string>
     <plurals name="zen_mode_duration_minutes_summary" formatted="false" msgid="2877101784123058273">
@@ -1892,7 +1921,7 @@
     <string name="app_blocked_title" msgid="7353262160455028160">"Apl tidak tersedia"</string>
     <string name="app_blocked_message" msgid="542972921087873023">"<xliff:g id="APP_NAME">%1$s</xliff:g> tidak tersedia sekarang."</string>
     <string name="deprecated_target_sdk_message" msgid="5203207875657579953">"Apl ini dibina untuk versi Android yang lebih lama dan mungkin tidak berfungsi dengan betul. Cuba semak kemas kini atau hubungi pembangun."</string>
-    <string name="deprecated_target_sdk_app_store" msgid="8456784048558808909">"Semak kemas kini"</string>
+    <string name="deprecated_target_sdk_app_store" msgid="8456784048558808909">"Semak kemaskinian"</string>
     <string name="new_sms_notification_title" msgid="6528758221319927107">"Anda mempunyai mesej baharu"</string>
     <string name="new_sms_notification_content" msgid="3197949934153460639">"Buka apl SMS untuk melihat"</string>
     <string name="profile_encrypted_title" msgid="9001208667521266472">"Sesetengah fungsi mungkin terhad"</string>

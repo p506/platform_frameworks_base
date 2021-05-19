@@ -1009,8 +1009,8 @@ public final class Settings {
      * Output: Nothing.
      */
     @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
-    public static final String ACTION_MANAGE_ALL_SUBSCRIPTIONS_SETTINGS =
-            "android.settings.MANAGE_ALL_SUBSCRIPTIONS_SETTINGS";
+    public static final String ACTION_MANAGE_ALL_SIM_PROFILES_SETTINGS =
+            "android.settings.MANAGE_ALL_SIM_PROFILES_SETTINGS";
 
     /**
      * Activity Action: Show screen for controlling which apps can draw on top of other apps.
@@ -7896,6 +7896,12 @@ public final class Settings {
          * @hide
          */
         public static final String UI_NIGHT_MODE_OVERRIDE_ON = "ui_night_mode_override_on";
+
+        /**
+         * The last computed night mode bool the last time the phone was on
+         * @hide
+         */
+        public static final String UI_NIGHT_MODE_LAST_COMPUTED = "ui_night_mode_last_computed";
 
         /**
          * The current night mode that has been overridden to turn off by the system.  Owned
@@ -15089,30 +15095,6 @@ public final class Settings {
         return isCallingPackageAllowedToPerformAppOpsProtectedOperation(context, uid,
                 callingPackage, throwException, AppOpsManager.OP_WRITE_SETTINGS,
                 PM_WRITE_SETTINGS, true);
-    }
-
-    /**
-     * Performs a strict and comprehensive check of whether a calling package is allowed to
-     * change the state of network, as the condition differs for pre-M, M+, and
-     * privileged/preinstalled apps. The caller is expected to have either the
-     * CHANGE_NETWORK_STATE or the WRITE_SETTINGS permission declared. Either of these
-     * permissions allow changing network state; WRITE_SETTINGS is a runtime permission and
-     * can be revoked, but (except in M, excluding M MRs), CHANGE_NETWORK_STATE is a normal
-     * permission and cannot be revoked. See http://b/23597341
-     *
-     * Note: if the check succeeds because the application holds WRITE_SETTINGS, the operation
-     * of this app will be updated to the current time.
-     * @hide
-     */
-    public static boolean checkAndNoteChangeNetworkStateOperation(Context context, int uid,
-            String callingPackage, boolean throwException) {
-        if (context.checkCallingOrSelfPermission(android.Manifest.permission.CHANGE_NETWORK_STATE)
-                == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        return isCallingPackageAllowedToPerformAppOpsProtectedOperation(context, uid,
-                callingPackage, throwException, AppOpsManager.OP_WRITE_SETTINGS,
-                PM_CHANGE_NETWORK_STATE, true);
     }
 
     /**

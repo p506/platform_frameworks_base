@@ -16,15 +16,21 @@
 
 package com.android.server.vcn;
 
+import static android.net.NetworkCapabilities.NET_CAPABILITY_DUN;
+import static android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET;
 import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_METERED;
 import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_ROAMING;
+import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_VCN_MANAGED;
 import static android.net.NetworkCapabilities.TRANSPORT_CELLULAR;
 import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -82,33 +88,46 @@ public class VcnGatewayConnectionTest extends VcnGatewayConnectionTestBase {
         super.setUp();
 
         mWifiInfo = mock(WifiInfo.class);
+        doReturn(mWifiInfo).when(mWifiInfo).makeCopy(anyLong());
     }
 
-    private void verifyBuildNetworkCapabilitiesCommon(int transportType) {
-        final NetworkCapabilities underlyingCaps = new NetworkCapabilities();
-        underlyingCaps.addTransportType(transportType);
-        underlyingCaps.addCapability(NET_CAPABILITY_NOT_METERED);
-        underlyingCaps.addCapability(NET_CAPABILITY_NOT_ROAMING);
+    private void verifyBuildNetworkCapabilitiesCommon(
+            int transportType, boolean isMobileDataEnabled) {
+        final NetworkCapabilities.Builder capBuilder = new NetworkCapabilities.Builder();
+        capBuilder.addTransportType(transportType);
+        capBuilder.addCapability(NET_CAPABILITY_NOT_VCN_MANAGED);
+        capBuilder.addCapability(NET_CAPABILITY_NOT_METERED);
+        capBuilder.addCapability(NET_CAPABILITY_NOT_ROAMING);
 
         if (transportType == TRANSPORT_WIFI) {
-            underlyingCaps.setTransportInfo(mWifiInfo);
-            underlyingCaps.setOwnerUid(TEST_UID);
+            capBuilder.setTransportInfo(mWifiInfo);
+            capBuilder.setOwnerUid(TEST_UID);
         } else if (transportType == TRANSPORT_CELLULAR) {
-            underlyingCaps.setAdministratorUids(new int[] {TEST_UID});
-            underlyingCaps.setNetworkSpecifier(
+            capBuilder.setNetworkSpecifier(
                     new TelephonyNetworkSpecifier(TEST_SUBSCRIPTION_ID_1));
         }
-
-        UnderlyingNetworkRecord record =
-                new UnderlyingNetworkRecord(
-                        new Network(0), underlyingCaps, new LinkProperties(), false);
+        capBuilder.setAdministratorUids(new int[] {TEST_UID});
+        UnderlyingNetworkRecord record = new UnderlyingNetworkRecord(
+                mock(Network.class, CALLS_REAL_METHODS),
+                capBuilder.build(), new LinkProperties(), false);
         final NetworkCapabilities vcnCaps =
                 VcnGatewayConnection.buildNetworkCapabilities(
-                        VcnGatewayConnectionConfigTest.buildTestConfig(), record);
+                        VcnGatewayConnectionConfigTest.buildTestConfig(),
+                        record,
+                        isMobileDataEnabled);
 
         assertTrue(vcnCaps.hasTransport(TRANSPORT_CELLULAR));
         assertTrue(vcnCaps.hasCapability(NET_CAPABILITY_NOT_METERED));
         assertTrue(vcnCaps.hasCapability(NET_CAPABILITY_NOT_ROAMING));
+
+        for (int cap : VcnGatewayConnectionConfigTest.EXPOSED_CAPS) {
+            if (cap == NET_CAPABILITY_INTERNET || cap == NET_CAPABILITY_DUN) {
+                assertEquals(isMobileDataEnabled, vcnCaps.hasCapability(cap));
+            } else {
+                assertTrue(vcnCaps.hasCapability(cap));
+            }
+        }
+
         assertArrayEquals(new int[] {TEST_UID}, vcnCaps.getAdministratorUids());
         assertTrue(vcnCaps.getTransportInfo() instanceof VcnTransportInfo);
 
@@ -122,20 +141,47 @@ public class VcnGatewayConnectionTest extends VcnGatewayConnectionTestBase {
 
     @Test
     public void testBuildNetworkCapabilitiesUnderlyingWifi() throws Exception {
-        verifyBuildNetworkCapabilitiesCommon(TRANSPORT_WIFI);
+        verifyBuildNetworkCapabilitiesCommon(TRANSPORT_WIFI, true /* isMobileDataEnabled */);
     }
 
     @Test
     public void testBuildNetworkCapabilitiesUnderlyingCell() throws Exception {
-        verifyBuildNetworkCapabilitiesCommon(TRANSPORT_CELLULAR);
+        verifyBuildNetworkCapabilitiesCommon(TRANSPORT_CELLULAR, true /* isMobileDataEnabled */);
+    }
+
+    @Test
+    public void testBuildNetworkCapabilitiesMobileDataDisabled() throws Exception {
+        verifyBuildNetworkCapabilitiesCommon(TRANSPORT_CELLULAR, false /* isMobileDataEnabled */);
     }
 
     @Test
     public void testSubscriptionSnapshotUpdateNotifiesUnderlyingNetworkTracker() {
+        verifyWakeLockSetUp();
+
         final TelephonySubscriptionSnapshot updatedSnapshot =
                 mock(TelephonySubscriptionSnapshot.class);
         mGatewayConnection.updateSubscriptionSnapshot(updatedSnapshot);
 
         verify(mUnderlyingNetworkTracker).updateSubscriptionSnapshot(eq(updatedSnapshot));
+        verifyWakeLockAcquired();
+
+        mTestLooper.dispatchAll();
+
+        verifyWakeLockReleased();
+    }
+
+    @Test
+    public void testNonNullUnderlyingNetworkRecordUpdateCancelsAlarm() {
+        mGatewayConnection
+                .getUnderlyingNetworkTrackerCallback()
+                .onSelectedUnderlyingNetworkChanged(null);
+
+        verifyDisconnectRequestAlarmAndGetCallback(false /* expectCanceled */);
+
+        mGatewayConnection
+                .getUnderlyingNetworkTrackerCallback()
+                .onSelectedUnderlyingNetworkChanged(TEST_UNDERLYING_NETWORK_RECORD_1);
+
+        verify(mDisconnectRequestAlarm).cancel();
     }
 }

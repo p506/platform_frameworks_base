@@ -446,6 +446,7 @@
     <string name="power_charging" msgid="6727132649743436802">"<xliff:g id="LEVEL">%1$s</xliff:g> - <xliff:g id="STATE">%2$s</xliff:g>"</string>
     <string name="power_remaining_charging_duration_only" msgid="7415639699283965818">"<xliff:g id="TIME">%1$s</xliff:g> esele ize ishaje"</string>
     <string name="power_charging_duration" msgid="5005740040558984057">"<xliff:g id="LEVEL">%1$s</xliff:g> - <xliff:g id="TIME">%2$s</xliff:g> ize igcwale"</string>
+    <string name="power_charging_limited" msgid="1956874810658999681">"<xliff:g id="LEVEL">%1$s</xliff:g> - Ilungiselela impilo yebhethri"</string>
     <string name="battery_info_status_unknown" msgid="268625384868401114">"Akwaziwa"</string>
     <string name="battery_info_status_charging" msgid="4279958015430387405">"Iyashaja"</string>
     <string name="battery_info_status_charging_fast" msgid="8027559755902954885">"Ishaja ngokushesha"</string>
@@ -457,7 +458,7 @@
     <string name="disabled" msgid="8017887509554714950">"Akusebenzi"</string>
     <string name="external_source_trusted" msgid="1146522036773132905">"Kuvumelekile"</string>
     <string name="external_source_untrusted" msgid="5037891688911672227">"Akuvumelekile"</string>
-    <string name="install_other_apps" msgid="3232595082023199454">"Faka izinhlelo zokusebenza ezingaziwa"</string>
+    <string name="install_other_apps" msgid="3232595082023199454">"Faka ama-app angaziwa"</string>
     <string name="home" msgid="973834627243661438">"Ikhaya lezilungiselelo"</string>
   <string-array name="battery_labels">
     <item msgid="7878690469765357158">"0%"</item>

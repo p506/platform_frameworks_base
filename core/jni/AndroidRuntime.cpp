@@ -50,6 +50,7 @@
 #include "jni.h"
 
 using namespace android;
+using android::base::GetBoolProperty;
 using android::base::GetProperty;
 
 extern int register_android_os_Binder(JNIEnv* env);
@@ -193,6 +194,7 @@ extern int register_com_android_internal_os_FuseAppLoop(JNIEnv* env);
 extern int register_com_android_internal_os_KernelCpuUidBpfMapReader(JNIEnv *env);
 extern int register_com_android_internal_os_KernelSingleUidTimeReader(JNIEnv *env);
 extern int register_com_android_internal_os_Zygote(JNIEnv *env);
+extern int register_com_android_internal_os_ZygoteCommandBuffer(JNIEnv *env);
 extern int register_com_android_internal_os_ZygoteInit(JNIEnv *env);
 extern int register_com_android_internal_util_VirtualRefBasePtr(JNIEnv *env);
 
@@ -628,7 +630,14 @@ int AndroidRuntime::startVm(JavaVM** pJavaVM, JNIEnv** pEnv, bool zygote, bool p
     char hotstartupsamplesOptsBuf[sizeof("-Xps-hot-startup-method-samples:")-1 + PROPERTY_VALUE_MAX];
     char saveResolvedClassesDelayMsOptsBuf[
             sizeof("-Xps-save-resolved-classes-delay-ms:")-1 + PROPERTY_VALUE_MAX];
+    char profileMinSavePeriodOptsBuf[sizeof("-Xps-min-save-period-ms:")-1 + PROPERTY_VALUE_MAX];
     char madviseRandomOptsBuf[sizeof("-XX:MadviseRandomAccess:")-1 + PROPERTY_VALUE_MAX];
+    char madviseWillNeedFileSizeVdex[
+            sizeof("-XMadviseWillNeedVdexFileSize:")-1 + PROPERTY_VALUE_MAX];
+    char madviseWillNeedFileSizeOdex[
+            sizeof("-XMadviseWillNeedOdexFileSize:")-1 + PROPERTY_VALUE_MAX];
+    char madviseWillNeedFileSizeArt[
+            sizeof("-XMadviseWillNeedArtFileSize:")-1 + PROPERTY_VALUE_MAX];
     char gctypeOptsBuf[sizeof("-Xgc:")-1 + PROPERTY_VALUE_MAX];
     char backgroundgcOptsBuf[sizeof("-XX:BackgroundGC=")-1 + PROPERTY_VALUE_MAX];
     char heaptargetutilizationOptsBuf[sizeof("-XX:HeapTargetUtilization=")-1 + PROPERTY_VALUE_MAX];
@@ -654,6 +663,8 @@ int AndroidRuntime::startVm(JavaVM** pJavaVM, JNIEnv** pEnv, bool zygote, bool p
     char extraOptsBuf[PROPERTY_VALUE_MAX];
     char voldDecryptBuf[PROPERTY_VALUE_MAX];
     char perfettoHprofOptBuf[sizeof("-XX:PerfettoHprof=") + PROPERTY_VALUE_MAX];
+    char perfettoJavaHeapStackOptBuf[
+            sizeof("-XX:PerfettoJavaHeapStackProf=") + PROPERTY_VALUE_MAX];
     enum {
       kEMDefault,
       kEMIntPortable,
@@ -720,17 +731,7 @@ int AndroidRuntime::startVm(JavaVM** pJavaVM, JNIEnv** pEnv, bool zygote, bool p
         ALOGI("Leaving lock profiling enabled");
     }
 
-    bool checkJni = false;
-    property_get("dalvik.vm.checkjni", propBuf, "");
-    if (strcmp(propBuf, "true") == 0) {
-        checkJni = true;
-    } else if (strcmp(propBuf, "false") != 0) {
-        /* property is neither true nor false; fall back on kernel parameter */
-        property_get("ro.kernel.android.checkjni", propBuf, "");
-        if (propBuf[0] == '1') {
-            checkJni = true;
-        }
-    }
+    const bool checkJni = GetBoolProperty("dalvik.vm.checkjni", false);
     ALOGV("CheckJNI is %s\n", checkJni ? "ON" : "OFF");
     if (checkJni) {
         /* extended JNI checking */
@@ -777,6 +778,10 @@ int AndroidRuntime::startVm(JavaVM** pJavaVM, JNIEnv** pEnv, bool zygote, bool p
     // and we do not want to enable it in tests.
     parseRuntimeOption("dalvik.vm.perfetto_hprof", perfettoHprofOptBuf, "-XX:PerfettoHprof=",
                        "true");
+
+    // Enable PerfettoJavaHeapStackProf in the zygote
+    parseRuntimeOption("dalvik.vm.perfetto_javaheap", perfettoJavaHeapStackOptBuf,
+                       "-XX:PerfettoJavaHeapStackProf=", "true");
 
     if (primary_zygote) {
         addOption("-Xprimaryzygote");
@@ -837,6 +842,22 @@ int AndroidRuntime::startVm(JavaVM** pJavaVM, JNIEnv** pEnv, bool zygote, bool p
     parseRuntimeOption("dalvik.vm.madvise-random", madviseRandomOptsBuf, "-XX:MadviseRandomAccess:");
 
     /*
+     * Use default platform configuration as limits for madvising,
+     * when no properties are specified.
+     */
+    parseRuntimeOption("dalvik.vm.madvise.vdexfile.size",
+                       madviseWillNeedFileSizeVdex,
+                       "-XMadviseWillNeedVdexFileSize:");
+
+    parseRuntimeOption("dalvik.vm.madvise.odexfile.size",
+                       madviseWillNeedFileSizeOdex,
+                       "-XMadviseWillNeedOdexFileSize:");
+
+    parseRuntimeOption("dalvik.vm.madvise.artfile.size",
+                       madviseWillNeedFileSizeArt,
+                       "-XMadviseWillNeedArtFileSize:");
+
+    /*
      * Profile related options.
      */
     parseRuntimeOption("dalvik.vm.hot-startup-method-samples", hotstartupsamplesOptsBuf,
@@ -844,6 +865,9 @@ int AndroidRuntime::startVm(JavaVM** pJavaVM, JNIEnv** pEnv, bool zygote, bool p
 
     parseRuntimeOption("dalvik.vm.ps-resolved-classes-delay-ms", saveResolvedClassesDelayMsOptsBuf,
             "-Xps-save-resolved-classes-delay-ms:");
+
+    parseRuntimeOption("dalvik.vm.ps-min-save-period-ms", profileMinSavePeriodOptsBuf,
+            "-Xps-min-save-period-ms:");
 
     property_get("ro.config.low_ram", propBuf, "");
     if (strcmp(propBuf, "true") == 0) {
@@ -1524,6 +1548,7 @@ static const RegJNIRec gRegJNI[] = {
         REG_JNI(register_com_android_internal_net_NetworkUtilsInternal),
         REG_JNI(register_com_android_internal_os_ClassLoaderFactory),
         REG_JNI(register_com_android_internal_os_Zygote),
+        REG_JNI(register_com_android_internal_os_ZygoteCommandBuffer),
         REG_JNI(register_com_android_internal_os_ZygoteInit),
         REG_JNI(register_com_android_internal_util_VirtualRefBasePtr),
         REG_JNI(register_android_hardware_Camera),

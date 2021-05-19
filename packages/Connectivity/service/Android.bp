@@ -14,6 +14,15 @@
 // limitations under the License.
 //
 
+package {
+    // See: http://go/android-license-faq
+    // A large-scale-change added 'default_applicable_licenses' to import
+    // all of the 'license_kinds' from "frameworks_base_license"
+    // to get the below license kinds:
+    //   SPDX-license-identifier-Apache-2.0
+    default_applicable_licenses: ["frameworks_base_license"],
+}
+
 cc_library_shared {
     name: "libservice-connectivity",
     // TODO: build against the NDK (sdk_version: "30" for example)
@@ -25,7 +34,6 @@ cc_library_shared {
     ],
     srcs: [
         "jni/com_android_server_TestNetworkService.cpp",
-        "jni/com_android_server_connectivity_Vpn.cpp",
         "jni/onload.cpp",
     ],
     shared_libs: [
@@ -42,23 +50,54 @@ cc_library_shared {
 }
 
 java_library {
-    name: "service-connectivity",
+    name: "service-connectivity-pre-jarjar",
     srcs: [
-        ":connectivity-service-srcs",
+        "src/**/*.java",
+        ":framework-connectivity-shared-srcs",
     ],
-    installable: true,
-    jarjar_rules: "jarjar-rules.txt",
     libs: [
         "android.net.ipsec.ike",
         "services.core",
         "services.net",
         "unsupportedappusage",
+        "ServiceConnectivityResources",
     ],
     static_libs: [
+        "modules-utils-os",
         "net-utils-device-common",
         "net-utils-framework-common",
         "netd-client",
+        "PlatformProperties",
+        "service-connectivity-protos",
     ],
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.tethering",
+    ],
+}
+
+java_library {
+    name: "service-connectivity-protos",
+    proto: {
+        type: "nano",
+    },
+    srcs: [
+        ":system-messages-proto-src",
+    ],
+    libs: ["libprotobuf-java-nano"],
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.tethering",
+    ],
+}
+
+java_library {
+    name: "service-connectivity",
+    installable: true,
+    static_libs: [
+        "service-connectivity-pre-jarjar",
+    ],
+    jarjar_rules: "jarjar-rules.txt",
     apex_available: [
         "//apex_available:platform",
         "com.android.tethering",

@@ -99,6 +99,11 @@ import java.util.Set;
  * packages that are currently installed on the device.
  *
  * You can find this class through {@link Context#getPackageManager}.
+ *
+ * <p class="note"><strong>Note: </strong>If your app targets Android 11 (API level 30) or
+ * higher, the methods in this class each return a filtered list of apps. Learn more about how to
+ * <a href="/training/basics/intents/package-visibility">manage package visibility</a>.
+ * </p>
  */
 public abstract class PackageManager {
     private static final String TAG = "PackageManager";
@@ -1059,15 +1064,11 @@ public abstract class PackageManager {
 
     /**
      * A value to indicate the lack of CUJ information, disabling all installation scenario logic.
-     *
-     * @hide
      */
     public static final int INSTALL_SCENARIO_DEFAULT = 0;
 
     /**
      * Installation scenario providing the fastest “install button to launch" experience possible.
-     *
-     * @hide
      */
     public static final int INSTALL_SCENARIO_FAST = 1;
 
@@ -1084,8 +1085,6 @@ public abstract class PackageManager {
      * less optimized applications.  The device state (e.g. memory usage or battery status) should
      * not be considered when making this decision as those factors are taken into account by the
      * Package Manager when acting on the installation scenario.
-     *
-     * @hide
      */
     public static final int INSTALL_SCENARIO_BULK = 2;
 
@@ -1096,8 +1095,6 @@ public abstract class PackageManager {
      * operation that are marked BULK_SECONDARY, the faster the entire bulk operation will be.
      *
      * See the comments for INSTALL_SCENARIO_BULK for more information.
-     *
-     * @hide
      */
     public static final int INSTALL_SCENARIO_BULK_SECONDARY = 3;
 
@@ -1748,6 +1745,15 @@ public abstract class PackageManager {
      * because the packge is a shared library used by other installed packages.
      * {@hide} */
     public static final int DELETE_FAILED_USED_SHARED_LIBRARY = -6;
+
+    /**
+     * Deletion failed return code: this is passed to the
+     * {@link IPackageDeleteObserver} if the system failed to delete the package
+     * because there is an app pinned.
+     *
+     * @hide
+     */
+    public static final int DELETE_FAILED_APP_PINNED = -7;
 
     /**
      * Return code that is passed to the {@link IPackageMoveObserver} when the
@@ -3161,8 +3167,57 @@ public abstract class PackageManager {
     public static final String FEATURE_VR_HEADTRACKING = "android.hardware.vr.headtracking";
 
     /**
-     * Feature for {@link #getSystemAvailableFeatures} and {@link #hasSystemFeature}:
-     * The device has a StrongBox hardware-backed Keystore.
+     * Feature for {@link #getSystemAvailableFeatures} and
+     * {@link #hasSystemFeature(String, int)}: If this feature is supported, the device implements
+     * the Android Keystore backed by an isolated execution environment. The version indicates
+     * which features are implemented in the isolated execution environment:
+     * <ul>
+     * <li>100: Hardware support for ECDH (see {@link javax.crypto.KeyAgreement}) and support
+     * for app-generated attestation keys (see {@link
+     * android.security.keystore.KeyGenParameterSpec.Builder#setAttestKeyAlias(String)}).
+     * <li>41: Hardware enforcement of device-unlocked keys (see {@link
+     * android.security.keystore.KeyGenParameterSpec.Builder#setUnlockedDeviceRequired(boolean)}).
+     * <li>40: Support for wrapped key import (see {@link
+     * android.security.keystore.WrappedKeyEntry}), optional support for ID attestation (see {@link
+     * android.security.keystore.KeyGenParameterSpec.Builder#setDevicePropertiesAttestationIncluded(boolean)}),
+     * attestation (see {@link
+     * android.security.keystore.KeyGenParameterSpec.Builder#setAttestationChallenge(byte[])}),
+     * AES, HMAC, ECDSA and RSA support where the secret or private key never leaves secure
+     * hardware, and support for requiring user authentication before a key can be used.
+     * </ul>
+     * This feature version is guaranteed to be set for all devices launching with Android 12 and
+     * may be set on devices launching with an earlier version. If the feature version is set, it
+     * will at least have the value 40. If it's not set the device may have a version of
+     * hardware-backed keystore but it may not support all features listed above.
+     */
+    @SdkConstant(SdkConstantType.FEATURE)
+    public static final String FEATURE_HARDWARE_KEYSTORE = "android.hardware.hardware_keystore";
+
+    /**
+     * Feature for {@link #getSystemAvailableFeatures}, {@link #hasSystemFeature(String)}, and
+     * {@link #hasSystemFeature(String, int)}: If this feature is supported, the device implements
+     * the Android Keystore backed by a dedicated secure processor referred to as
+     * <a href="https://source.android.com/security/best-practices/hardware#strongbox-keymaster">
+     * StrongBox</a>. If this feature has a version, the version number indicates which features are
+     * implemented in StrongBox:
+     * <ul>
+     * <li>100: Hardware support for ECDH (see {@link javax.crypto.KeyAgreement}) and support
+     * for app-generated attestation keys (see {@link
+     * android.security.keystore.KeyGenParameterSpec.Builder#setAttestKeyAlias(String)}).
+     * <li>41: Hardware enforcement of device-unlocked keys (see {@link
+     * android.security.keystore.KeyGenParameterSpec.Builder#setUnlockedDeviceRequired(boolean)}).
+     * <li>40: Support for wrapped key import (see {@link
+     * android.security.keystore.WrappedKeyEntry}), optional support for ID attestation (see {@link
+     * android.security.keystore.KeyGenParameterSpec.Builder#setDevicePropertiesAttestationIncluded(boolean)}),
+     * attestation (see {@link
+     * android.security.keystore.KeyGenParameterSpec.Builder#setAttestationChallenge(byte[])}),
+     * AES, HMAC, ECDSA and RSA support where the secret or private key never leaves secure
+     * hardware, and support for requiring user authentication before a key can be used.
+     * </ul>
+     * If a device has StrongBox, this feature version number is guaranteed to be set for all
+     * devices launching with Android 12 and may be set on devices launching with an earlier
+     * version. If the feature version is set, it will at least have the value 40. If it's not
+     * set the device may have StrongBox but it may not support all features listed above.
      */
     @SdkConstant(SdkConstantType.FEATURE)
     public static final String FEATURE_STRONGBOX_KEYSTORE =
@@ -3279,6 +3334,15 @@ public abstract class PackageManager {
     @SdkConstant(SdkConstantType.FEATURE)
     public static final String FEATURE_KEYSTORE_LIMITED_USE_KEY =
             "android.hardware.keystore.limited_use_key";
+
+    /**
+     * Feature for {@link #getSystemAvailableFeatures} and {@link #hasSystemFeature}: The device has
+     * a Keystore implementation that can create application-specific attestation keys.
+     * See {@link android.security.keystore.KeyGenParameterSpec.Builder#setAttestKeyAlias}.
+     */
+    @SdkConstant(SdkConstantType.FEATURE)
+    public static final String FEATURE_KEYSTORE_APP_ATTEST_KEY =
+            "android.hardware.keystore.app_attest_key";
 
     /** @hide */
     public static final boolean APP_ENUMERATION_ENABLED_BY_DEFAULT = true;
@@ -4252,6 +4316,15 @@ public abstract class PackageManager {
             @ApplicationInfoFlags int flags, @NonNull UserHandle user)
             throws NameNotFoundException {
         return getApplicationInfoAsUser(packageName, flags, user.getIdentifier());
+    }
+
+    /**
+     * @return The target SDK version for the given package name.
+     * @throws NameNotFoundException if a package with the given name cannot be found on the system.
+     */
+    @IntRange(from = 0)
+    public int getTargetSdkVersion(@NonNull String packageName) throws NameNotFoundException {
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -7781,6 +7854,7 @@ public abstract class PackageManager {
             case DELETE_FAILED_OWNER_BLOCKED: return "DELETE_FAILED_OWNER_BLOCKED";
             case DELETE_FAILED_ABORTED: return "DELETE_FAILED_ABORTED";
             case DELETE_FAILED_USED_SHARED_LIBRARY: return "DELETE_FAILED_USED_SHARED_LIBRARY";
+            case DELETE_FAILED_APP_PINNED: return "DELETE_FAILED_APP_PINNED";
             default: return Integer.toString(status);
         }
     }
@@ -7795,6 +7869,7 @@ public abstract class PackageManager {
             case DELETE_FAILED_OWNER_BLOCKED: return PackageInstaller.STATUS_FAILURE_BLOCKED;
             case DELETE_FAILED_ABORTED: return PackageInstaller.STATUS_FAILURE_ABORTED;
             case DELETE_FAILED_USED_SHARED_LIBRARY: return PackageInstaller.STATUS_FAILURE_CONFLICT;
+            case DELETE_FAILED_APP_PINNED: return PackageInstaller.STATUS_FAILURE_BLOCKED;
             default: return PackageInstaller.STATUS_FAILURE;
         }
     }

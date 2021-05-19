@@ -116,7 +116,7 @@
     <string name="usb_preference_title" msgid="1439924437558480718">"Опције USB преноса датотека"</string>
     <string name="use_mtp_button_title" msgid="5036082897886518086">"Прикључи као медија плејер (MTP)"</string>
     <string name="use_ptp_button_title" msgid="7676427598943446826">"Прикључи као камеру (PTP)"</string>
-    <string name="installer_cd_button_title" msgid="5499998592841984743">"Инсталирај Android пребацивање датотека за Mac"</string>
+    <string name="installer_cd_button_title" msgid="5499998592841984743">"Инсталирај Android пребацивање фајлова за Mac"</string>
     <string name="accessibility_back" msgid="6530104400086152611">"Назад"</string>
     <string name="accessibility_home" msgid="5430449841237966217">"Почетна"</string>
     <string name="accessibility_menu" msgid="2701163794470513040">"Мени"</string>
@@ -1056,7 +1056,7 @@
     <string name="accessibility_control_change_unfavorite" msgid="6997408061750740327">"уклонили из омиљених"</string>
     <string name="accessibility_control_move" msgid="8980344493796647792">"Преместите на <xliff:g id="NUMBER">%d</xliff:g>. позицију"</string>
     <string name="controls_favorite_default_title" msgid="967742178688938137">"Контроле"</string>
-    <string name="controls_favorite_subtitle" msgid="6604402232298443956">"Одаберите контроле којима ћете приступати из менија напајања"</string>
+    <string name="controls_favorite_subtitle" msgid="6604402232298443956">"Одаберите контроле којима ћете приступати из менија за укључивање"</string>
     <string name="controls_favorite_rearrange" msgid="5616952398043063519">"Задржите и превуците да бисте променили распоред контрола"</string>
     <string name="controls_favorite_removed" msgid="5276978408529217272">"Све контроле су уклоњене"</string>
     <string name="controls_favorite_toast_no_changes" msgid="7094494210840877931">"Промене нису сачуване"</string>
@@ -1080,6 +1080,7 @@
     <string name="controls_seeding_in_progress" msgid="3033855341410264148">"Учитавају се препоруке"</string>
     <string name="controls_media_title" msgid="1746947284862928133">"Медији"</string>
     <string name="controls_media_close_session" msgid="3957093425905475065">"Сакријте актуелну сесију."</string>
+    <string name="controls_media_active_session" msgid="1984383994625845642">"Актуелна сесија не може да се сакрије."</string>
     <string name="controls_media_dismiss_button" msgid="9081375542265132213">"Одбаци"</string>
     <string name="controls_media_resume" msgid="1933520684481586053">"Настави"</string>
     <string name="controls_media_settings_button" msgid="5815790345117172504">"Подешавања"</string>
@@ -1095,4 +1096,11 @@
     <string name="controls_added_tooltip" msgid="4842812921719153085">"Задржите дугме за укључивање да бисте видели нове контроле"</string>
     <string name="controls_menu_add" msgid="4447246119229920050">"Додај контроле"</string>
     <string name="controls_menu_edit" msgid="890623986951347062">"Измени контроле"</string>
+    <string name="media_output_dialog_add_output" msgid="5642703238877329518">"Додајте излазе"</string>
+    <string name="media_output_dialog_group" msgid="5571251347877452212">"Група"</string>
+    <string name="media_output_dialog_single_device" msgid="3102758980643351058">"Изабран је 1 уређај"</string>
+    <string name="media_output_dialog_multiple_devices" msgid="1093771040315422350">"Изабраних уређаја: <xliff:g id="COUNT">%1$d</xliff:g>"</string>
+    <string name="media_output_dialog_disconnected" msgid="1834473104836986046">"<xliff:g id="DEVICE_NAME">%1$s</xliff:g> (веза је прекинута)"</string>
+    <string name="media_output_dialog_connect_failed" msgid="3225190634236259010">"Повезивање није успело. Пробајте поново."</string>
+    <string name="media_output_dialog_pairing_new" msgid="9099497976087485862">"Упари нови уређај"</string>
 </resources>

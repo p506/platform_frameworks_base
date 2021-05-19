@@ -57,7 +57,7 @@
     <string name="imei" msgid="2157082351232630390">"IMEI"</string>
     <string name="meid" msgid="3291227361605924674">"MEID"</string>
     <string name="ClipMmi" msgid="4110549342447630629">"உள்வரும் அழைப்பாளர் ஐடி"</string>
-    <string name="ClirMmi" msgid="4702929460236547156">"வெளிசெல்லும் அழைப்பாளர் ஐடி"</string>
+    <string name="ClirMmi" msgid="6752346475055446417">"வெளிச்செல்லும் அழைப்பாளர் ஐடியை மறைத்தல்"</string>
     <string name="ColpMmi" msgid="4736462893284419302">"இணைக்கப்பட்ட லைன் ஐடி"</string>
     <string name="ColrMmi" msgid="5889782479745764278">"இணைக்கப்பட்ட லைன் ஐடியை வரம்பிடல்"</string>
     <string name="CfMmi" msgid="8390012691099787178">"அழைப்பு திருப்பிவிடுதல்"</string>
@@ -100,7 +100,7 @@
     <string name="peerTtyModeHco" msgid="5626377160840915617">"TTY Mode HCOஐ இணைச் செயல்பாடு கோரியது"</string>
     <string name="peerTtyModeVco" msgid="572208600818270944">"TTY Mode VCOஐ இணைச் செயல்பாடு கோரியது"</string>
     <string name="peerTtyModeOff" msgid="2420380956369226583">"TTY Mode OFFஐ இணைச் செயல்பாடு கோரியது"</string>
-    <string name="serviceClassVoice" msgid="2065556932043454987">"குரல்"</string>
+    <string name="serviceClassVoice" msgid="2065556932043454987">"Voice"</string>
     <string name="serviceClassData" msgid="4148080018967300248">"தரவு"</string>
     <string name="serviceClassFAX" msgid="2561653371698904118">"தொலைநகல்"</string>
     <string name="serviceClassSMS" msgid="1547664561704509004">"SMS"</string>
@@ -268,7 +268,7 @@
     <string name="status_bar_notification_info_overflow" msgid="3330152558746563475">"999+"</string>
     <string name="notification_hidden_text" msgid="2835519769868187223">"புதிய அறிவிப்பு"</string>
     <string name="notification_channel_virtual_keyboard" msgid="6465975799223304567">"விர்ச்சுவல் கீபோர்டு"</string>
-    <string name="notification_channel_physical_keyboard" msgid="5417306456125988096">"கைமுறை விசைப்பலகை"</string>
+    <string name="notification_channel_physical_keyboard" msgid="5417306456125988096">"கைமுறை கீபோர்டு"</string>
     <string name="notification_channel_security" msgid="8516754650348238057">"பாதுகாப்பு"</string>
     <string name="notification_channel_car_mode" msgid="2123919247040988436">"கார் பயன்முறை"</string>
     <string name="notification_channel_account" msgid="6436294521740148173">"கணக்கின் நிலை"</string>
@@ -297,7 +297,7 @@
     <string name="permgroupdesc_contacts" msgid="9163927941244182567">"தொடர்புகளை அணுக வேண்டும்"</string>
     <string name="permgrouplab_location" msgid="1858277002233964394">"இருப்பிடம்"</string>
     <string name="permgroupdesc_location" msgid="1995955142118450685">"இந்தச் சாதனத்தின் இருப்பிடத்தை அறிந்து கொள்ள"</string>
-    <string name="permgrouplab_calendar" msgid="6426860926123033230">"Calendar"</string>
+    <string name="permgrouplab_calendar" msgid="6426860926123033230">"கேலெண்டர்"</string>
     <string name="permgroupdesc_calendar" msgid="6762751063361489379">"கேலெண்டரை அணுகலாம்"</string>
     <string name="permgrouplab_sms" msgid="795737735126084874">"SMS"</string>
     <string name="permgroupdesc_sms" msgid="5726462398070064542">"SMS அனுப்பலாம், வந்த SMSகளைப் பார்க்கலாம்"</string>
@@ -349,6 +349,8 @@
     <string name="permdesc_receiveMms" msgid="958102423732219710">"MMS செய்திகளைப் பெற, செயற்படுத்தப் ஆப்ஸை அனுமதிக்கிறது. இதற்கு அர்த்தம் உங்கள் சாதனத்திற்கு அனுப்பப்படும் செய்திகளை உங்களுக்குக் காட்டாமல் கண்காணிக்கவோ, நீக்கவோ ஆப்ஸால் முடியும் என்பதாகும்."</string>
     <string name="permlab_bindCellBroadcastService" msgid="586746677002040651">"செல் பிராட்காஸ்ட் மெசேஜ்களை முன்னனுப்பு"</string>
     <string name="permdesc_bindCellBroadcastService" msgid="6540910200973641606">"செல் பிராட்காஸ்ட் மெசேஜ்களைப் பெறும்போதெல்லாம் அவற்றை முன்னனுப்பும் பொருட்டு, ஆப்ஸை செல் பிராட்காஸ்ட் மாடியூலோடு இணைக்கும். சில இடங்களில் அவசர சூழ்நிலைகளின் போது உங்களை எச்சரிக்க செல் பிராட்காஸ்ட் விழிப்பூட்டல்கள் அனுப்பப்படும். அவசரநிலை செல் பிராட்காஸ்ட்டைப் பெறும்போது, தீங்கிழைக்கும் ஆப்ஸ் உங்கள் சாதனத்தின் செயல்திறனுக்கோ செயல்பாட்டிற்கோ இடையூறு விளைவிக்கக்கூடும்."</string>
+    <string name="permlab_manageOngoingCalls" msgid="281244770664231782">"செயலில் உள்ள அழைப்புகளை நிர்வகித்தல்"</string>
+    <string name="permdesc_manageOngoingCalls" msgid="7003138133829915265">"உங்கள் சாதனத்தில், செயலில் உள்ள அழைப்புகள் குறித்த விவரங்களைப் பார்க்கவும் அந்த அழைப்புகளை நிர்வகிக்கவும் ஆப்ஸை அனுமதிக்கும்."</string>
     <string name="permlab_readCellBroadcasts" msgid="5869884450872137693">"செல் அலைபரப்புச் செய்திகளைப் படித்தல்"</string>
     <string name="permdesc_readCellBroadcasts" msgid="672513437331980168">"உங்கள் சாதனத்தில் பெறப்படும் செல் அலைபரப்புச் செய்திகளைப் படிப்பதற்குப் ஆப்ஸை அனுமதிக்கிறது. அவசரநிலை சூழ்நிலைகளை உங்களுக்கு எச்சரிக்கைச் செய்வதற்கு சில இடங்களில் செல் அலைபரப்பு விழிப்பூட்டல்கள் வழங்கப்படும். அவசரநிலை மொபைல் அலைபரப்புப் பெறப்படும்போது உங்கள் சாதனத்தின் செயல்திறன் அல்லது செயல்பாட்டுடன் தீங்கிழைக்கும் ஆப்ஸ் அதைத் தடுக்கலாம்."</string>
     <string name="permlab_subscribedFeedsRead" msgid="217624769238425461">"குழுசேர்ந்த ஊட்டங்களைப் படித்தல்"</string>
@@ -678,7 +680,7 @@
     <string name="policydesc_watchLogin_secondaryUser" product="tablet" msgid="2049038943004297474">"திரையைத் திறக்கும் போது, எத்தனை முறை தவறான கடவுச்சொல்லை உள்ளிட்டீர்கள் என்பதைக் கண்காணிக்கிறது மற்றும் கடவுச்சொற்களைப் பல முறை தவறாக உள்ளிட்டால், டேப்லெட்டைப் பூட்டும் அல்லது இந்தப் பயனரின் எல்லா தரவையும் அழிக்கும்."</string>
     <string name="policydesc_watchLogin_secondaryUser" product="tv" msgid="8965224107449407052">"திரையைத் திறக்கும் போது எத்தனை முறை தவறான கடவுச்சொல்லை உள்ளிட்டீர்கள் என்பதைக் கண்காணிப்பதோடு கடவுச்சொற்களைப் பல முறை தவறாக உள்ளிட்டால் Android TVயைப் பூட்டும் அல்லது இந்தப் பயனரின் அனைத்துத் தரவையும் அழிக்கும்."</string>
     <string name="policydesc_watchLogin_secondaryUser" product="default" msgid="9177645136475155924">"திரையைத் திறக்கும் போது, எத்தனை முறை தவறான கடவுச்சொல்லை உள்ளிட்டீர்கள் என்பதைக் கண்காணிக்கிறது மற்றும் கடவுச்சொற்களைப் பல முறை தவறாக உள்ளிட்டால், ஃபோனைப் பூட்டும் அல்லது இந்தப் பயனரின் எல்லா தரவையும் அழிக்கும்."</string>
-    <string name="policylab_resetPassword" msgid="214556238645096520">"திரைப் பூட்டை மாற்று"</string>
+    <string name="policylab_resetPassword" msgid="214556238645096520">"திரைப் பூட்டை மாற்றுதல்"</string>
     <string name="policydesc_resetPassword" msgid="4626419138439341851">"திரைப் பூட்டை மாற்றும்."</string>
     <string name="policylab_forceLock" msgid="7360335502968476434">"திரையைப் பூட்டு"</string>
     <string name="policydesc_forceLock" msgid="1008844760853899693">"திரை எப்படி, எப்போது பூட்டப்படுகிறது என்பதைக் கட்டுப்படுத்தலாம்."</string>
@@ -1327,9 +1329,9 @@
     <string name="share_remote_bugreport_action" msgid="7630880678785123682">"பகிர்"</string>
     <string name="decline_remote_bugreport_action" msgid="4040894777519784346">"வேண்டாம்"</string>
     <string name="select_input_method" msgid="3971267998568587025">"உள்ளீட்டு முறையைத் தேர்வுசெய்க"</string>
-    <string name="show_ime" msgid="6406112007347443383">"கைமுறை விசைப்பலகை இயக்கத்தில் இருக்கும் போது IMEஐ திரையில் வைத்திரு"</string>
+    <string name="show_ime" msgid="6406112007347443383">"கைமுறை கீபோர்டு இயக்கத்தில் இருக்கும் போது IMEஐ திரையில் வைத்திரு"</string>
     <string name="hardware" msgid="1800597768237606953">"விர்ச்சுவல் கீபோர்டை காட்டு"</string>
-    <string name="select_keyboard_layout_notification_title" msgid="4427643867639774118">"கைமுறை விசைப்பலகையை உள்ளமைக்கவும்"</string>
+    <string name="select_keyboard_layout_notification_title" msgid="4427643867639774118">"கைமுறை கீபோர்டை உள்ளமைக்கவும்"</string>
     <string name="select_keyboard_layout_notification_message" msgid="8835158247369158154">"மொழியையும் தளவமைப்பையும் தேர்ந்தெடுக்க, தட்டவும்"</string>
     <string name="fast_scroll_alphabet" msgid="8854435958703888376">" ABCDEFGHIJKLMNOPQRSTUVWXYZ"</string>
     <string name="fast_scroll_numeric_alphabet" msgid="2529539945421557329">" 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"</string>
@@ -1340,11 +1342,14 @@
     <string name="alert_windows_notification_turn_off_action" msgid="7805857234839123780">"ஆஃப் செய்"</string>
     <string name="ext_media_checking_notification_title" msgid="8299199995416510094">"<xliff:g id="NAME">%s</xliff:g>ஐச் சரிபார்க்கிறது…"</string>
     <string name="ext_media_checking_notification_message" msgid="2231566971425375542">"தற்போதைய உள்ளடக்கத்தை மதிப்பாய்வு செய்கிறது"</string>
+    <string name="ext_media_checking_notification_message" product="tv" msgid="7986154434946021415">"\'மீடியா சேமிப்பகம்\' பகுப்பாய்வு செய்யப்படுகிறது"</string>
     <string name="ext_media_new_notification_title" msgid="3517407571407687677">"புதிய <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_new_notification_title" product="automotive" msgid="9085349544984742727">"<xliff:g id="NAME">%s</xliff:g> வேலை செய்யவில்லை"</string>
     <string name="ext_media_new_notification_message" msgid="6095403121990786986">"அமைக்க, தட்டவும்"</string>
+    <string name="ext_media_new_notification_message" product="tv" msgid="216863352100263668">"அமைக்கத் தேர்ந்தெடுங்கள்"</string>
     <string name="ext_media_new_notification_message" product="automotive" msgid="5140127881613227162">"சாதனத்தை ரீஃபார்மேட் செய்ய வேண்டியிருக்கும். வெளியேற்ற தட்டவும்."</string>
     <string name="ext_media_ready_notification_message" msgid="777258143284919261">"படங்களையும் மீடியாவையும் மாற்றலாம்"</string>
+    <string name="ext_media_ready_notification_message" product="tv" msgid="8847134811163165935">"மீடியா கோப்புகளை உலாவுக"</string>
     <string name="ext_media_unmountable_notification_title" msgid="4895444667278979910">"<xliff:g id="NAME">%s</xliff:g> இல் சிக்கல்"</string>
     <string name="ext_media_unmountable_notification_title" product="automotive" msgid="3142723758949023280">"<xliff:g id="NAME">%s</xliff:g> வேலை செய்யவில்லை"</string>
     <string name="ext_media_unmountable_notification_message" msgid="3256290114063126205">"சரிசெய்ய, தட்டவும்"</string>
@@ -1353,7 +1358,7 @@
     <string name="ext_media_unsupported_notification_title" msgid="4358280700537030333">"ஆதரிக்கப்படாத <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_unsupported_notification_title" product="automotive" msgid="6004193172658722381">"<xliff:g id="NAME">%s</xliff:g> வேலை செய்யவில்லை"</string>
     <string name="ext_media_unsupported_notification_message" msgid="917738524888367560">"சாதனம் இந்த <xliff:g id="NAME">%s</xliff:g>ஐ ஆதரிக்கவில்லை. ஆதரிக்கப்படும் வடிவமைப்பில் அமைக்க, தட்டவும்."</string>
-    <string name="ext_media_unsupported_notification_message" product="tv" msgid="7744945987775645685">"சாதனம் இந்த <xliff:g id="NAME">%s</xliff:g>ஐ ஆதரிக்கவில்லை. ஆதரிக்கப்படும் வடிவமைப்பில் அமைக்க, தேர்ந்தெடுக்கவும்."</string>
+    <string name="ext_media_unsupported_notification_message" product="tv" msgid="1595482802187036532">"ஆதரிக்கப்படும் வடிவத்தில் <xliff:g id="NAME">%s</xliff:g> ஐ அமைக்கத் தேர்ந்தெடுங்கள்."</string>
     <string name="ext_media_unsupported_notification_message" product="automotive" msgid="3412494732736336330">"சாதனத்தை ரீஃபார்மேட் செய்ய வேண்டியிருக்கும்"</string>
     <string name="ext_media_badremoval_notification_title" msgid="4114625551266196872">"<xliff:g id="NAME">%s</xliff:g> அகற்றப்பட்டது"</string>
     <string name="ext_media_badremoval_notification_message" msgid="1986514704499809244">"உள்ளடக்கத்தை இழக்காமலிருக்க, அகற்றும் முன்பாக மீடியாவை வெளியேற்றவும்"</string>
@@ -1713,6 +1718,28 @@
     <string name="mediasize_na_monarch" msgid="4396943937986136896">"மோனார்க்"</string>
     <string name="mediasize_na_quarto" msgid="2119101847712239885">"குவார்டோ"</string>
     <string name="mediasize_na_foolscap" msgid="5011612828564394648">"பூல்ஸ்கேப்"</string>
+    <!-- no translation found for mediasize_na_ansi_c (3104916921818289618) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_d (254005964819282724) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_e (4424174989686785675) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_f (146980362213260987) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_a (5280681822380032361) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_b (2113344093437297427) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_c (971002546186856623) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_d (6450996075335049806) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e (6782708486949266519) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e1 (4707138568738504275) -->
+    <skip />
+    <!-- no translation found for mediasize_na_super_b (6964127155618393178) -->
+    <skip />
     <string name="mediasize_chinese_roc_8k" msgid="411670106572707544">"ROC 8K"</string>
     <string name="mediasize_chinese_roc_16k" msgid="7496706798725321898">"ROC 16K"</string>
     <string name="mediasize_chinese_prc_1" msgid="946949835711037253">"PRC 1"</string>
@@ -1749,6 +1776,8 @@
     <string name="mediasize_japanese_kahu" msgid="7290232592648122042">"Kahu"</string>
     <string name="mediasize_japanese_kaku2" msgid="7477551750461028312">"Kaku2"</string>
     <string name="mediasize_japanese_you4" msgid="5552111912684384833">"You4"</string>
+    <!-- no translation found for mediasize_japanese_l (1326765321473431817) -->
+    <skip />
     <string name="mediasize_unknown_portrait" msgid="3817016220446495613">"அறியப்படாத நிலைபதிப்பு"</string>
     <string name="mediasize_unknown_landscape" msgid="1584741567225095325">"அறியப்படாத நிலைபரப்பு"</string>
     <string name="write_fail_reason_cancelled" msgid="2344081488493969190">"ரத்துசெய்யப்பட்டது"</string>
@@ -2000,7 +2029,7 @@
     <string name="dynamic_mode_notification_channel_name" msgid="2986926422100223328">"வழக்கமான பேட்டரி சேமிப்பானுக்கான விவர அறிவிப்பு"</string>
     <string name="dynamic_mode_notification_title" msgid="9205715501274608016">"வழக்கமாகச் சார்ஜ் செய்வதற்கு முன்பே பேட்டரி தீர்ந்துபோகக்கூடும்"</string>
     <string name="dynamic_mode_notification_summary" msgid="4141614604437372157">"பேட்டரி நிலையை நீட்டிக்க பேட்டரி சேமிப்பான் இயக்கப்பட்டுள்ளது"</string>
-    <string name="battery_saver_notification_channel_name" msgid="3918243458067916913">"பேட்டரி சேமிப்பான்"</string>
+    <string name="battery_saver_notification_channel_name" msgid="3918243458067916913">"பேட்டரி சேமிப்பு"</string>
     <string name="battery_saver_off_notification_title" msgid="7637255960468032515">"பேட்டரி சேமிப்பான் ஆஃப் செய்யப்பட்டுள்ளது"</string>
     <string name="battery_saver_charged_notification_summary" product="default" msgid="5544457317418624367">"மொபைலில் போதுமான சார்ஜ் உள்ளது. அம்சங்கள் இனி தடையின்றி இயங்கும்."</string>
     <string name="battery_saver_charged_notification_summary" product="tablet" msgid="4426317048139996888">"டேப்லெட்டில் போதுமான சார்ஜ் உள்ளது. அம்சங்கள் இனி தடையின்றி இயங்கும்."</string>

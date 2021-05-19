@@ -41,12 +41,12 @@ import android.os.UserHandle;
 import android.os.ZygoteProcess;
 import android.os.storage.StorageManager;
 import android.provider.DeviceConfig;
-import android.security.keystore.AndroidKeyStoreProvider;
+import android.security.keystore2.AndroidKeyStoreProvider;
 import android.system.ErrnoException;
 import android.system.Os;
 import android.system.OsConstants;
-import android.system.StructCapUserData;
-import android.system.StructCapUserHeader;
+import android.system.StructUserCapData;
+import android.system.StructUserCapHeader;
 import android.text.Hyphenator;
 import android.util.EventLog;
 import android.util.Log;
@@ -65,6 +65,7 @@ import dalvik.system.ZygoteHooks;
 import libcore.io.IoUtils;
 
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -73,7 +74,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.Provider;
 import java.security.Security;
-import java.util.Optional;
 
 /**
  * Startup class for the zygote process.
@@ -117,7 +117,7 @@ public class ZygoteInit {
     /**
      * Controls whether we should preload resources during zygote init.
      */
-    public static final boolean PRELOAD_RESOURCES = true;
+    private static final boolean PRELOAD_RESOURCES = true;
 
     private static final int UNPRIVILEGED_UID = 9999;
     private static final int UNPRIVILEGED_GID = 9999;
@@ -159,7 +159,7 @@ public class ZygoteInit {
         sPreloadComplete = true;
     }
 
-    public static void lazyPreload() {
+    static void lazyPreload() {
         Preconditions.checkState(!sPreloadComplete);
         Log.i(TAG, "Lazily preloading resources.");
 
@@ -223,20 +223,8 @@ public class ZygoteInit {
         long startTime = SystemClock.uptimeMillis();
         Trace.traceBegin(
                 Trace.TRACE_TAG_DALVIK, "Starting installation of AndroidKeyStoreProvider");
-        // AndroidKeyStoreProvider.install() manipulates the list of JCA providers to insert
-        // preferred providers. Note this is not done via security.properties as the JCA providers
-        // are not on the classpath in the case of, for example, raw dalvikvm runtimes.
-        // TODO b/171305684 This code is used to conditionally enable the installation of the
-        //      Keystore 2.0 provider to enable teams adjusting to Keystore 2.0 at their own
-        //      pace. This code will be removed when all calling code was adjusted to
-        //      Keystore 2.0.
-        Optional<Boolean> keystore2_enabled =
-                android.sysprop.Keystore2Properties.keystore2_enabled();
-        if (keystore2_enabled.isPresent() && keystore2_enabled.get()) {
-            android.security.keystore2.AndroidKeyStoreProvider.install();
-        } else {
-            AndroidKeyStoreProvider.install();
-        }
+
+        AndroidKeyStoreProvider.install();
         Log.i(TAG, "Installed AndroidKeyStoreProvider in "
                 + (SystemClock.uptimeMillis() - startTime) + "ms.");
         Trace.traceEnd(Trace.TRACE_TAG_DALVIK);
@@ -364,7 +352,7 @@ public class ZygoteInit {
             }
             if ("true".equals(prop)) {
                 Trace.traceBegin(Trace.TRACE_TAG_DALVIK, "ResetJitCounters");
-                runtime.resetJitCounters();
+                VMRuntime.resetJitCounters();
                 Trace.traceEnd(Trace.TRACE_TAG_DALVIK);
             }
 
@@ -418,8 +406,6 @@ public class ZygoteInit {
      * larger.
      */
     private static void preloadResources() {
-        final VMRuntime runtime = VMRuntime.getRuntime();
-
         try {
             mResources = Resources.getSystem();
             mResources.startPreloading();
@@ -463,9 +449,7 @@ public class ZygoteInit {
         int N = ar.length();
         for (int i = 0; i < N; i++) {
             int id = ar.getResourceId(i, 0);
-            if (false) {
-                Log.v(TAG, "Preloading resource #" + Integer.toHexString(id));
-            }
+
             if (id != 0) {
                 if (mResources.getColorStateList(id, null) == null) {
                     throw new IllegalArgumentException(
@@ -483,9 +467,7 @@ public class ZygoteInit {
         int N = ar.length();
         for (int i = 0; i < N; i++) {
             int id = ar.getResourceId(i, 0);
-            if (false) {
-                Log.v(TAG, "Preloading resource #" + Integer.toHexString(id));
-            }
+
             if (id != 0) {
                 if (mResources.getDrawable(id, null) == null) {
                     throw new IllegalArgumentException(
@@ -653,8 +635,6 @@ public class ZygoteInit {
      */
     private static void performSystemServerDexOpt(String classPath) {
         final String[] classPathElements = classPath.split(":");
-        final IInstalld installd = IInstalld.Stub
-                .asInterface(ServiceManager.getService("installd"));
         final String instructionSet = VMRuntime.getRuntime().vmInstructionSet();
 
         String classPathForElement = "";
@@ -688,13 +668,16 @@ public class ZygoteInit {
                 final String packageName = "*";
                 final String outputPath = null;
                 final int dexFlags = 0;
-                final String compilerFilter = systemServerFilter;
                 final String uuid = StorageManager.UUID_PRIVATE_INTERNAL;
                 final String seInfo = null;
                 final int targetSdkVersion = 0;  // SystemServer targets the system's SDK version
+                // Wait for installd to be made available
+                IInstalld installd = IInstalld.Stub.asInterface(
+                        ServiceManager.waitForService("installd"));
+
                 try {
                     installd.dexopt(classPathElement, Process.SYSTEM_UID, packageName,
-                            instructionSet, dexoptNeeded, outputPath, dexFlags, compilerFilter,
+                            instructionSet, dexoptNeeded, outputPath, dexFlags, systemServerFilter,
                             uuid, classLoaderContext, seInfo, false /* downgrade */,
                             targetSdkVersion, /*profileName*/ null, /*dexMetadataPath*/ null,
                             "server-dexopt");
@@ -759,9 +742,9 @@ public class ZygoteInit {
                 OsConstants.CAP_BLOCK_SUSPEND
         );
         /* Containers run without some capabilities, so drop any caps that are not available. */
-        StructCapUserHeader header = new StructCapUserHeader(
+        StructUserCapHeader header = new StructUserCapHeader(
                 OsConstants._LINUX_CAPABILITY_VERSION_3, 0);
-        StructCapUserData[] data;
+        StructUserCapData[] data;
         try {
             data = Os.capget(header);
         } catch (ErrnoException ex) {
@@ -770,7 +753,7 @@ public class ZygoteInit {
         capabilities &= ((long) data[0].effective) | (((long) data[1].effective) << 32);
 
         /* Hardcoded command line to start the system server */
-        String args[] = {
+        String[] args = {
                 "--setuid=1000",
                 "--setgid=1000",
                 "--setgroups=1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1018,1021,1023,"
@@ -781,12 +764,18 @@ public class ZygoteInit {
                 "--target-sdk-version=" + VMRuntime.SDK_VERSION_CUR_DEVELOPMENT,
                 "com.android.server.SystemServer",
         };
-        ZygoteArguments parsedArgs = null;
+        ZygoteArguments parsedArgs;
 
         int pid;
 
         try {
-            parsedArgs = new ZygoteArguments(args);
+            ZygoteCommandBuffer commandBuffer = new ZygoteCommandBuffer(args);
+            try {
+                parsedArgs = ZygoteArguments.getInstance(commandBuffer);
+            } catch (EOFException e) {
+                throw new AssertionError("Unexpected argument error for forking system server", e);
+            }
+            commandBuffer.close();
             Zygote.applyDebuggerSystemProperty(parsedArgs);
             Zygote.applyInvokeWithSystemProperty(parsedArgs);
 
@@ -865,12 +854,12 @@ public class ZygoteInit {
      * into new processes are required to either set the priority to the default value or terminate
      * before executing any non-system code.  The native side of this occurs in SpecializeCommon,
      * while the Java Language priority is changed in ZygoteInit.handleSystemServerProcess,
-     * ZygoteConnection.handleChildProc, and Zygote.usapMain.
+     * ZygoteConnection.handleChildProc, and Zygote.childMain.
      *
      * @param argv  Command line arguments used to specify the Zygote's configuration.
      */
     @UnsupportedAppUsage
-    public static void main(String argv[]) {
+    public static void main(String[] argv) {
         ZygoteServer zygoteServer = null;
 
         // Mark zygote start. This ensures that thread creation will throw
@@ -1029,7 +1018,7 @@ public class ZygoteInit {
      *                              are enabled)
      * @param argv             arg strings
      */
-    public static final Runnable zygoteInit(int targetSdkVersion, long[] disabledCompatChanges,
+    public static Runnable zygoteInit(int targetSdkVersion, long[] disabledCompatChanges,
             String[] argv, ClassLoader classLoader) {
         if (RuntimeInit.DEBUG) {
             Slog.d(RuntimeInit.TAG, "RuntimeInit: Starting application from zygote");
@@ -1049,11 +1038,10 @@ public class ZygoteInit {
      * to zygoteInit(), which skips calling into initialization routines that start the Binder
      * threadpool.
      */
-    static final Runnable childZygoteInit(
-            int targetSdkVersion, String[] argv, ClassLoader classLoader) {
+    static Runnable childZygoteInit(String[] argv) {
         RuntimeInit.Arguments args = new RuntimeInit.Arguments(argv);
-        return RuntimeInit.findStaticMain(args.startClass, args.startArgs, classLoader);
+        return RuntimeInit.findStaticMain(args.startClass, args.startArgs, /* classLoader= */null);
     }
 
-    private static final native void nativeZygoteInit();
+    private static native void nativeZygoteInit();
 }

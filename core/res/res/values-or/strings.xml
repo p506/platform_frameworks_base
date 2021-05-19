@@ -57,7 +57,7 @@
     <string name="imei" msgid="2157082351232630390">"IMEI"</string>
     <string name="meid" msgid="3291227361605924674">"MEID"</string>
     <string name="ClipMmi" msgid="4110549342447630629">"ଇନକମିଙ୍ଗ କଲର୍ ଆଇଡି"</string>
-    <string name="ClirMmi" msgid="4702929460236547156">"ଆଉଟଗୋଇଙ୍ଗ୍ କଲର୍ ଆଇଡି"</string>
+    <string name="ClirMmi" msgid="6752346475055446417">"ଆଉଟଗୋଇଂ କଲର୍ IDକୁ ଲୁଚାନ୍ତୁ"</string>
     <string name="ColpMmi" msgid="4736462893284419302">"ସଂଯୁକ୍ତ ଲାଇନ୍ ID"</string>
     <string name="ColrMmi" msgid="5889782479745764278">"ସଂଯୁକ୍ତ ଲାଇନ୍ ID କଟକଣା"</string>
     <string name="CfMmi" msgid="8390012691099787178">"କଲ୍‌ ଫରୱାର୍ଡିଂ"</string>
@@ -100,7 +100,7 @@
     <string name="peerTtyModeHco" msgid="5626377160840915617">"ପୀଅର୍‌ ଅନୁରୋଧ କରିଥିବା TTY ମୋଡ୍‍ HCO ଅଟେ"</string>
     <string name="peerTtyModeVco" msgid="572208600818270944">"ପୀଅର୍‌ ଅନୁରୋଧ କରିଥିବା TTY ମୋଡ୍‍ VCO ଅଟେ"</string>
     <string name="peerTtyModeOff" msgid="2420380956369226583">"ପୀଅର୍‌ ଅନୁରୋଧ କରିଥିବା TTY ମୋଡ୍‍ OFF ଅଛି"</string>
-    <string name="serviceClassVoice" msgid="2065556932043454987">"ଭଏସ୍"</string>
+    <string name="serviceClassVoice" msgid="2065556932043454987">"Voice"</string>
     <string name="serviceClassData" msgid="4148080018967300248">"ଡାଟା"</string>
     <string name="serviceClassFAX" msgid="2561653371698904118">"ଫାକ୍ସ"</string>
     <string name="serviceClassSMS" msgid="1547664561704509004">"SMS"</string>
@@ -349,6 +349,8 @@
     <string name="permdesc_receiveMms" msgid="958102423732219710">"MMS ମେସେଜ୍‌ ପ୍ରାପ୍ତ କରିବାକୁ ତଥା ପ୍ରକ୍ରିୟା କରାଇବାକୁ ଆପ୍‍ଟିକୁ ଅନୁମତି ଦିଏ। ଏହାର ଅର୍ଥ, ଆପଣଙ୍କ ଡିଭାଇସ୍‍କୁ ପଠାଯାଇଥିବା ମେସେଜ୍‍ ଆପଣଙ୍କୁ ନଦେଖାଇ ଆପ୍‍ଟି ମନିଟର୍‍ କିମ୍ବା ଡିଲିଟ୍‍ କରିପାରେ।"</string>
     <string name="permlab_bindCellBroadcastService" msgid="586746677002040651">"ସେଲ୍ ପ୍ରସାରଣ ମେସେଜ୍ ଫର୍‍ୱାର୍ଡ କରନ୍ତୁ"</string>
     <string name="permdesc_bindCellBroadcastService" msgid="6540910200973641606">"ସେଲ୍ ପ୍ରସାରଣ ମେସେଜ୍ ପ୍ରାପ୍ତ ହେବା ପରେ ସେଗୁଡ଼ିକୁ ଫର୍‍ୱାର୍ଡ କରିବା ପାଇଁ ଆପ୍‍କୁ ସେଲ୍ ପ୍ରସାରଣ ମଡ୍ୟୁଲ୍ ସହିତ ସଂଯୁକ୍ତ କରିବାକୁ ଅନୁମତି ଦିଏ। ଜରୁରୀକାଳୀନ ପରିସ୍ଥିତିରେ ଆପଣଙ୍କୁ ଚେତାବନୀ ଦେବା ପାଇଁ କିଛି ଲୋକେସନ୍‍‍ରେ ସେଲ୍ ପ୍ରସାରଣ ଆଲର୍ଟ ବିତରଣ କରାଯାଇଥାଏ। ଏକ ଜରୁରୀକାଳୀନ ସେଲ୍ ପ୍ରସାରଣ ପ୍ରାପ୍ତ ହେବା ସମୟରେ କିଛି କ୍ଷତିକାରକ ଆପ୍ସ ହୁଏତ ଆପଣଙ୍କର ଡିଭାଇସ୍‍ର କାର୍ଯ୍ୟଦକ୍ଷତା କିମ୍ବା କାର୍ଯ୍ୟ ପ୍ରକ୍ରିୟାରେ ହସ୍ତକ୍ଷେପ କରିପାରେ।"</string>
+    <string name="permlab_manageOngoingCalls" msgid="281244770664231782">"ଚାଲୁଥିବା କଲଗୁଡ଼ିକୁ ପରିଚାଳନା କରନ୍ତୁ"</string>
+    <string name="permdesc_manageOngoingCalls" msgid="7003138133829915265">"ଏକ ଆପକୁ ଆପଣଙ୍କ ଡିଭାଇସରେ ଚାଲୁଥିବା କଲଗୁଡ଼ିକର ବିବରଣୀ ଦେଖିବା ଓ ଏହି କଲଗୁଡ଼ିକୁ ନିୟନ୍ତ୍ରଣ କରିବା ପାଇଁ ଅନୁମତି ଦେଇଥାଏ।"</string>
     <string name="permlab_readCellBroadcasts" msgid="5869884450872137693">"ସେଲ୍‍ ବ୍ରଡ୍‍କାଷ୍ଟ ମେସେଜ୍‍ ପଢ଼ନ୍ତୁ"</string>
     <string name="permdesc_readCellBroadcasts" msgid="672513437331980168">"ଆପଣଙ୍କ ଡିଭାଇସ୍‍ରେ ପ୍ରାପ୍ତ ହୋଇଥିବା ସେଲ୍‍ ବ୍ରଡ୍‍କାଷ୍ଟ ମେସେଜ୍‍ ପଢିବାକୁ ଆପ୍‍କୁ ଅନୁମତି ଦିଏ। ଜରୁରୀକାଳୀନ ଅବସ୍ଥା ବିଷୟରେ ଆପଣଙ୍କୁ ସତର୍କ କରାଇବାକୁ କିଛି ଲୋକେଶନ୍‍ରେ ସେଲ୍‍ ବ୍ରଡ୍‍କାଷ୍ଟ ସତର୍କ ଡେଲିଭର୍ କରାଯାଇଥାଏ। ଏକ ଜରୁରୀକାଳୀନ ସେଲ୍‍ ବ୍ରଡ୍‍କାଷ୍ଟ ପ୍ରାପ୍ତ ହେବାପରେ ହାନୀକାରକ ଆପ୍‍ ଆପଣଙ୍କ ଡିଭାଇସ୍‍ର କାର୍ଯ୍ୟକ୍ଷମତା କିମ୍ବା ସଞ୍ଚାଳନାରେ ବାଧା ପହଞ୍ଚାଇପାରନ୍ତି।"</string>
     <string name="permlab_subscribedFeedsRead" msgid="217624769238425461">"ସବସ୍କ୍ରାଇବ୍ ହୋଇଥିବା ଫୀଡ୍‌କୁ ପଢ଼ନ୍ତୁ"</string>
@@ -1103,7 +1105,7 @@
     <string name="redo" msgid="7231448494008532233">"ପୁଣି କରନ୍ତୁ"</string>
     <string name="autofill" msgid="511224882647795296">"ଅଟୋଫିଲ୍‌"</string>
     <string name="textSelectionCABTitle" msgid="5151441579532476940">"ଟେକ୍ସଟ୍‍ ଚୟନ"</string>
-    <string name="addToDictionary" msgid="8041821113480950096">"ଶବ୍ଦକୋଷରେ ଯୋଡ଼ନ୍ତୁ"</string>
+    <string name="addToDictionary" msgid="8041821113480950096">"ଶବ୍ଦକୋଷରେ ଯୋଗ କରନ୍ତୁ"</string>
     <string name="deleteText" msgid="4200807474529938112">"ଡିଲିଟ୍‍ କରନ୍ତୁ"</string>
     <string name="inputMethod" msgid="1784759500516314751">"ଇନପୁଟ୍ ପଦ୍ଧତି"</string>
     <string name="editTextMenuTitle" msgid="857666911134482176">"ଟେକ୍ସଟ୍‌ କାର୍ଯ୍ୟ"</string>
@@ -1113,9 +1115,9 @@
     <string name="app_running_notification_title" msgid="8985999749231486569">"<xliff:g id="APP_NAME">%1$s</xliff:g> ଚାଲୁଛି"</string>
     <string name="app_running_notification_text" msgid="5120815883400228566">"ଅଧିକ ସୂଚନା ପାଇଁ କିମ୍ବା ଆପ୍‍ ବନ୍ଦ କରିବାକୁ ଟାପ୍‍ କରନ୍ତୁ।"</string>
     <string name="ok" msgid="2646370155170753815">"ଠିକ୍‍ ଅଛି"</string>
-    <string name="cancel" msgid="6908697720451760115">"କ୍ୟାନ୍ସଲ୍‍ କରନ୍ତୁ"</string>
+    <string name="cancel" msgid="6908697720451760115">"ବାତିଲ୍‍ କରନ୍ତୁ"</string>
     <string name="yes" msgid="9069828999585032361">"ଠିକ୍‍ ଅଛି"</string>
-    <string name="no" msgid="5122037903299899715">"କ୍ୟାନ୍ସଲ୍‍ କରନ୍ତୁ"</string>
+    <string name="no" msgid="5122037903299899715">"ବାତିଲ୍‍ କରନ୍ତୁ"</string>
     <string name="dialog_alert_title" msgid="651856561974090712">"ଧ୍ୟାନଦିଅନ୍ତୁ"</string>
     <string name="loading" msgid="3138021523725055037">"ଲୋଡ୍ କରାଯାଉଛି…"</string>
     <string name="capital_on" msgid="2770685323900821829">"ଚାଲୁ"</string>
@@ -1258,7 +1260,7 @@
     <item msgid="9177085807664964627">"VPN"</item>
   </string-array>
     <string name="network_switch_type_name_unknown" msgid="3665696841646851068">"ଏକ ଅଜଣା ନେଟ୍‌ୱର୍କ ପ୍ରକାର"</string>
-    <string name="accept" msgid="5447154347815825107">"ସ୍ୱୀକାର କରନ୍ତୁ"</string>
+    <string name="accept" msgid="5447154347815825107">"ଗ୍ରହଣ କରନ୍ତୁ"</string>
     <string name="decline" msgid="6490507610282145874">"ପ୍ରତ୍ୟାଖ୍ୟାନ"</string>
     <string name="select_character" msgid="3352797107930786979">"ବର୍ଣ୍ଣ ଲେଖନ୍ତୁ"</string>
     <string name="sms_control_title" msgid="4748684259903148341">"SMS ମେସେଜ୍‌ଗୁଡ଼ିକୁ ପଠାଯାଉଛି"</string>
@@ -1269,7 +1271,7 @@
     <string name="sms_short_code_details" msgid="2723725738333388351">"ଏହା ଦ୍ୱାରା "<b>" ଆପଣଙ୍କ ମୋବାଇଲ୍ ଆକାଉଣ୍ଟରୁ ପଇସା କଟିପାରେ। "</b></string>
     <string name="sms_premium_short_code_details" msgid="1400296309866638111"><b>" ଆପଣଙ୍କ ମୋବାଇଲ୍ ଆକାଉଣ୍ଟରୁ ପଇସା କଟିପାରେ। "</b></string>
     <string name="sms_short_code_confirm_allow" msgid="920477594325526691">"ପଠାନ୍ତୁ"</string>
-    <string name="sms_short_code_confirm_deny" msgid="1356917469323768230">"କ୍ୟାନ୍ସଲ୍‍ କରନ୍ତୁ"</string>
+    <string name="sms_short_code_confirm_deny" msgid="1356917469323768230">"ବାତିଲ୍‍ କରନ୍ତୁ"</string>
     <string name="sms_short_code_remember_choice" msgid="1374526438647744862">"ମୋ ପସନ୍ଦ ମନେରଖନ୍ତୁ"</string>
     <string name="sms_short_code_remember_undo_instruction" msgid="2620984439143080410">"ଏହାକୁ ଆପଣ ସେଟିଙ୍ଗ ଓ ଆପ୍‍ରେ ପରବର୍ତ୍ତୀ ସମୟରେ ବଦଳାଇପାରିବେ"</string>
     <string name="sms_short_code_confirm_always_allow" msgid="2223014893129755950">"ସର୍ବଦା ଅନୁମତି ଦିଅନ୍ତୁ"</string>
@@ -1340,11 +1342,14 @@
     <string name="alert_windows_notification_turn_off_action" msgid="7805857234839123780">"ବନ୍ଦ କରନ୍ତୁ"</string>
     <string name="ext_media_checking_notification_title" msgid="8299199995416510094">"<xliff:g id="NAME">%s</xliff:g>ର ଯାଞ୍ଚ କରାଯାଉଛି…"</string>
     <string name="ext_media_checking_notification_message" msgid="2231566971425375542">"ସାମ୍ପ୍ରତିକ କଣ୍ଟେଣ୍ଟର ଯାଞ୍ଚ କରାଯାଉଛି"</string>
+    <string name="ext_media_checking_notification_message" product="tv" msgid="7986154434946021415">"ମିଡିଆ ଷ୍ଟୋରେଜର ବିଶ୍ଳେଷଣ କରାଯାଉଛି"</string>
     <string name="ext_media_new_notification_title" msgid="3517407571407687677">"ନୂଆ <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_new_notification_title" product="automotive" msgid="9085349544984742727">"<xliff:g id="NAME">%s</xliff:g> କାମ କରୁନାହିଁ"</string>
     <string name="ext_media_new_notification_message" msgid="6095403121990786986">"ସେଟଅପ୍‌ କରିବା ପାଇଁ ଟାପ୍‌ କରନ୍ତୁ"</string>
+    <string name="ext_media_new_notification_message" product="tv" msgid="216863352100263668">"ସେଟ୍ ଅପ୍ କରିବାକୁ ଚୟନ କରନ୍ତୁ"</string>
     <string name="ext_media_new_notification_message" product="automotive" msgid="5140127881613227162">"ଆପଣଙ୍କୁ ପୁଣି ଡିଭାଇସ୍ ଫର୍ମାଟ୍ କରିବାକୁ ପଡ଼ିପାରେ। ବାହାର କରିବାକୁ ଟାପ୍ କରନ୍ତୁ।"</string>
     <string name="ext_media_ready_notification_message" msgid="777258143284919261">"ଫଟୋ ଓ ମିଡିଆ ସ୍ଥାନାନ୍ତର କରାଯିବା ପାଇଁ"</string>
+    <string name="ext_media_ready_notification_message" product="tv" msgid="8847134811163165935">"ମିଡିଆ ଫାଇଲଗୁଡ଼ିକୁ ବ୍ରାଉଜ୍ କରନ୍ତୁ"</string>
     <string name="ext_media_unmountable_notification_title" msgid="4895444667278979910">"<xliff:g id="NAME">%s</xliff:g> ସହ ସମସ୍ୟା"</string>
     <string name="ext_media_unmountable_notification_title" product="automotive" msgid="3142723758949023280">"<xliff:g id="NAME">%s</xliff:g> କାମ କରୁନାହିଁ"</string>
     <string name="ext_media_unmountable_notification_message" msgid="3256290114063126205">"ଠିକ୍‌ କରିବାକୁ ଟାପ୍‌ କରନ୍ତୁ"</string>
@@ -1353,7 +1358,7 @@
     <string name="ext_media_unsupported_notification_title" msgid="4358280700537030333">"<xliff:g id="NAME">%s</xliff:g> ସପୋର୍ଟ କରୁନାହିଁ"</string>
     <string name="ext_media_unsupported_notification_title" product="automotive" msgid="6004193172658722381">"<xliff:g id="NAME">%s</xliff:g> କାମ କରୁନାହିଁ"</string>
     <string name="ext_media_unsupported_notification_message" msgid="917738524888367560">"ଏହି ଡିଭାଇସ୍ ଏହି <xliff:g id="NAME">%s</xliff:g>କୁ ସପୋର୍ଟ କରେନାହିଁ। ଗୋଟିଏ ସପୋର୍ଟ କରୁଥିବା ଫର୍ମାଟ୍‌ରେ ସେଟ୍‍ ଅପ୍‍ କରିବା ପାଇଁ ଟାପ୍‍ କରନ୍ତୁ।"</string>
-    <string name="ext_media_unsupported_notification_message" product="tv" msgid="7744945987775645685">"ଏହି ଡିଭାଇସ୍ ଏହି <xliff:g id="NAME">%s</xliff:g>କୁ ସପୋର୍ଟ କରେ ନାହିଁ। ଗୋଟିଏ ସପୋର୍ଟ କରୁଥିବା ଫର୍ମାଟରେ ସେଟ୍‍ ଅପ୍‍ କରିବାକୁ ଟାପ୍‍ କରନ୍ତୁ।"</string>
+    <string name="ext_media_unsupported_notification_message" product="tv" msgid="1595482802187036532">"<xliff:g id="NAME">%s</xliff:g>କୁ ଏକ ସମର୍ଥିତ ଫର୍ମାଟରେ ସେଟ୍ ଅପ୍ କରିବାକୁ ଚୟନ କରନ୍ତୁ।"</string>
     <string name="ext_media_unsupported_notification_message" product="automotive" msgid="3412494732736336330">"ଆପଣଙ୍କୁ ପୁଣି ଡିଭାଇସ୍ ଫର୍ମାଟ୍ କରିବାକୁ ପଡ଼ିପାରେ"</string>
     <string name="ext_media_badremoval_notification_title" msgid="4114625551266196872">"<xliff:g id="NAME">%s</xliff:g>କୁ ହଠାତ୍‌ କାଢ଼ିଦିଆଗଲା"</string>
     <string name="ext_media_badremoval_notification_message" msgid="1986514704499809244">"କଣ୍ଟେଣ୍ତ ହରାଇବାକୁ ଏଡ଼ାଇବା ପାଇଁ କାଢ଼ିବା ପୂର୍ବରୁ ମିଡିଆକୁ ଇଜେକ୍ଟ କରନ୍ତୁ"</string>
@@ -1490,7 +1495,7 @@
     <string name="date_picker_prev_month_button" msgid="3418694374017868369">"ପୂର୍ବ ମାସ"</string>
     <string name="date_picker_next_month_button" msgid="4858207337779144840">"ପରବର୍ତ୍ତୀ ମାସ"</string>
     <string name="keyboardview_keycode_alt" msgid="8997420058584292385">"ALT"</string>
-    <string name="keyboardview_keycode_cancel" msgid="2134624484115716975">"କ୍ୟାନ୍ସଲ୍‍ କରନ୍ତୁ"</string>
+    <string name="keyboardview_keycode_cancel" msgid="2134624484115716975">"ବାତିଲ୍‍ କରନ୍ତୁ"</string>
     <string name="keyboardview_keycode_delete" msgid="2661117313730098650">"ଡିଲିଟ୍‍ କରନ୍ତୁ"</string>
     <string name="keyboardview_keycode_done" msgid="2524518019001653851">"ହୋଇଗଲା"</string>
     <string name="keyboardview_keycode_mode_change" msgid="2743735349997999020">"ମୋଡ୍‍ ପରିବର୍ତ୍ତନ"</string>
@@ -1618,7 +1623,7 @@
     <string name="kg_failed_attempts_almost_at_login" product="tv" msgid="4670840383567106114">"ଆପଣ ଆପଣଙ୍କର ଅନଲକ୍ ପାଟର୍ନକୁ <xliff:g id="NUMBER_0">%1$d</xliff:g> ଥର ଭୁଲ ଭାବେ ଆଙ୍କିଛନ୍ତି। <xliff:g id="NUMBER_1">%2$d</xliff:g> ଥର ଅସଫଳ ଚେଷ୍ଟା ପରେ, ଏକ ଇମେଲ୍ ଆକାଉଣ୍ଟ ବ୍ୟବହାର କରି ଆପଣଙ୍କର Android TV ଡିଭାଇସ୍‌କୁ ଅନ୍‌ଲକ୍ କରିବା ପାଇଁ କୁହାଯିବ। \n\n<xliff:g id="NUMBER_2">%3$d</xliff:g> ସେକେଣ୍ଡ ମଧ୍ୟରେ ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।"</string>
     <string name="kg_failed_attempts_almost_at_login" product="default" msgid="5270861875006378092">"ଆପଣଙ୍କ ଅନଲକ୍‍ ପାଟର୍ନକୁ ଆପଣ <xliff:g id="NUMBER_0">%1$d</xliff:g> ଥର ଭୁଲ ଭାବେ ଅଙ୍କନ କରିଛନ୍ତି। ଆଉ <xliff:g id="NUMBER_1">%2$d</xliff:g>ଟି ଭୁଲ ପ୍ରୟାସ ପରେ ଏକ ଇମେଲ୍‍ ଆକାଉଣ୍ଟ ବ୍ୟବହାର କରି ନିଜ ଫୋନ୍‌କୁ ଅନଲକ୍‌ କରିବା ପାଇଁ କୁହାଯିବ।\n\n<xliff:g id="NUMBER_2">%3$d</xliff:g> ସେକେଣ୍ଡ ପରେ ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।"</string>
     <string name="kg_text_message_separator" product="default" msgid="4503708889934976866">" — "</string>
-    <string name="kg_reordering_delete_drop_target_text" msgid="2034358143731750914">"ବାହାର କରନ୍ତୁ"</string>
+    <string name="kg_reordering_delete_drop_target_text" msgid="2034358143731750914">"କାଢ଼ି ଦିଅନ୍ତୁ"</string>
     <string name="safe_media_volume_warning" product="default" msgid="3751676824423049994">"ମାତ୍ରା ବଢ଼ାଇ ସୁପାରିଶ ସ୍ତର ବଢ଼ାଉଛନ୍ତି? \n\n ଲମ୍ବା ସମୟ ପର୍ଯ୍ୟନ୍ତ ଉଚ୍ଚ ଶବ୍ଦରେ ଶୁଣିଲେ ଆପଣଙ୍କ ଶ୍ରବଣ ଶକ୍ତି ଖରାପ ହୋଇପାରେ।"</string>
     <string name="accessibility_shortcut_warning_dialog_title" msgid="4017995837692622933">"ଆକ୍ସେସବିଲିଟି ଶର୍ଟକଟ୍‍ ବ୍ୟବହାର କରିବେ?"</string>
     <string name="accessibility_shortcut_toogle_warning" msgid="4161716521310929544">"ସର୍ଟକଟ୍ ଚାଲୁ ଥିବା ବେଳେ, ଉଭୟ ଭଲ୍ୟୁମ୍ ବଟନ୍ 3 ସେକେଣ୍ଡ ପାଇଁ ଦବାଇବା ଦ୍ୱାରା ଏକ ଆକ୍ସେସବିଲିଟି ଫିଚର୍ ଆରମ୍ଭ ହେବ।"</string>
@@ -1661,7 +1666,7 @@
     <string name="accessibility_gesture_3finger_instructional_text" msgid="3425123684990193765">"ଫିଚରଗୁଡ଼ିକ ମଧ୍ୟରେ ସ୍ୱିଚ୍ କରିବାକୁ, ତିନୋଟି ଆଙ୍ଗୁଠିରେ ଉପରକୁ ସ୍ୱାଇପ୍ କରି ଧରି ରଖନ୍ତୁ।"</string>
     <string name="accessibility_magnification_chooser_text" msgid="1502075582164931596">"ମ୍ୟାଗ୍ନିଫିକେସନ୍‍"</string>
     <string name="user_switched" msgid="7249833311585228097">"ବର୍ତ୍ତମାନର ୟୁଜର୍‌ ହେଉଛନ୍ତି <xliff:g id="NAME">%1$s</xliff:g>।"</string>
-    <string name="user_switching_message" msgid="1912993630661332336">"<xliff:g id="NAME">%1$s</xliff:g> ରେ ସୁଇଚ୍ କରନ୍ତୁ…"</string>
+    <string name="user_switching_message" msgid="1912993630661332336">"<xliff:g id="NAME">%1$s</xliff:g>ରେ ସ୍ୱିଚ୍ କରନ୍ତୁ…"</string>
     <string name="user_logging_out_message" msgid="7216437629179710359">"<xliff:g id="NAME">%1$s</xliff:g>ଙ୍କୁ ଲଗଆଉଟ୍‍ କରାଯାଉଛି…"</string>
     <string name="owner_name" msgid="8713560351570795743">"ମାଲିକ"</string>
     <string name="error_message_title" msgid="4082495589294631966">"ତ୍ରୁଟି"</string>
@@ -1713,6 +1718,28 @@
     <string name="mediasize_na_monarch" msgid="4396943937986136896">"ମୋନାର୍କ"</string>
     <string name="mediasize_na_quarto" msgid="2119101847712239885">"କ୍ୱାର୍ଟୋ"</string>
     <string name="mediasize_na_foolscap" msgid="5011612828564394648">"Foolscap"</string>
+    <!-- no translation found for mediasize_na_ansi_c (3104916921818289618) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_d (254005964819282724) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_e (4424174989686785675) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_f (146980362213260987) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_a (5280681822380032361) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_b (2113344093437297427) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_c (971002546186856623) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_d (6450996075335049806) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e (6782708486949266519) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e1 (4707138568738504275) -->
+    <skip />
+    <!-- no translation found for mediasize_na_super_b (6964127155618393178) -->
+    <skip />
     <string name="mediasize_chinese_roc_8k" msgid="411670106572707544">"ROC 8K"</string>
     <string name="mediasize_chinese_roc_16k" msgid="7496706798725321898">"ROC 16K"</string>
     <string name="mediasize_chinese_prc_1" msgid="946949835711037253">"PRC 1"</string>
@@ -1749,9 +1776,11 @@
     <string name="mediasize_japanese_kahu" msgid="7290232592648122042">"Kahu"</string>
     <string name="mediasize_japanese_kaku2" msgid="7477551750461028312">"Kaku2"</string>
     <string name="mediasize_japanese_you4" msgid="5552111912684384833">"You4"</string>
+    <!-- no translation found for mediasize_japanese_l (1326765321473431817) -->
+    <skip />
     <string name="mediasize_unknown_portrait" msgid="3817016220446495613">"ଅଜଣା ପୋର୍ଟ୍ରେଟ୍‍"</string>
     <string name="mediasize_unknown_landscape" msgid="1584741567225095325">"ଅଜଣା ଲ୍ୟାଣ୍ଡସ୍କେପ୍‌"</string>
-    <string name="write_fail_reason_cancelled" msgid="2344081488493969190">"କ୍ୟାନ୍ସଲ୍‍ କରାଗଲା"</string>
+    <string name="write_fail_reason_cancelled" msgid="2344081488493969190">"ବାତିଲ୍‍ କରାଗଲା"</string>
     <string name="write_fail_reason_cannot_write" msgid="432118118378451508">"କଣ୍ଟେଣ୍ଟ ଲେଖିବାବେଳେ ତ୍ରୁଟି"</string>
     <string name="reason_unknown" msgid="5599739807581133337">"ଅଜଣା"</string>
     <string name="reason_service_unavailable" msgid="5288405248063804713">"ପ୍ରିଣ୍ଟ ସେବାକୁ ସକ୍ଷମ କରାଯାଇନାହିଁ"</string>

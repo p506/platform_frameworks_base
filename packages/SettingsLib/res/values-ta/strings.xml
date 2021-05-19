@@ -388,7 +388,7 @@
   <string-array name="color_mode_names">
     <item msgid="3836559907767149216">"வைபிரன்ட் (இயல்பு)"</item>
     <item msgid="9112200311983078311">"இயற்கை வண்ணம்"</item>
-    <item msgid="6564241960833766170">"வழக்கமான வண்ணம்"</item>
+    <item msgid="6564241960833766170">"இயல்புநிலை"</item>
   </string-array>
   <string-array name="color_mode_descriptions">
     <item msgid="6828141153199944847">"மேம்படுத்தப்பட்ட வண்ணங்கள்"</item>
@@ -446,6 +446,7 @@
     <string name="power_charging" msgid="6727132649743436802">"<xliff:g id="LEVEL">%1$s</xliff:g> - <xliff:g id="STATE">%2$s</xliff:g>"</string>
     <string name="power_remaining_charging_duration_only" msgid="7415639699283965818">"முழு சார்ஜாக <xliff:g id="TIME">%1$s</xliff:g> ஆகும்"</string>
     <string name="power_charging_duration" msgid="5005740040558984057">"<xliff:g id="LEVEL">%1$s</xliff:g> - முழு சார்ஜாக <xliff:g id="TIME">%2$s</xliff:g> ஆகும்"</string>
+    <string name="power_charging_limited" msgid="1956874810658999681">"<xliff:g id="LEVEL">%1$s</xliff:g> - பேட்டரியின் ஆயுளை மேம்படுத்துகிறது"</string>
     <string name="battery_info_status_unknown" msgid="268625384868401114">"அறியப்படாத"</string>
     <string name="battery_info_status_charging" msgid="4279958015430387405">"சார்ஜ் ஆகிறது"</string>
     <string name="battery_info_status_charging_fast" msgid="8027559755902954885">"வேகமாக சார்ஜாகிறது"</string>
@@ -457,7 +458,7 @@
     <string name="disabled" msgid="8017887509554714950">"முடக்கப்பட்டது"</string>
     <string name="external_source_trusted" msgid="1146522036773132905">"அனுமதிக்கப்பட்டது"</string>
     <string name="external_source_untrusted" msgid="5037891688911672227">"அனுமதிக்கப்படவில்லை"</string>
-    <string name="install_other_apps" msgid="3232595082023199454">"நிறுவுதல் (அறியாதவை)"</string>
+    <string name="install_other_apps" msgid="3232595082023199454">"தெரியாத ஆப்ஸ்களை நிறுவுதல்"</string>
     <string name="home" msgid="973834627243661438">"அமைப்புகள் முகப்பு"</string>
   <string-array name="battery_labels">
     <item msgid="7878690469765357158">"0%"</item>

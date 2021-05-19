@@ -30,7 +30,6 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyPermanentlyInvalidatedException;
 import android.security.keystore.KeyProperties;
 import android.security.keystore.KeyProtection;
-import android.security.keystore.KeymasterUtils;
 import android.security.keystore.SecureKeyImportUnavailableException;
 import android.security.keystore.WrappedKeyEntry;
 import android.system.keystore2.AuthenticatorSpec;
@@ -41,6 +40,8 @@ import android.system.keystore2.KeyEntryResponse;
 import android.system.keystore2.KeyMetadata;
 import android.system.keystore2.ResponseCode;
 import android.util.Log;
+
+import com.android.internal.annotations.VisibleForTesting;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -100,7 +101,7 @@ public class AndroidKeyStoreSpi extends KeyStoreSpi {
     public static final String NAME = "AndroidKeyStore";
 
     private KeyStore2 mKeyStore;
-    private int mNamespace = KeyProperties.NAMESPACE_APPLICATION;
+    private @KeyProperties.Namespace int mNamespace = KeyProperties.NAMESPACE_APPLICATION;
 
     @Override
     public Key engineGetKey(String alias, char[] password) throws NoSuchAlgorithmException,
@@ -975,7 +976,6 @@ public class AndroidKeyStoreSpi extends KeyStoreSpi {
     }
 
     private Set<String> getUniqueAliases() {
-
         try {
             final KeyDescriptor[] keys = mKeyStore.list(
                     getTargetDomain(),
@@ -988,7 +988,7 @@ public class AndroidKeyStoreSpi extends KeyStoreSpi {
             return aliases;
         } catch (android.security.KeyStoreException e) {
             Log.e(TAG, "Failed to list keystore entries.", e);
-            return null;
+            return new HashSet<>();
         }
     }
 
@@ -1100,6 +1100,17 @@ public class AndroidKeyStoreSpi extends KeyStoreSpi {
         return caAlias;
     }
 
+    /**
+     * Used by Tests to initialize with a fake KeyStore2.
+     * @hide
+     * @param keystore
+     */
+    @VisibleForTesting
+    public void initForTesting(KeyStore2 keystore) {
+        mKeyStore = keystore;
+        mNamespace = KeyProperties.NAMESPACE_APPLICATION;
+    }
+
     @Override
     public void engineStore(OutputStream stream, char[] password) throws IOException,
             NoSuchAlgorithmException, CertificateException {
@@ -1125,7 +1136,7 @@ public class AndroidKeyStoreSpi extends KeyStoreSpi {
     @Override
     public void engineLoad(LoadStoreParameter param) throws IOException,
             NoSuchAlgorithmException, CertificateException {
-        int namespace = KeyProperties.NAMESPACE_APPLICATION;
+        @KeyProperties.Namespace int namespace = KeyProperties.NAMESPACE_APPLICATION;
         if (param != null) {
             if (param instanceof AndroidKeyStoreLoadStoreParameter) {
                 namespace = ((AndroidKeyStoreLoadStoreParameter) param).getNamespace();

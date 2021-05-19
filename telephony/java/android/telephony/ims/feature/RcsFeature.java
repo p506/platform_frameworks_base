@@ -47,6 +47,7 @@ import com.android.internal.telephony.util.TelephonyUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -119,8 +120,8 @@ public class RcsFeature extends ImsFeature {
                 @Nullable ICapabilityExchangeEventListener listener) throws RemoteException {
             CapabilityExchangeEventListener listenerWrapper =
                     new CapabilityExchangeAidlWrapper(listener);
-            executeMethodAsync(() -> mReference.setCapabilityExchangeEventListener(
-                    mExecutor, listenerWrapper), "setCapabilityExchangeEventListener");
+            executeMethodAsync(() -> mReference.setCapabilityExchangeEventListener(listenerWrapper),
+                    "setCapabilityExchangeEventListener");
         }
 
         @Override
@@ -145,8 +146,8 @@ public class RcsFeature extends ImsFeature {
                 throws RemoteException {
             OptionsResponseCallback callbackWrapper = new RcsOptionsResponseAidlWrapper(callback);
             executeMethodAsync(() -> mReference.getCapabilityExchangeImplBaseInternal()
-                    .sendOptionsCapabilityRequest(contactUri, myCapabilities, callbackWrapper),
-                    "sendOptionsCapabilityRequest");
+                    .sendOptionsCapabilityRequest(contactUri, new HashSet<>(myCapabilities),
+                        callbackWrapper), "sendOptionsCapabilityRequest");
         }
 
         // Call the methods with a clean calling identity on the executor and wait indefinitely for
@@ -384,26 +385,24 @@ public class RcsFeature extends ImsFeature {
      * operation and the RcsFeature sets the status of the capability to true using
      * {@link #notifyCapabilitiesStatusChanged(RcsImsCapabilities)}.
      *
-     * @param executor The executor for the framework to use when request RCS resquests to this
-     * service.
      * @param listener A {@link CapabilityExchangeEventListener} to send the capability exchange
      * event to the framework.
      * @return An instance of {@link RcsCapabilityExchangeImplBase} that implements capability
      * exchange if it is supported by the device.
      */
     public @NonNull RcsCapabilityExchangeImplBase createCapabilityExchangeImpl(
-            @NonNull Executor executor, @NonNull CapabilityExchangeEventListener listener) {
+            @NonNull CapabilityExchangeEventListener listener) {
         // Base Implementation, override to implement functionality
-        return new RcsCapabilityExchangeImplBase(executor);
+        return new RcsCapabilityExchangeImplBase();
     }
 
     /**
      * Remove the given CapabilityExchangeImplBase instance.
-     * @param capExchangeImpl The {@link RcsCapabilityExchangeImplBase} instance to be removed.
+     * @param capExchangeImpl The {@link RcsCapabilityExchangeImplBase} instance to be destroyed.
      */
-    public void removeCapabilityExchangeImpl(
+    public void destroyCapabilityExchangeImpl(
             @NonNull RcsCapabilityExchangeImplBase capExchangeImpl) {
-        // Override to implement the process of removing RcsCapabilityExchangeImplBase instance.
+        // Override to implement the process of destroying RcsCapabilityExchangeImplBase instance.
     }
 
     /**{@inheritDoc}*/
@@ -428,22 +427,20 @@ public class RcsFeature extends ImsFeature {
 
     /**
      * Set the capability exchange listener.
-     * @param executor The executor for the framework to use when request RCS requests to this
-     * service.
      * @param listener A {@link CapabilityExchangeEventListener} to send the capability exchange
      * event to the framework.
      */
-    private void setCapabilityExchangeEventListener(@NonNull Executor executor,
+    private void setCapabilityExchangeEventListener(
             @Nullable CapabilityExchangeEventListener listener) {
         synchronized (mLock) {
             mCapExchangeEventListener = listener;
             if (mCapExchangeEventListener != null) {
-                initRcsCapabilityExchangeImplBase(executor, mCapExchangeEventListener);
+                initRcsCapabilityExchangeImplBase(mCapExchangeEventListener);
             } else {
                 // Remove the RcsCapabilityExchangeImplBase instance when the capability exchange
                 // instance has been removed in the framework.
                 if (mCapabilityExchangeImpl != null) {
-                    removeCapabilityExchangeImpl(mCapabilityExchangeImpl);
+                    destroyCapabilityExchangeImpl(mCapabilityExchangeImpl);
                 }
                 mCapabilityExchangeImpl = null;
             }
@@ -453,19 +450,17 @@ public class RcsFeature extends ImsFeature {
     /**
      * Initialize the RcsCapabilityExchangeImplBase instance if the capability exchange instance
      * has already been created in the framework.
-     * @param executor The executor for the framework to use when request RCS requests to this
-     * service.
      * @param listener A {@link CapabilityExchangeEventListener} to send the capability exchange
      * event to the framework.
      */
-    private void initRcsCapabilityExchangeImplBase(@NonNull Executor executor,
+    private void initRcsCapabilityExchangeImplBase(
             @NonNull CapabilityExchangeEventListener listener) {
         synchronized (mLock) {
             // Remove the original instance
             if (mCapabilityExchangeImpl != null) {
-                removeCapabilityExchangeImpl(mCapabilityExchangeImpl);
+                destroyCapabilityExchangeImpl(mCapabilityExchangeImpl);
             }
-            mCapabilityExchangeImpl = createCapabilityExchangeImpl(executor, listener);
+            mCapabilityExchangeImpl = createCapabilityExchangeImpl(listener);
         }
     }
 

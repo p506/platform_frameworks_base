@@ -15,13 +15,19 @@
  */
 package android.net.vcn;
 
+import static android.net.ipsec.ike.IkeSessionParams.IKE_OPTION_MOBIKE;
+
 import static com.android.internal.annotations.VisibleForTesting.Visibility;
 
 import android.annotation.IntDef;
 import android.annotation.IntRange;
 import android.annotation.NonNull;
 import android.annotation.Nullable;
+import android.annotation.SuppressLint;
+import android.net.Network;
 import android.net.NetworkCapabilities;
+import android.net.ipsec.ike.IkeTunnelConnectionParams;
+import android.net.vcn.persistablebundleutils.TunnelConnectionParamsUtils;
 import android.os.PersistableBundle;
 import android.util.ArraySet;
 
@@ -50,33 +56,27 @@ import java.util.concurrent.TimeUnit;
  * Network}s.
  *
  * <p>A VCN connection based on this configuration will be brought up dynamically based on device
- * settings, and filed NetworkRequests. Underlying networks will be selected based on the services
- * required by this configuration (as represented by network capabilities), and must be part of the
- * subscription group under which this configuration is registered (see {@link
+ * settings, and filed NetworkRequests. Underlying Networks must provide INTERNET connectivity, and
+ * must be part of the subscription group under which this configuration is registered (see {@link
  * VcnManager#setVcnConfig}).
  *
- * <p>Services that can be provided by a VCN network, or required for underlying networks are
+ * <p>As an abstraction of a cellular network, services that can be provided by a VCN network are
  * limited to services provided by cellular networks:
  *
  * <ul>
- *   <li>{@link android.net.NetworkCapabilities.NET_CAPABILITY_MMS}
- *   <li>{@link android.net.NetworkCapabilities.NET_CAPABILITY_SUPL}
- *   <li>{@link android.net.NetworkCapabilities.NET_CAPABILITY_DUN}
- *   <li>{@link android.net.NetworkCapabilities.NET_CAPABILITY_FOTA}
- *   <li>{@link android.net.NetworkCapabilities.NET_CAPABILITY_IMS}
- *   <li>{@link android.net.NetworkCapabilities.NET_CAPABILITY_CBS}
- *   <li>{@link android.net.NetworkCapabilities.NET_CAPABILITY_IA}
- *   <li>{@link android.net.NetworkCapabilities.NET_CAPABILITY_RCS}
- *   <li>{@link android.net.NetworkCapabilities.NET_CAPABILITY_XCAP}
- *   <li>{@link android.net.NetworkCapabilities.NET_CAPABILITY_EIMS}
- *   <li>{@link android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET}
- *   <li>{@link android.net.NetworkCapabilities.NET_CAPABILITY_MCX}
+ *   <li>{@link NetworkCapabilities#NET_CAPABILITY_MMS}
+ *   <li>{@link NetworkCapabilities#NET_CAPABILITY_SUPL}
+ *   <li>{@link NetworkCapabilities#NET_CAPABILITY_DUN}
+ *   <li>{@link NetworkCapabilities#NET_CAPABILITY_FOTA}
+ *   <li>{@link NetworkCapabilities#NET_CAPABILITY_IMS}
+ *   <li>{@link NetworkCapabilities#NET_CAPABILITY_CBS}
+ *   <li>{@link NetworkCapabilities#NET_CAPABILITY_IA}
+ *   <li>{@link NetworkCapabilities#NET_CAPABILITY_RCS}
+ *   <li>{@link NetworkCapabilities#NET_CAPABILITY_XCAP}
+ *   <li>{@link NetworkCapabilities#NET_CAPABILITY_EIMS}
+ *   <li>{@link NetworkCapabilities#NET_CAPABILITY_INTERNET}
+ *   <li>{@link NetworkCapabilities#NET_CAPABILITY_MCX}
  * </ul>
- *
- * <p>The meteredness and roaming of the VCN {@link Network} will be determined by that of the
- * underlying Network(s).
- *
- * @hide
  */
 public final class VcnGatewayConnectionConfig {
     // TODO: Use MIN_MTU_V6 once it is public, @hide
@@ -138,7 +138,7 @@ public final class VcnGatewayConnectionConfig {
      * <p>To ensure the device is not constantly being woken up, this retry interval MUST be greater
      * than this value.
      *
-     * @see {@link Builder#setRetryInterval()}
+     * @see {@link Builder#setRetryIntervalsMillis()}
      */
     private static final long MINIMUM_REPEATING_RETRY_INTERVAL_MS = TimeUnit.MINUTES.toMillis(15);
 
@@ -152,14 +152,14 @@ public final class VcnGatewayConnectionConfig {
                 TimeUnit.MINUTES.toMillis(5),
                 TimeUnit.MINUTES.toMillis(15)
             };
+    private static final String GATEWAY_CONNECTION_NAME_KEY = "mGatewayConnectionName";
+    @NonNull private final String mGatewayConnectionName;
+
+    private static final String TUNNEL_CONNECTION_PARAMS_KEY = "mTunnelConnectionParams";
+    @NonNull private IkeTunnelConnectionParams mTunnelConnectionParams;
 
     private static final String EXPOSED_CAPABILITIES_KEY = "mExposedCapabilities";
     @NonNull private final SortedSet<Integer> mExposedCapabilities;
-
-    private static final String UNDERLYING_CAPABILITIES_KEY = "mUnderlyingCapabilities";
-    @NonNull private final SortedSet<Integer> mUnderlyingCapabilities;
-
-    // TODO: Add Ike/ChildSessionParams as a subclass - maybe VcnIkeGatewayConnectionConfig
 
     private static final String MAX_MTU_KEY = "mMaxMtu";
     private final int mMaxMtu;
@@ -169,12 +169,14 @@ public final class VcnGatewayConnectionConfig {
 
     /** Builds a VcnGatewayConnectionConfig with the specified parameters. */
     private VcnGatewayConnectionConfig(
+            @NonNull String gatewayConnectionName,
+            @NonNull IkeTunnelConnectionParams tunnelConnectionParams,
             @NonNull Set<Integer> exposedCapabilities,
-            @NonNull Set<Integer> underlyingCapabilities,
             @NonNull long[] retryIntervalsMs,
             @IntRange(from = MIN_MTU_V6) int maxMtu) {
+        mGatewayConnectionName = gatewayConnectionName;
+        mTunnelConnectionParams = tunnelConnectionParams;
         mExposedCapabilities = new TreeSet(exposedCapabilities);
-        mUnderlyingCapabilities = new TreeSet(underlyingCapabilities);
         mRetryIntervalsMs = retryIntervalsMs;
         mMaxMtu = maxMtu;
 
@@ -184,15 +186,19 @@ public final class VcnGatewayConnectionConfig {
     /** @hide */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     public VcnGatewayConnectionConfig(@NonNull PersistableBundle in) {
+        final PersistableBundle tunnelConnectionParamsBundle =
+                in.getPersistableBundle(TUNNEL_CONNECTION_PARAMS_KEY);
+        Objects.requireNonNull(
+                tunnelConnectionParamsBundle, "tunnelConnectionParamsBundle was null");
+
         final PersistableBundle exposedCapsBundle =
                 in.getPersistableBundle(EXPOSED_CAPABILITIES_KEY);
-        final PersistableBundle underlyingCapsBundle =
-                in.getPersistableBundle(UNDERLYING_CAPABILITIES_KEY);
 
+        mGatewayConnectionName = in.getString(GATEWAY_CONNECTION_NAME_KEY);
+        mTunnelConnectionParams =
+                TunnelConnectionParamsUtils.fromPersistableBundle(tunnelConnectionParamsBundle);
         mExposedCapabilities = new TreeSet<>(PersistableBundleUtils.toList(
                 exposedCapsBundle, PersistableBundleUtils.INTEGER_DESERIALIZER));
-        mUnderlyingCapabilities = new TreeSet<>(PersistableBundleUtils.toList(
-                underlyingCapsBundle, PersistableBundleUtils.INTEGER_DESERIALIZER));
         mRetryIntervalsMs = in.getLongArray(RETRY_INTERVAL_MS_KEY);
         mMaxMtu = in.getInt(MAX_MTU_KEY);
 
@@ -200,17 +206,13 @@ public final class VcnGatewayConnectionConfig {
     }
 
     private void validate() {
+        Objects.requireNonNull(mGatewayConnectionName, "gatewayConnectionName was null");
+        Objects.requireNonNull(mTunnelConnectionParams, "tunnel connection parameter was null");
+
         Preconditions.checkArgument(
                 mExposedCapabilities != null && !mExposedCapabilities.isEmpty(),
                 "exposedCapsBundle was null or empty");
         for (Integer cap : getAllExposedCapabilities()) {
-            checkValidCapability(cap);
-        }
-
-        Preconditions.checkArgument(
-                mUnderlyingCapabilities != null && !mUnderlyingCapabilities.isEmpty(),
-                "underlyingCapabilities was null or empty");
-        for (Integer cap : getAllUnderlyingCapabilities()) {
             checkValidCapability(cap);
         }
 
@@ -243,14 +245,37 @@ public final class VcnGatewayConnectionConfig {
     }
 
     /**
+     * Returns the configured Gateway Connection name.
+     *
+     * <p>This name is used by the configuring apps to distinguish between
+     * VcnGatewayConnectionConfigs configured on a single {@link VcnConfig}. This will be used as
+     * the identifier in VcnStatusCallback invocations.
+     *
+     * @see VcnManager.VcnStatusCallback#onGatewayConnectionError
+     */
+    @NonNull
+    public String getGatewayConnectionName() {
+        return mGatewayConnectionName;
+    }
+
+    /**
+     * Returns tunnel connection parameters.
+     *
+     * @hide
+     */
+    @NonNull
+    public IkeTunnelConnectionParams getTunnelConnectionParams() {
+        return mTunnelConnectionParams;
+    }
+
+    /**
      * Returns all exposed capabilities.
      *
      * <p>The returned integer-value capabilities will not contain duplicates, and will be sorted in
      * ascending numerical order.
      *
      * @see Builder#addExposedCapability(int)
-     * @see Builder#clearExposedCapability(int)
-     * @hide
+     * @see Builder#removeExposedCapability(int)
      */
     @NonNull
     public int[] getExposedCapabilities() {
@@ -273,64 +298,19 @@ public final class VcnGatewayConnectionConfig {
     }
 
     /**
-     * Returns all capabilities required of underlying networks.
-     *
-     * <p>The returned integer-value capabilities will be sorted in ascending numerical order.
-     *
-     * @see Builder#addRequiredUnderlyingCapability(int)
-     * @see Builder#clearRequiredUnderlyingCapability(int)
-     * @hide
-     */
-    @NonNull
-    public int[] getRequiredUnderlyingCapabilities() {
-        // Sorted set guarantees ordering
-        return ArrayUtils.convertToIntArray(new ArrayList<>(mUnderlyingCapabilities));
-    }
-
-    /**
-     * Returns all capabilities required of underlying networks.
-     *
-     * <p>Left to prevent the need to make major changes while changes are actively in flight.
-     *
-     * @deprecated use getRequiredUnderlyingCapabilities() instead
-     * @hide
-     */
-    @Deprecated
-    @NonNull
-    public Set<Integer> getAllUnderlyingCapabilities() {
-        return Collections.unmodifiableSet(mUnderlyingCapabilities);
-    }
-
-    /**
      * Retrieves the configured retry intervals.
      *
-     * @see Builder#setRetryInterval(long[])
-     * @hide
+     * @see Builder#setRetryIntervalsMillis(long[])
      */
     @NonNull
-    public long[] getRetryInterval() {
+    public long[] getRetryIntervalsMillis() {
         return Arrays.copyOf(mRetryIntervalsMs, mRetryIntervalsMs.length);
-    }
-
-    /**
-     * Retrieves the configured retry intervals.
-     *
-     * <p>Left to prevent the need to make major changes while changes are actively in flight.
-     *
-     * @deprecated use getRequiredUnderlyingCapabilities() instead
-     * @hide
-     */
-    @Deprecated
-    @NonNull
-    public long[] getRetryIntervalsMs() {
-        return getRetryInterval();
     }
 
     /**
      * Retrieves the maximum MTU allowed for this Gateway Connection.
      *
-     * @see Builder.setMaxMtu(int)
-     * @hide
+     * @see Builder#setMaxMtu(int)
      */
     @IntRange(from = MIN_MTU_V6)
     public int getMaxMtu() {
@@ -347,17 +327,16 @@ public final class VcnGatewayConnectionConfig {
     public PersistableBundle toPersistableBundle() {
         final PersistableBundle result = new PersistableBundle();
 
+        final PersistableBundle tunnelConnectionParamsBundle =
+                TunnelConnectionParamsUtils.toPersistableBundle(mTunnelConnectionParams);
         final PersistableBundle exposedCapsBundle =
                 PersistableBundleUtils.fromList(
                         new ArrayList<>(mExposedCapabilities),
                         PersistableBundleUtils.INTEGER_SERIALIZER);
-        final PersistableBundle underlyingCapsBundle =
-                PersistableBundleUtils.fromList(
-                        new ArrayList<>(mUnderlyingCapabilities),
-                        PersistableBundleUtils.INTEGER_SERIALIZER);
 
+        result.putString(GATEWAY_CONNECTION_NAME_KEY, mGatewayConnectionName);
+        result.putPersistableBundle(TUNNEL_CONNECTION_PARAMS_KEY, tunnelConnectionParamsBundle);
         result.putPersistableBundle(EXPOSED_CAPABILITIES_KEY, exposedCapsBundle);
-        result.putPersistableBundle(UNDERLYING_CAPABILITIES_KEY, underlyingCapsBundle);
         result.putLongArray(RETRY_INTERVAL_MS_KEY, mRetryIntervalsMs);
         result.putInt(MAX_MTU_KEY, mMaxMtu);
 
@@ -367,8 +346,8 @@ public final class VcnGatewayConnectionConfig {
     @Override
     public int hashCode() {
         return Objects.hash(
+                mGatewayConnectionName,
                 mExposedCapabilities,
-                mUnderlyingCapabilities,
                 Arrays.hashCode(mRetryIntervalsMs),
                 mMaxMtu);
     }
@@ -380,26 +359,53 @@ public final class VcnGatewayConnectionConfig {
         }
 
         final VcnGatewayConnectionConfig rhs = (VcnGatewayConnectionConfig) other;
-        return mExposedCapabilities.equals(rhs.mExposedCapabilities)
-                && mUnderlyingCapabilities.equals(rhs.mUnderlyingCapabilities)
+        return mGatewayConnectionName.equals(rhs.mGatewayConnectionName)
+                && mExposedCapabilities.equals(rhs.mExposedCapabilities)
                 && Arrays.equals(mRetryIntervalsMs, rhs.mRetryIntervalsMs)
                 && mMaxMtu == rhs.mMaxMtu;
     }
 
     /**
      * This class is used to incrementally build {@link VcnGatewayConnectionConfig} objects.
-     *
-     * @hide
      */
     public static final class Builder {
+        @NonNull private final String mGatewayConnectionName;
+        @NonNull private final IkeTunnelConnectionParams mTunnelConnectionParams;
         @NonNull private final Set<Integer> mExposedCapabilities = new ArraySet();
-        @NonNull private final Set<Integer> mUnderlyingCapabilities = new ArraySet();
         @NonNull private long[] mRetryIntervalsMs = DEFAULT_RETRY_INTERVALS_MS;
         private int mMaxMtu = DEFAULT_MAX_MTU;
 
         // TODO: (b/175829816) Consider VCN-exposed capabilities that may be transport dependent.
         //       Consider the case where the VCN might only expose MMS on WiFi, but defer to MMS
         //       when on Cell.
+
+        /**
+         * Construct a Builder object.
+         *
+         * @param gatewayConnectionName the String GatewayConnection name for this
+         *     VcnGatewayConnectionConfig. Each VcnGatewayConnectionConfig within a {@link
+         *     VcnConfig} must be given a unique name. This name is used by the caller to
+         *     distinguish between VcnGatewayConnectionConfigs configured on a single {@link
+         *     VcnConfig}. This will be used as the identifier in VcnStatusCallback invocations.
+         * @param tunnelConnectionParams the IKE tunnel connection configuration
+         * @throws IllegalArgumentException if the provided IkeTunnelConnectionParams is not
+         *     configured to support MOBIKE
+         * @see IkeTunnelConnectionParams
+         * @see VcnManager.VcnStatusCallback#onGatewayConnectionError
+         */
+        public Builder(
+                @NonNull String gatewayConnectionName,
+                @NonNull IkeTunnelConnectionParams tunnelConnectionParams) {
+            Objects.requireNonNull(gatewayConnectionName, "gatewayConnectionName was null");
+            Objects.requireNonNull(tunnelConnectionParams, "tunnelConnectionParams was null");
+            if (!tunnelConnectionParams.getIkeSessionParams().hasIkeOption(IKE_OPTION_MOBIKE)) {
+                throw new IllegalArgumentException(
+                        "MOBIKE must be configured for the provided IkeSessionParams");
+            }
+
+            mGatewayConnectionName = gatewayConnectionName;
+            mTunnelConnectionParams = tunnelConnectionParams;
+        }
 
         /**
          * Add a capability that this VCN Gateway Connection will support.
@@ -409,7 +415,6 @@ public final class VcnGatewayConnectionConfig {
          * @return this {@link Builder} instance, for chaining
          * @see VcnGatewayConnectionConfig for a list of capabilities may be exposed by a Gateway
          *     Connection
-         * @hide
          */
         @NonNull
         public Builder addExposedCapability(@VcnSupportedCapability int exposedCapability) {
@@ -427,55 +432,13 @@ public final class VcnGatewayConnectionConfig {
          * @return this {@link Builder} instance, for chaining
          * @see VcnGatewayConnectionConfig for a list of capabilities may be exposed by a Gateway
          *     Connection
-         * @hide
          */
         @NonNull
-        public Builder clearExposedCapability(@VcnSupportedCapability int exposedCapability) {
+        @SuppressLint("BuilderSetStyle") // For consistency with NetCaps.Builder add/removeCap
+        public Builder removeExposedCapability(@VcnSupportedCapability int exposedCapability) {
             checkValidCapability(exposedCapability);
 
             mExposedCapabilities.remove(exposedCapability);
-            return this;
-        }
-
-        /**
-         * Require a capability for Networks underlying this VCN Gateway Connection.
-         *
-         * @param underlyingCapability the capability that a network MUST have in order to be an
-         *     underlying network for this VCN Gateway Connection.
-         * @return this {@link Builder} instance, for chaining
-         * @see VcnGatewayConnectionConfig for a list of capabilities may be required of underlying
-         *     networks
-         * @hide
-         */
-        @NonNull
-        public Builder addRequiredUnderlyingCapability(
-                @VcnSupportedCapability int underlyingCapability) {
-            checkValidCapability(underlyingCapability);
-
-            mUnderlyingCapabilities.add(underlyingCapability);
-            return this;
-        }
-
-        /**
-         * Remove a requirement of a capability for Networks underlying this VCN Gateway Connection.
-         *
-         * <p>Calling this method will allow Networks that do NOT have this capability to be
-         * selected as an underlying network for this VCN Gateway Connection. However, underlying
-         * networks MAY still have the removed capability.
-         *
-         * @param underlyingCapability the capability that a network DOES NOT need to have in order
-         *     to be an underlying network for this VCN Gateway Connection.
-         * @return this {@link Builder} instance, for chaining
-         * @see VcnGatewayConnectionConfig for a list of capabilities may be required of underlying
-         *     networks
-         * @hide
-         */
-        @NonNull
-        public Builder clearRequiredUnderlyingCapability(
-                @VcnSupportedCapability int underlyingCapability) {
-            checkValidCapability(underlyingCapability);
-
-            mUnderlyingCapabilities.remove(underlyingCapability);
             return this;
         }
 
@@ -501,10 +464,9 @@ public final class VcnGatewayConnectionConfig {
          *     15m]}
          * @return this {@link Builder} instance, for chaining
          * @see VcnManager for additional discussion on fail-safe mode
-         * @hide
          */
         @NonNull
-        public Builder setRetryInterval(@NonNull long[] retryIntervalsMs) {
+        public Builder setRetryIntervalsMillis(@NonNull long[] retryIntervalsMs) {
             validateRetryInterval(retryIntervalsMs);
 
             mRetryIntervalsMs = retryIntervalsMs;
@@ -523,7 +485,6 @@ public final class VcnGatewayConnectionConfig {
          * @param maxMtu the maximum MTU allowed for this Gateway Connection. Must be greater than
          *     the IPv6 minimum MTU of 1280. Defaults to 1500.
          * @return this {@link Builder} instance, for chaining
-         * @hide
          */
         @NonNull
         public Builder setMaxMtu(@IntRange(from = MIN_MTU_V6) int maxMtu) {
@@ -538,12 +499,15 @@ public final class VcnGatewayConnectionConfig {
          * Builds and validates the VcnGatewayConnectionConfig.
          *
          * @return an immutable VcnGatewayConnectionConfig instance
-         * @hide
          */
         @NonNull
         public VcnGatewayConnectionConfig build() {
             return new VcnGatewayConnectionConfig(
-                    mExposedCapabilities, mUnderlyingCapabilities, mRetryIntervalsMs, mMaxMtu);
+                    mGatewayConnectionName,
+                    mTunnelConnectionParams,
+                    mExposedCapabilities,
+                    mRetryIntervalsMs,
+                    mMaxMtu);
         }
     }
 }

@@ -57,7 +57,7 @@
     <string name="imei" msgid="2157082351232630390">"IMEI"</string>
     <string name="meid" msgid="3291227361605924674">"MEID"</string>
     <string name="ClipMmi" msgid="4110549342447630629">"លេខ​សម្គាល់​អ្នក​ហៅ​​ចូល​"</string>
-    <string name="ClirMmi" msgid="4702929460236547156">"លេខ​សម្គាល់​អ្នក​ហៅ​ចេញ"</string>
+    <string name="ClirMmi" msgid="6752346475055446417">"លាក់​អត្តសញ្ញាណ​អ្នកហៅ​ទូរសព្ទចេញ"</string>
     <string name="ColpMmi" msgid="4736462893284419302">"បាន​ភ្ជាប់​លេខ​សម្គាល់​បន្ទាត់"</string>
     <string name="ColrMmi" msgid="5889782479745764278">"បាន​ភ្ជាប់​ការ​ដាក់កម្រិត​លេខ​សម្គាល់​បន្ទាត់"</string>
     <string name="CfMmi" msgid="8390012691099787178">"បញ្ជូន​ការ​ហៅ​បន្ត"</string>
@@ -349,6 +349,8 @@
     <string name="permdesc_receiveMms" msgid="958102423732219710">"ឲ្យ​កម្មវិធី​ទទួល និង​ដំណើរការ​​សារ​ MMS ។ វា​មាន​ន័យ​ថា កម្មវិធី​អាច​តាមដាន​ ឬ​លុប​សារ​ដែល​បាន​ផ្ញើ​ទៅ​ឧបករណ៍​របស់​អ្នក​ដោយ​មិន​បង្ហាញ​ពួកវា។"</string>
     <string name="permlab_bindCellBroadcastService" msgid="586746677002040651">"បញ្ជូន​សារ​ផ្សាយចល័ត​បន្ត"</string>
     <string name="permdesc_bindCellBroadcastService" msgid="6540910200973641606">"អនុញ្ញាតឱ្យ​កម្មវិធី​ភ្ជាប់ទៅ​ម៉ូឌុល​ការផ្សាយចល័ត ដើម្បីបញ្ជូន​សារផ្សាយ​ចល័តបន្ត នៅពេល​ទទួលបាន​សារទាំងនោះ។ ការជូនដំណឹងអំពី​ការផ្សាយចល័ត​ត្រូវបានបញ្ជូនទៅ​ទីតាំងមួយចំនួន ដើម្បីព្រមាន​អ្នក​អំពីស្ថានភាព​អាសន្ន។ កម្មវិធី​គ្រោះថ្នាក់​អាច​រំខាន​ដល់ដំណើរការ ឬប្រតិបត្តិការ​ឧបករណ៍​របស់អ្នក នៅពេល​ទទួលបានការផ្សាយ​ចល័តពេលមានអាសន្ន​។"</string>
+    <string name="permlab_manageOngoingCalls" msgid="281244770664231782">"គ្រប់គ្រង​ការហៅទូរសព្ទដែល​កំពុងដំណើរការ"</string>
+    <string name="permdesc_manageOngoingCalls" msgid="7003138133829915265">"អនុញ្ញាតឱ្យ​កម្មវិធីមើលព័ត៌មានលម្អិត​អំពីការហៅទូរសព្ទ​ដែលកំពុងដំណើរការ​នៅលើឧបករណ៍​របស់អ្នក និងគ្រប់គ្រង​ការហៅទូរសព្ទទាំងនេះ។"</string>
     <string name="permlab_readCellBroadcasts" msgid="5869884450872137693">"អាន​សារ​ប្រកាស​ចល័ត"</string>
     <string name="permdesc_readCellBroadcasts" msgid="672513437331980168">"ឲ្យ​កម្មវិធី​អាន​សារ​ប្រកាស​ការ​ហៅ​ដែល​ឧបករណ៍​របស់​​អ្នក​បាន​ទទួល។ ការ​ជូន​ដំណឹង​ប្រកាស​ចល័ត​ត្រូវ​បាន​បញ្ជូន​ទៅ​ទីតាំង​មួយ​ចំនួន ដើម្បី​ព្រមាន​អ្នក​អំពី​ស្ថានភាព​អាសន្ន។ កម្មវិធី​ព្យាបាទ​អាច​ជ្រៀតជ្រែក​ការ​អនុវត្ត ឬ​ប្រតិបត្តិការ​ឧបករណ៍​របស់​អ្នក​​ពេល​ទទួល​ការ​ប្រកាស​ចល័ត​ពេល​អាសន្ន។"</string>
     <string name="permlab_subscribedFeedsRead" msgid="217624769238425461">"អាន​អត្ថបទ​ព័ត៌មាន​បាន​ជាវ"</string>
@@ -1093,7 +1095,7 @@
     <string name="cut" msgid="2561199725874745819">"កាត់"</string>
     <string name="copy" msgid="5472512047143665218">"ចម្លង"</string>
     <string name="failed_to_copy_to_clipboard" msgid="725919885138539875">"មិនអាច​ចម្លងទៅ​អង្គចងចាំទេ"</string>
-    <string name="paste" msgid="461843306215520225">"បិទ​ភ្ជាប់"</string>
+    <string name="paste" msgid="461843306215520225">"ដាក់ចូល"</string>
     <string name="paste_as_plain_text" msgid="7664800665823182587">"បិទភ្ជាប់ជាអត្ថបទធម្មតា"</string>
     <string name="replace" msgid="7842675434546657444">"ជំនួស..."</string>
     <string name="delete" msgid="1514113991712129054">"លុប"</string>
@@ -1306,8 +1308,8 @@
     <string name="usb_power_notification_message" msgid="7284765627437897702">"កំពុងសាកថ្ម​ឧបករណ៍​ដែលបានភ្ជាប់។ សូមចុចសម្រាប់​ជម្រើសបន្ថែម។"</string>
     <string name="usb_unsupported_audio_accessory_title" msgid="2335775548086533065">"បាន​រកឃើញ​គ្រឿង​បរិក្ខារ​សំឡេង​អាណាឡូក"</string>
     <string name="usb_unsupported_audio_accessory_message" msgid="1300168007129796621">"ឧបករណ៍​ដែលភ្ជាប់​មក​ជាមួយ​មិនត្រូវគ្នា​ជាមួយ​ទូរសព្ទ​នេះទេ។ ចុច​ដើម្បី​ស្វែងយល់​បន្ថែម។"</string>
-    <string name="adb_active_notification_title" msgid="408390247354560331">"បាន​ភ្ជាប់​ការ​កែ​កំហុសតាម​ USB"</string>
-    <string name="adb_active_notification_message" msgid="5617264033476778211">"ចុច​ដើម្បី​បិទ​ការកែកំហុសតាម ​USB"</string>
+    <string name="adb_active_notification_title" msgid="408390247354560331">"បាន​ភ្ជាប់​ការ​ជួសជុលតាម​ USB"</string>
+    <string name="adb_active_notification_message" msgid="5617264033476778211">"ចុច​ដើម្បី​បិទ​ការជួសជុលតាម ​USB"</string>
     <string name="adb_active_notification_message" product="tv" msgid="6624498401272780855">"ជ្រើស​រើស ដើម្បី​បិទ​ការ​កែ​កំហុសតាម USB ។"</string>
     <string name="adbwifi_active_notification_title" msgid="6147343659168302473">"បានភ្ជាប់​ការជួសជុល​ដោយឥតខ្សែ"</string>
     <string name="adbwifi_active_notification_message" msgid="930987922852867972">"ចុច ដើម្បី​បិទ​ការជួសជុល​ដោយឥតខ្សែ"</string>
@@ -1340,11 +1342,14 @@
     <string name="alert_windows_notification_turn_off_action" msgid="7805857234839123780">"បិទ"</string>
     <string name="ext_media_checking_notification_title" msgid="8299199995416510094">"កំពុង​ពិនិត្យ <xliff:g id="NAME">%s</xliff:g>…"</string>
     <string name="ext_media_checking_notification_message" msgid="2231566971425375542">"កំពុង​ពិនិត្យ​​មើលខ្លឹមសារ​បច្ចុប្បន្ន"</string>
+    <string name="ext_media_checking_notification_message" product="tv" msgid="7986154434946021415">"កំពុងវិភាគទំហំ​ផ្ទុកមេឌៀ"</string>
     <string name="ext_media_new_notification_title" msgid="3517407571407687677">"<xliff:g id="NAME">%s</xliff:g> ថ្មី"</string>
     <string name="ext_media_new_notification_title" product="automotive" msgid="9085349544984742727">"<xliff:g id="NAME">%s</xliff:g> មិនដំណើរការទេ"</string>
     <string name="ext_media_new_notification_message" msgid="6095403121990786986">"ចុច​ដើម្បី​រៀបចំ"</string>
+    <string name="ext_media_new_notification_message" product="tv" msgid="216863352100263668">"ជ្រើសរើសដើម្បីរៀបចំ"</string>
     <string name="ext_media_new_notification_message" product="automotive" msgid="5140127881613227162">"អ្នកប្រហែលជាត្រូវសម្អាតឧបករណ៍ឡើងវិញ។ សូមចុច ដើម្បីដកចេញ។"</string>
     <string name="ext_media_ready_notification_message" msgid="777258143284919261">"សម្រាប់ផ្ទេររូបភាព និងមេឌៀ"</string>
+    <string name="ext_media_ready_notification_message" product="tv" msgid="8847134811163165935">"រុករក​ឯកសារមេឌៀ"</string>
     <string name="ext_media_unmountable_notification_title" msgid="4895444667278979910">"មាន​បញ្ហា​ជាមួយ <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_unmountable_notification_title" product="automotive" msgid="3142723758949023280">"<xliff:g id="NAME">%s</xliff:g> មិនដំណើរការទេ"</string>
     <string name="ext_media_unmountable_notification_message" msgid="3256290114063126205">"ចុចដើម្បីកែបញ្ហា"</string>
@@ -1353,7 +1358,7 @@
     <string name="ext_media_unsupported_notification_title" msgid="4358280700537030333">"<xliff:g id="NAME">%s</xliff:g> មិនគាំទ្រ"</string>
     <string name="ext_media_unsupported_notification_title" product="automotive" msgid="6004193172658722381">"<xliff:g id="NAME">%s</xliff:g> មិនដំណើរការទេ"</string>
     <string name="ext_media_unsupported_notification_message" msgid="917738524888367560">"ឧបករណ៍នេះមិនគាំទ្រ <xliff:g id="NAME">%s</xliff:g> នេះទេ។ ប៉ះដើម្បីកំណត់ទម្រង់ដែលគាំទ្រ។"</string>
-    <string name="ext_media_unsupported_notification_message" product="tv" msgid="7744945987775645685">"ឧបករណ៍នេះ​មិន​ស្គាល់ <xliff:g id="NAME">%s</xliff:g> នេះ​ទេ។ សូម​ជ្រើសរើស​ដើម្បី​រៀបចំ​ក្នុង​ទម្រង់ដែលស្គាល់។"</string>
+    <string name="ext_media_unsupported_notification_message" product="tv" msgid="1595482802187036532">"ជ្រើសរើសដើម្បីរៀបចំ <xliff:g id="NAME">%s</xliff:g> ក្នុងទម្រង់ដែលអាចប្រើបាន។"</string>
     <string name="ext_media_unsupported_notification_message" product="automotive" msgid="3412494732736336330">"អ្នកប្រហែលជាត្រូវសម្អាតឧបករណ៍ឡើងវិញ"</string>
     <string name="ext_media_badremoval_notification_title" msgid="4114625551266196872">"បានដក <xliff:g id="NAME">%s</xliff:g> ចេញដោយមិនបានរំពឹងទុក"</string>
     <string name="ext_media_badremoval_notification_message" msgid="1986514704499809244">"ដក​មេឌៀ​មុន​ពេល​យក​វា​ចេញ ដើម្បី​ជៀសវាង​ការ​បាត់​បង់​ខ្លឹមសារ"</string>
@@ -1507,7 +1512,7 @@
     <string name="action_menu_overflow_description" msgid="4579536843510088170">"ជម្រើស​ច្រើន​ទៀត"</string>
     <string name="action_bar_home_description_format" msgid="5087107531331621803">"%1$s, %2$s"</string>
     <string name="action_bar_home_subtitle_description_format" msgid="4346835454749569826">"%1$s, %2$s, %3$s"</string>
-    <string name="storage_internal" msgid="8490227947584914460">"ឧបករណ៍ផ្ទុកដែលចែករំលែកខាងក្នុង"</string>
+    <string name="storage_internal" msgid="8490227947584914460">"ទំហំផ្ទុករួមខាងក្នុង"</string>
     <string name="storage_sd_card" msgid="3404740277075331881">"កាត​អេសឌី"</string>
     <string name="storage_sd_card_label" msgid="7526153141147470509">"កាត SD <xliff:g id="MANUFACTURER">%s</xliff:g>"</string>
     <string name="storage_usb_drive" msgid="448030813201444573">"ឧបករណ៍ផ្ទុក USB"</string>
@@ -1713,6 +1718,28 @@
     <string name="mediasize_na_monarch" msgid="4396943937986136896">"Monarch"</string>
     <string name="mediasize_na_quarto" msgid="2119101847712239885">"Quarto"</string>
     <string name="mediasize_na_foolscap" msgid="5011612828564394648">"Foolscap"</string>
+    <!-- no translation found for mediasize_na_ansi_c (3104916921818289618) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_d (254005964819282724) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_e (4424174989686785675) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_f (146980362213260987) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_a (5280681822380032361) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_b (2113344093437297427) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_c (971002546186856623) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_d (6450996075335049806) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e (6782708486949266519) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e1 (4707138568738504275) -->
+    <skip />
+    <!-- no translation found for mediasize_na_super_b (6964127155618393178) -->
+    <skip />
     <string name="mediasize_chinese_roc_8k" msgid="411670106572707544">"ROC 8K"</string>
     <string name="mediasize_chinese_roc_16k" msgid="7496706798725321898">"ROC 16K"</string>
     <string name="mediasize_chinese_prc_1" msgid="946949835711037253">"PRC 1"</string>
@@ -1749,6 +1776,8 @@
     <string name="mediasize_japanese_kahu" msgid="7290232592648122042">"Kahu"</string>
     <string name="mediasize_japanese_kaku2" msgid="7477551750461028312">"Kaku2"</string>
     <string name="mediasize_japanese_you4" msgid="5552111912684384833">"You4"</string>
+    <!-- no translation found for mediasize_japanese_l (1326765321473431817) -->
+    <skip />
     <string name="mediasize_unknown_portrait" msgid="3817016220446495613">"​មិន​ស្គាល់​បញ្ឈរ"</string>
     <string name="mediasize_unknown_landscape" msgid="1584741567225095325">"មិន​ស្គាល់​ទេសភាព"</string>
     <string name="write_fail_reason_cancelled" msgid="2344081488493969190">"បាន​បោះ​បង់​"</string>
@@ -1786,7 +1815,7 @@
     <string name="managed_profile_label_badge_2" msgid="5673187309555352550">"<xliff:g id="LABEL">%1$s</xliff:g> ការងារទី 2"</string>
     <string name="managed_profile_label_badge_3" msgid="6882151970556391957">"<xliff:g id="LABEL">%1$s</xliff:g> ការងារទី 3"</string>
     <string name="lock_to_app_unlock_pin" msgid="3890940811866290782">"សួរ​រក​កូដ PIN មុន​ពេល​ផ្ដាច់"</string>
-    <string name="lock_to_app_unlock_pattern" msgid="2694204070499712503">"សួរ​រក​លំនាំ​ដោះ​សោ​មុន​ពេល​ផ្ដាច់"</string>
+    <string name="lock_to_app_unlock_pattern" msgid="2694204070499712503">"សួរ​រក​លំនាំ​ដោះ​សោ​មុន​ពេលដោះខ្ទាស់"</string>
     <string name="lock_to_app_unlock_password" msgid="9126722403506560473">"សួរ​រក​ពាក្យ​សម្ងាត់​មុន​ពេល​ផ្ដាច់"</string>
     <string name="package_installed_device_owner" msgid="7035926868974878525">"​ដំឡើង​ដោយ​អ្នកគ្រប់គ្រង​របស់​អ្នក"</string>
     <string name="package_updated_device_owner" msgid="7560272363805506941">"ធ្វើ​បច្ចុប្បន្នភាព​ដោយ​អ្នកគ្រប់គ្រង​របស់​អ្នក"</string>

@@ -18,9 +18,16 @@ package android.security.keystore2;
 
 import android.annotation.NonNull;
 import android.annotation.Nullable;
+import android.app.ActivityThread;
+import android.content.Context;
 import android.hardware.security.keymint.KeyParameter;
+import android.hardware.security.keymint.KeyPurpose;
 import android.hardware.security.keymint.SecurityLevel;
+import android.hardware.security.keymint.Tag;
 import android.os.Build;
+import android.os.RemoteException;
+import android.security.GenerateRkpKey;
+import android.security.GenerateRkpKeyException;
 import android.security.KeyPairGeneratorSpec;
 import android.security.KeyStore2;
 import android.security.KeyStoreException;
@@ -28,16 +35,21 @@ import android.security.KeyStoreSecurityLevel;
 import android.security.keymaster.KeymasterArguments;
 import android.security.keymaster.KeymasterDefs;
 import android.security.keystore.ArrayUtils;
+import android.security.keystore.AttestationUtils;
+import android.security.keystore.DeviceIdAttestationException;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
-import android.security.keystore.KeymasterUtils;
 import android.security.keystore.SecureKeyImportUnavailableException;
 import android.security.keystore.StrongBoxUnavailableException;
+import android.system.keystore2.Authorization;
 import android.system.keystore2.Domain;
 import android.system.keystore2.IKeystoreSecurityLevel;
 import android.system.keystore2.KeyDescriptor;
+import android.system.keystore2.KeyEntryResponse;
 import android.system.keystore2.KeyMetadata;
 import android.system.keystore2.ResponseCode;
+import android.telephony.TelephonyManager;
+import android.util.ArraySet;
 import android.util.Log;
 
 import libcore.util.EmptyArray;
@@ -55,6 +67,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,6 +76,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Provides a way to create instances of a KeyPair which will be placed in the
@@ -142,11 +156,12 @@ public abstract class AndroidKeyStoreKeyPairGeneratorSpi extends KeyPairGenerato
     private KeyGenParameterSpec mSpec;
 
     private String mEntryAlias;
-    private int mEntryUid;
+    private int mEntryNamespace;
     private @KeyProperties.KeyAlgorithmEnum String mJcaKeyAlgorithm;
     private int mKeymasterAlgorithm = -1;
     private int mKeySizeBits;
     private SecureRandom mRng;
+    private KeyDescriptor mAttestKeyDescriptor;
 
     private int[] mKeymasterPurposes;
     private int[] mKeymasterBlockModes;
@@ -191,83 +206,9 @@ public abstract class AndroidKeyStoreKeyPairGeneratorSpi extends KeyPairGenerato
                 // Legacy/deprecated spec
                 KeyPairGeneratorSpec legacySpec = (KeyPairGeneratorSpec) params;
                 try {
-                    KeyGenParameterSpec.Builder specBuilder;
-                    String specKeyAlgorithm = legacySpec.getKeyType();
-                    if (specKeyAlgorithm != null) {
-                        // Spec overrides the generator's default key algorithm
-                        try {
-                            keymasterAlgorithm =
-                                    KeyProperties.KeyAlgorithm.toKeymasterAsymmetricKeyAlgorithm(
-                                            specKeyAlgorithm);
-                        } catch (IllegalArgumentException e) {
-                            throw new InvalidAlgorithmParameterException(
-                                    "Invalid key type in parameters", e);
-                        }
-                    }
-                    switch (keymasterAlgorithm) {
-                        case KeymasterDefs.KM_ALGORITHM_EC:
-                            specBuilder = new KeyGenParameterSpec.Builder(
-                                    legacySpec.getKeystoreAlias(),
-                                    KeyProperties.PURPOSE_SIGN
-                                    | KeyProperties.PURPOSE_VERIFY);
-                            // Authorized to be used with any digest (including no digest).
-                            // MD5 was never offered for Android Keystore for ECDSA.
-                            specBuilder.setDigests(
-                                    KeyProperties.DIGEST_NONE,
-                                    KeyProperties.DIGEST_SHA1,
-                                    KeyProperties.DIGEST_SHA224,
-                                    KeyProperties.DIGEST_SHA256,
-                                    KeyProperties.DIGEST_SHA384,
-                                    KeyProperties.DIGEST_SHA512);
-                            break;
-                        case KeymasterDefs.KM_ALGORITHM_RSA:
-                            specBuilder = new KeyGenParameterSpec.Builder(
-                                    legacySpec.getKeystoreAlias(),
-                                    KeyProperties.PURPOSE_ENCRYPT
-                                    | KeyProperties.PURPOSE_DECRYPT
-                                    | KeyProperties.PURPOSE_SIGN
-                                    | KeyProperties.PURPOSE_VERIFY);
-                            // Authorized to be used with any digest (including no digest).
-                            specBuilder.setDigests(
-                                    KeyProperties.DIGEST_NONE,
-                                    KeyProperties.DIGEST_MD5,
-                                    KeyProperties.DIGEST_SHA1,
-                                    KeyProperties.DIGEST_SHA224,
-                                    KeyProperties.DIGEST_SHA256,
-                                    KeyProperties.DIGEST_SHA384,
-                                    KeyProperties.DIGEST_SHA512);
-                            // Authorized to be used with any encryption and signature padding
-                            // schemes (including no padding).
-                            specBuilder.setEncryptionPaddings(
-                                    KeyProperties.ENCRYPTION_PADDING_NONE,
-                                    KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1,
-                                    KeyProperties.ENCRYPTION_PADDING_RSA_OAEP);
-                            specBuilder.setSignaturePaddings(
-                                    KeyProperties.SIGNATURE_PADDING_RSA_PKCS1,
-                                    KeyProperties.SIGNATURE_PADDING_RSA_PSS);
-                            // Disable randomized encryption requirement to support encryption
-                            // padding NONE above.
-                            specBuilder.setRandomizedEncryptionRequired(false);
-                            break;
-                        default:
-                            throw new ProviderException(
-                                    "Unsupported algorithm: " + mKeymasterAlgorithm);
-                    }
-
-                    if (legacySpec.getKeySize() != -1) {
-                        specBuilder.setKeySize(legacySpec.getKeySize());
-                    }
-                    if (legacySpec.getAlgorithmParameterSpec() != null) {
-                        specBuilder.setAlgorithmParameterSpec(
-                                legacySpec.getAlgorithmParameterSpec());
-                    }
-                    specBuilder.setCertificateSubject(legacySpec.getSubjectDN());
-                    specBuilder.setCertificateSerialNumber(legacySpec.getSerialNumber());
-                    specBuilder.setCertificateNotBefore(legacySpec.getStartDate());
-                    specBuilder.setCertificateNotAfter(legacySpec.getEndDate());
-                    specBuilder.setUserAuthenticationRequired(false);
-
-                    spec = specBuilder.build();
+                    keymasterAlgorithm = getKeymasterAlgorithmFromLegacy(keymasterAlgorithm,
+                            legacySpec);
+                    spec = buildKeyGenParameterSpecFromLegacy(legacySpec, keymasterAlgorithm);
                 } catch (NullPointerException | IllegalArgumentException e) {
                     throw new InvalidAlgorithmParameterException(e);
                 }
@@ -279,7 +220,7 @@ public abstract class AndroidKeyStoreKeyPairGeneratorSpi extends KeyPairGenerato
             }
 
             mEntryAlias = spec.getKeystoreAlias();
-            mEntryUid = spec.getUid();
+            mEntryNamespace = spec.getNamespace();
             mSpec = spec;
             mKeymasterAlgorithm = keymasterAlgorithm;
             mKeySizeBits = spec.getKeySize();
@@ -328,7 +269,7 @@ public abstract class AndroidKeyStoreKeyPairGeneratorSpi extends KeyPairGenerato
                 // Check that user authentication related parameters are acceptable. This method
                 // will throw an IllegalStateException if there are issues (e.g., secure lock screen
                 // not set up).
-                KeymasterUtils.addUserAuthArgs(new KeymasterArguments(), mSpec);
+                KeyStore2ParameterUtils.addUserAuthArgs(new ArrayList<>(), mSpec);
             } catch (IllegalArgumentException | IllegalStateException e) {
                 throw new InvalidAlgorithmParameterException(e);
             }
@@ -336,6 +277,10 @@ public abstract class AndroidKeyStoreKeyPairGeneratorSpi extends KeyPairGenerato
             mJcaKeyAlgorithm = jcaKeyAlgorithm;
             mRng = random;
             mKeyStore = KeyStore2.getInstance();
+
+            mAttestKeyDescriptor = buildAndCheckAttestKeyDescriptor(spec);
+            checkAttestKeyPurpose(spec);
+
             success = true;
         } finally {
             if (!success) {
@@ -344,9 +289,159 @@ public abstract class AndroidKeyStoreKeyPairGeneratorSpi extends KeyPairGenerato
         }
     }
 
+    private void checkAttestKeyPurpose(KeyGenParameterSpec spec)
+            throws InvalidAlgorithmParameterException {
+        if ((spec.getPurposes() & KeyProperties.PURPOSE_ATTEST_KEY) != 0
+                && spec.getPurposes() != KeyProperties.PURPOSE_ATTEST_KEY) {
+            throw new InvalidAlgorithmParameterException(
+                    "PURPOSE_ATTEST_KEY may not be specified with any other purposes");
+        }
+    }
+
+    private KeyDescriptor buildAndCheckAttestKeyDescriptor(KeyGenParameterSpec spec)
+            throws InvalidAlgorithmParameterException {
+        if (spec.getAttestKeyAlias() != null) {
+            KeyDescriptor attestKeyDescriptor = new KeyDescriptor();
+            attestKeyDescriptor.domain = Domain.APP;
+            attestKeyDescriptor.alias = spec.getAttestKeyAlias();
+            try {
+                KeyEntryResponse attestKey = mKeyStore.getKeyEntry(attestKeyDescriptor);
+                checkAttestKeyChallenge(spec);
+                checkAttestKeyPurpose(attestKey.metadata.authorizations);
+                checkAttestKeySecurityLevel(spec, attestKey);
+            } catch (KeyStoreException e) {
+                throw new InvalidAlgorithmParameterException("Invalid attestKeyAlias", e);
+            }
+            return attestKeyDescriptor;
+        }
+        return null;
+    }
+
+    private void checkAttestKeyChallenge(KeyGenParameterSpec spec)
+            throws InvalidAlgorithmParameterException {
+        if (spec.getAttestationChallenge() == null) {
+            throw new InvalidAlgorithmParameterException(
+                    "AttestKey specified but no attestation challenge provided");
+        }
+    }
+
+    private void checkAttestKeyPurpose(Authorization[] keyAuths)
+            throws InvalidAlgorithmParameterException {
+        Predicate<Authorization> isAttestKeyPurpose = x -> x.keyParameter.tag == Tag.PURPOSE
+                && x.keyParameter.value.getKeyPurpose() == KeyPurpose.ATTEST_KEY;
+
+        if (Arrays.stream(keyAuths).noneMatch(isAttestKeyPurpose)) {
+            throw new InvalidAlgorithmParameterException(
+                    ("Invalid attestKey, does not have PURPOSE_ATTEST_KEY"));
+        }
+    }
+
+    private void checkAttestKeySecurityLevel(KeyGenParameterSpec spec, KeyEntryResponse key)
+            throws InvalidAlgorithmParameterException {
+        boolean attestKeyInStrongBox = key.metadata.keySecurityLevel == SecurityLevel.STRONGBOX;
+        if (spec.isStrongBoxBacked() != attestKeyInStrongBox) {
+            if (attestKeyInStrongBox) {
+                throw new InvalidAlgorithmParameterException(
+                        "Invalid security level: Cannot sign non-StrongBox key with "
+                                + "StrongBox attestKey");
+
+            } else {
+                throw new InvalidAlgorithmParameterException(
+                        "Invalid security level: Cannot sign StrongBox key with "
+                                + "non-StrongBox attestKey");
+            }
+        }
+    }
+
+    private int getKeymasterAlgorithmFromLegacy(int keymasterAlgorithm,
+            KeyPairGeneratorSpec legacySpec) throws InvalidAlgorithmParameterException {
+        String specKeyAlgorithm = legacySpec.getKeyType();
+        if (specKeyAlgorithm != null) {
+            // Spec overrides the generator's default key algorithm
+            try {
+                keymasterAlgorithm =
+                        KeyProperties.KeyAlgorithm.toKeymasterAsymmetricKeyAlgorithm(
+                                specKeyAlgorithm);
+            } catch (IllegalArgumentException e) {
+                throw new InvalidAlgorithmParameterException(
+                        "Invalid key type in parameters", e);
+            }
+        }
+        return keymasterAlgorithm;
+    }
+
+    private KeyGenParameterSpec buildKeyGenParameterSpecFromLegacy(KeyPairGeneratorSpec legacySpec,
+            int keymasterAlgorithm) {
+        KeyGenParameterSpec.Builder specBuilder;
+        switch (keymasterAlgorithm) {
+            case KeymasterDefs.KM_ALGORITHM_EC:
+                specBuilder = new KeyGenParameterSpec.Builder(
+                        legacySpec.getKeystoreAlias(),
+                        KeyProperties.PURPOSE_SIGN
+                        | KeyProperties.PURPOSE_VERIFY);
+                // Authorized to be used with any digest (including no digest).
+                // MD5 was never offered for Android Keystore for ECDSA.
+                specBuilder.setDigests(
+                        KeyProperties.DIGEST_NONE,
+                        KeyProperties.DIGEST_SHA1,
+                        KeyProperties.DIGEST_SHA224,
+                        KeyProperties.DIGEST_SHA256,
+                        KeyProperties.DIGEST_SHA384,
+                        KeyProperties.DIGEST_SHA512);
+                break;
+            case KeymasterDefs.KM_ALGORITHM_RSA:
+                specBuilder = new KeyGenParameterSpec.Builder(
+                        legacySpec.getKeystoreAlias(),
+                        KeyProperties.PURPOSE_ENCRYPT
+                        | KeyProperties.PURPOSE_DECRYPT
+                        | KeyProperties.PURPOSE_SIGN
+                        | KeyProperties.PURPOSE_VERIFY);
+                // Authorized to be used with any digest (including no digest).
+                specBuilder.setDigests(
+                        KeyProperties.DIGEST_NONE,
+                        KeyProperties.DIGEST_MD5,
+                        KeyProperties.DIGEST_SHA1,
+                        KeyProperties.DIGEST_SHA224,
+                        KeyProperties.DIGEST_SHA256,
+                        KeyProperties.DIGEST_SHA384,
+                        KeyProperties.DIGEST_SHA512);
+                // Authorized to be used with any encryption and signature padding
+                // schemes (including no padding).
+                specBuilder.setEncryptionPaddings(
+                        KeyProperties.ENCRYPTION_PADDING_NONE,
+                        KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1,
+                        KeyProperties.ENCRYPTION_PADDING_RSA_OAEP);
+                specBuilder.setSignaturePaddings(
+                        KeyProperties.SIGNATURE_PADDING_RSA_PKCS1,
+                        KeyProperties.SIGNATURE_PADDING_RSA_PSS);
+                // Disable randomized encryption requirement to support encryption
+                // padding NONE above.
+                specBuilder.setRandomizedEncryptionRequired(false);
+                break;
+            default:
+                throw new ProviderException(
+                        "Unsupported algorithm: " + mKeymasterAlgorithm);
+        }
+
+        if (legacySpec.getKeySize() != -1) {
+            specBuilder.setKeySize(legacySpec.getKeySize());
+        }
+        if (legacySpec.getAlgorithmParameterSpec() != null) {
+            specBuilder.setAlgorithmParameterSpec(
+                    legacySpec.getAlgorithmParameterSpec());
+        }
+        specBuilder.setCertificateSubject(legacySpec.getSubjectDN());
+        specBuilder.setCertificateSerialNumber(legacySpec.getSerialNumber());
+        specBuilder.setCertificateNotBefore(legacySpec.getStartDate());
+        specBuilder.setCertificateNotAfter(legacySpec.getEndDate());
+        specBuilder.setUserAuthenticationRequired(false);
+
+        return specBuilder.build();
+    }
+
     private void resetAll() {
         mEntryAlias = null;
-        mEntryUid = KeyProperties.NAMESPACE_APPLICATION;
+        mEntryNamespace = KeyProperties.NAMESPACE_APPLICATION;
         mJcaKeyAlgorithm = null;
         mKeymasterAlgorithm = -1;
         mKeymasterPurposes = null;
@@ -427,6 +522,18 @@ public abstract class AndroidKeyStoreKeyPairGeneratorSpi extends KeyPairGenerato
 
     @Override
     public KeyPair generateKeyPair() {
+        try {
+            return generateKeyPairHelper();
+        } catch (GenerateRkpKeyException e) {
+            try {
+                return generateKeyPairHelper();
+            } catch (GenerateRkpKeyException f) {
+                throw new ProviderException("Failed to provision new attestation keys.");
+            }
+        }
+    }
+
+    private KeyPair generateKeyPairHelper() throws GenerateRkpKeyException {
         if (mKeyStore == null || mSpec == null) {
             throw new IllegalStateException("Not initialized");
         }
@@ -448,29 +555,48 @@ public abstract class AndroidKeyStoreKeyPairGeneratorSpi extends KeyPairGenerato
 
         KeyDescriptor descriptor = new KeyDescriptor();
         descriptor.alias = mEntryAlias;
-        descriptor.domain = mEntryUid == KeyProperties.NAMESPACE_APPLICATION
+        descriptor.domain = mEntryNamespace == KeyProperties.NAMESPACE_APPLICATION
                 ? Domain.APP
                 : Domain.SELINUX;
-        descriptor.nspace = mEntryUid;
+        descriptor.nspace = mEntryNamespace;
         descriptor.blob = null;
 
         boolean success = false;
         try {
             KeyStoreSecurityLevel iSecurityLevel = mKeyStore.getSecurityLevel(securityLevel);
 
-            KeyMetadata metadata = iSecurityLevel.generateKey(descriptor, null,
+            KeyMetadata metadata = iSecurityLevel.generateKey(descriptor, mAttestKeyDescriptor,
                     constructKeyGenerationArguments(), flags, additionalEntropy);
 
             AndroidKeyStorePublicKey publicKey =
                     AndroidKeyStoreProvider.makeAndroidKeyStorePublicKeyFromKeyEntryResponse(
                             descriptor, metadata, iSecurityLevel, mKeymasterAlgorithm);
-
+            GenerateRkpKey keyGen = new GenerateRkpKey(ActivityThread
+                    .currentApplication());
+            try {
+                if (mSpec.getAttestationChallenge() != null) {
+                    keyGen.notifyKeyGenerated(securityLevel);
+                }
+            } catch (RemoteException e) {
+                // This is not really an error state, and necessarily does not apply to non RKP
+                // systems or hybrid systems where RKP is not currently turned on.
+                Log.d(TAG, "Couldn't connect to the RemoteProvisioner backend.");
+            }
             success = true;
             return new KeyPair(publicKey, publicKey.getPrivateKey());
         } catch (android.security.KeyStoreException e) {
             switch(e.getErrorCode()) {
                 case KeymasterDefs.KM_ERROR_HARDWARE_TYPE_UNAVAILABLE:
                     throw new StrongBoxUnavailableException("Failed to generated key pair.", e);
+                case ResponseCode.OUT_OF_KEYS:
+                    GenerateRkpKey keyGen = new GenerateRkpKey(ActivityThread
+                            .currentApplication());
+                    try {
+                        keyGen.notifyEmpty(securityLevel);
+                    } catch (RemoteException f) {
+                        throw new ProviderException("Failed to talk to RemoteProvisioner", f);
+                    }
+                    throw new GenerateRkpKeyException();
                 default:
                     ProviderException p = new ProviderException("Failed to generate key pair.", e);
                     if ((mSpec.getPurposes() & KeyProperties.PURPOSE_WRAP_KEY) != 0) {
@@ -478,7 +604,8 @@ public abstract class AndroidKeyStoreKeyPairGeneratorSpi extends KeyPairGenerato
                     }
                     throw p;
             }
-        } catch (UnrecoverableKeyException e) {
+        } catch (UnrecoverableKeyException | IllegalArgumentException
+                    | DeviceIdAttestationException e) {
             throw new ProviderException(
                     "Failed to construct key object from newly generated key pair.", e);
         } finally {
@@ -496,7 +623,7 @@ public abstract class AndroidKeyStoreKeyPairGeneratorSpi extends KeyPairGenerato
     }
 
     private void addAttestationParameters(@NonNull List<KeyParameter> params)
-            throws ProviderException {
+            throws ProviderException, IllegalArgumentException, DeviceIdAttestationException {
         byte[] challenge = mSpec.getAttestationChallenge();
 
         if (challenge != null) {
@@ -526,15 +653,69 @@ public abstract class AndroidKeyStoreKeyPairGeneratorSpi extends KeyPairGenerato
                         Build.MODEL.getBytes(StandardCharsets.UTF_8)
                 ));
             }
-        } else {
-            if (mSpec.isDevicePropertiesAttestationIncluded()) {
-                throw new ProviderException("An attestation challenge must be provided when "
-                        + "requesting device properties attestation.");
+
+            int[] idTypes = mSpec.getAttestationIds();
+            if (idTypes.length == 0) {
+                return;
+            }
+            final Set<Integer> idTypesSet = new ArraySet<>(idTypes.length);
+            for (int idType : idTypes) {
+                idTypesSet.add(idType);
+            }
+            TelephonyManager telephonyService = null;
+            if (idTypesSet.contains(AttestationUtils.ID_TYPE_IMEI)
+                    || idTypesSet.contains(AttestationUtils.ID_TYPE_MEID)) {
+                telephonyService =
+                    (TelephonyManager) android.app.AppGlobals.getInitialApplication()
+                            .getSystemService(Context.TELEPHONY_SERVICE);
+                if (telephonyService == null) {
+                    throw new DeviceIdAttestationException("Unable to access telephony service");
+                }
+            }
+            for (final Integer idType : idTypesSet) {
+                switch (idType) {
+                    case AttestationUtils.ID_TYPE_SERIAL:
+                        params.add(KeyStore2ParameterUtils.makeBytes(
+                                KeymasterDefs.KM_TAG_ATTESTATION_ID_SERIAL,
+                                Build.getSerial().getBytes(StandardCharsets.UTF_8)
+                        ));
+                        break;
+                    case AttestationUtils.ID_TYPE_IMEI: {
+                        final String imei = telephonyService.getImei(0);
+                        if (imei == null) {
+                            throw new DeviceIdAttestationException("Unable to retrieve IMEI");
+                        }
+                        params.add(KeyStore2ParameterUtils.makeBytes(
+                                KeymasterDefs.KM_TAG_ATTESTATION_ID_IMEI,
+                                imei.getBytes(StandardCharsets.UTF_8)
+                        ));
+                        break;
+                    }
+                    case AttestationUtils.ID_TYPE_MEID: {
+                        final String meid = telephonyService.getMeid(0);
+                        if (meid == null) {
+                            throw new DeviceIdAttestationException("Unable to retrieve MEID");
+                        }
+                        params.add(KeyStore2ParameterUtils.makeBytes(
+                                KeymasterDefs.KM_TAG_ATTESTATION_ID_MEID,
+                                meid.getBytes(StandardCharsets.UTF_8)
+                        ));
+                        break;
+                    }
+                    case AttestationUtils.USE_INDIVIDUAL_ATTESTATION: {
+                        params.add(KeyStore2ParameterUtils.makeBool(
+                                KeymasterDefs.KM_TAG_DEVICE_UNIQUE_ATTESTATION));
+                        break;
+                    }
+                    default:
+                        throw new IllegalArgumentException("Unknown device ID type " + idType);
+                }
             }
         }
     }
 
-    private Collection<KeyParameter> constructKeyGenerationArguments() {
+    private Collection<KeyParameter> constructKeyGenerationArguments()
+            throws DeviceIdAttestationException, IllegalArgumentException {
         List<KeyParameter> params = new ArrayList<>();
         params.add(KeyStore2ParameterUtils.makeInt(KeymasterDefs.KM_TAG_KEY_SIZE, mKeySizeBits));
         params.add(KeyStore2ParameterUtils.makeEnum(

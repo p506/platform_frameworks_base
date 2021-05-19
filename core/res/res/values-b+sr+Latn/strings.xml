@@ -58,7 +58,7 @@
     <string name="imei" msgid="2157082351232630390">"IMEI"</string>
     <string name="meid" msgid="3291227361605924674">"MEID"</string>
     <string name="ClipMmi" msgid="4110549342447630629">"Dolazni ID pozivaoca"</string>
-    <string name="ClirMmi" msgid="4702929460236547156">"Odlazni ID pozivaoca"</string>
+    <string name="ClirMmi" msgid="6752346475055446417">"Sakrijte ID odlaznog pozivaoca"</string>
     <string name="ColpMmi" msgid="4736462893284419302">"ID povezane linije"</string>
     <string name="ColrMmi" msgid="5889782479745764278">"Ograničenje ID-a povezane linije"</string>
     <string name="CfMmi" msgid="8390012691099787178">"Preusmeravanje poziva"</string>
@@ -305,7 +305,7 @@
     <string name="permgrouplab_sms" msgid="795737735126084874">"SMS"</string>
     <string name="permgroupdesc_sms" msgid="5726462398070064542">"šalje i pregleda SMS poruke"</string>
     <string name="permgrouplab_storage" msgid="1938416135375282333">"Datoteke i mediji"</string>
-    <string name="permgroupdesc_storage" msgid="6351503740613026600">"pristupa slikama, medijima i datotekama na uređaju"</string>
+    <string name="permgroupdesc_storage" msgid="6351503740613026600">"pristupa slikama, medijima i fajlovima na uređaju"</string>
     <string name="permgrouplab_microphone" msgid="2480597427667420076">"Mikrofon"</string>
     <string name="permgroupdesc_microphone" msgid="1047786732792487722">"snima zvuk"</string>
     <string name="permgrouplab_activityRecognition" msgid="3324466667921775766">"Fizičke aktivnosti"</string>
@@ -352,6 +352,8 @@
     <string name="permdesc_receiveMms" msgid="958102423732219710">"Dozvoljava aplikaciji da prima i obrađuje MMS poruke. To znači da aplikacija može da nadgleda ili briše poruke koje se šalju uređaju, a da vam ih ne prikaže."</string>
     <string name="permlab_bindCellBroadcastService" msgid="586746677002040651">"Prosleđivanje poruka za mobilne uređaje na lokalitetu"</string>
     <string name="permdesc_bindCellBroadcastService" msgid="6540910200973641606">"Dozvoljava aplikaciji da se vezuje za modul poruka za mobilne uređaje na lokalitetu da bi prosleđivala poruke za mobilne uređaje na lokalitetu onako kako su primljene. Obaveštenja poruka za mobilne uređaje na lokalitetu se na nekim lokacijama primaju kao upozorenja na hitne slučajeve. Zlonamerne aplikacije mogu da utiču na učinak ili ometaju rad uređaja kada se primi poruka o hitnom slučaju za mobilne uređaje na lokalitetu."</string>
+    <string name="permlab_manageOngoingCalls" msgid="281244770664231782">"Upravljanje odlaznim pozivima"</string>
+    <string name="permdesc_manageOngoingCalls" msgid="7003138133829915265">"Omogućava aplikaciji da vidi detalje o odlaznim pozivima na uređaju i da kontroliše te pozive."</string>
     <string name="permlab_readCellBroadcasts" msgid="5869884450872137693">"čitanje poruka info servisa"</string>
     <string name="permdesc_readCellBroadcasts" msgid="672513437331980168">"Omogućava aplikaciji da čita poruke info servisa koje uređaj prima. Upozorenja info servisa se na nekim lokacijama primaju kao upozorenja na hitne slučajeve. Zlonamerne aplikacije mogu da utiču na učinak ili ometaju funkcionisanje uređaja kada se primi poruka info servisa o hitnom slučaju."</string>
     <string name="permlab_subscribedFeedsRead" msgid="217624769238425461">"čitanje prijavljenih fidova"</string>
@@ -682,13 +684,13 @@
     <string name="policydesc_watchLogin_secondaryUser" product="tv" msgid="8965224107449407052">"Nadgleda broj netačnih lozinki unetih pri otključavanju ekrana i zaključava Android TV uređaj ili briše sve podatke ovog korisnika ako se unese previše netačnih lozinki."</string>
     <string name="policydesc_watchLogin_secondaryUser" product="default" msgid="9177645136475155924">"Nadgleda broj netačnih lozinki unetih pri otključavanju ekrana i zaključava telefon ili briše sve podatke ovog korisnika ako se unese previše netačnih lozinki."</string>
     <string name="policylab_resetPassword" msgid="214556238645096520">"Promena zaključavanja ekrana"</string>
-    <string name="policydesc_resetPassword" msgid="4626419138439341851">"Promenite zaključavanje ekrana."</string>
+    <string name="policydesc_resetPassword" msgid="4626419138439341851">"Menja zaključavanje ekrana."</string>
     <string name="policylab_forceLock" msgid="7360335502968476434">"Zaključavanje ekrana"</string>
-    <string name="policydesc_forceLock" msgid="1008844760853899693">"Kontrolišite način i vreme zaključavanja ekrana."</string>
+    <string name="policydesc_forceLock" msgid="1008844760853899693">"Kontrola načina i vremena zaključavanja ekrana."</string>
     <string name="policylab_wipeData" msgid="1359485247727537311">"Brisanje svih podataka"</string>
     <string name="policydesc_wipeData" product="tablet" msgid="7245372676261947507">"Brisanje podataka na tabletu bez upozorenja resetovanjem na fabrička podešavanja."</string>
     <string name="policydesc_wipeData" product="tv" msgid="513862488950801261">"Briše podatke Android TV uređaja bez upozorenja pomoću resetovanja na fabrička podešavanja."</string>
-    <string name="policydesc_wipeData" product="default" msgid="8036084184768379022">"Izbrišite podatke na telefonu bez upozorenja resetovanjem na fabrička podešavanja."</string>
+    <string name="policydesc_wipeData" product="default" msgid="8036084184768379022">"Brisanje podataka na telefonu bez upozorenja resetovanjem na fabrička podešavanja."</string>
     <string name="policylab_wipeData_secondaryUser" msgid="413813645323433166">"Obriši podatke korisnika"</string>
     <string name="policydesc_wipeData_secondaryUser" product="tablet" msgid="2336676480090926470">"Briše podatke ovog korisnika na ovom tabletu bez upozorenja."</string>
     <string name="policydesc_wipeData_secondaryUser" product="tv" msgid="2293713284515865200">"Briše podatke ovog korisnika na ovom Android TV uređaju bez upozorenja."</string>
@@ -1360,11 +1362,14 @@
     <string name="alert_windows_notification_turn_off_action" msgid="7805857234839123780">"Isključi"</string>
     <string name="ext_media_checking_notification_title" msgid="8299199995416510094">"Proverava se <xliff:g id="NAME">%s</xliff:g>…"</string>
     <string name="ext_media_checking_notification_message" msgid="2231566971425375542">"Pregleda se aktuelni sadržaj"</string>
+    <string name="ext_media_checking_notification_message" product="tv" msgid="7986154434946021415">"Analizira se memorijski prostor za medije"</string>
     <string name="ext_media_new_notification_title" msgid="3517407571407687677">"Novi/a <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_new_notification_title" product="automotive" msgid="9085349544984742727">"<xliff:g id="NAME">%s</xliff:g> ne radi"</string>
     <string name="ext_media_new_notification_message" msgid="6095403121990786986">"Dodirnite da biste podesili"</string>
+    <string name="ext_media_new_notification_message" product="tv" msgid="216863352100263668">"Izaberite da biste podesili"</string>
     <string name="ext_media_new_notification_message" product="automotive" msgid="5140127881613227162">"Možda morate da reformatirate uređaj. Dodirnite da biste izbacili."</string>
     <string name="ext_media_ready_notification_message" msgid="777258143284919261">"Za prenos slika i medija"</string>
+    <string name="ext_media_ready_notification_message" product="tv" msgid="8847134811163165935">"Pregledajte medijske fajlove"</string>
     <string name="ext_media_unmountable_notification_title" msgid="4895444667278979910">"Problem sa: <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_unmountable_notification_title" product="automotive" msgid="3142723758949023280">"<xliff:g id="NAME">%s</xliff:g> ne radi"</string>
     <string name="ext_media_unmountable_notification_message" msgid="3256290114063126205">"Dodirnite da biste ispravili"</string>
@@ -1373,7 +1378,7 @@
     <string name="ext_media_unsupported_notification_title" msgid="4358280700537030333">"Uređaj <xliff:g id="NAME">%s</xliff:g> nije podržan"</string>
     <string name="ext_media_unsupported_notification_title" product="automotive" msgid="6004193172658722381">"<xliff:g id="NAME">%s</xliff:g> ne radi"</string>
     <string name="ext_media_unsupported_notification_message" msgid="917738524888367560">"Ovaj uređaj ne podržava ovaj uređaj <xliff:g id="NAME">%s</xliff:g>. Dodirnite da biste podesili podržani format."</string>
-    <string name="ext_media_unsupported_notification_message" product="tv" msgid="7744945987775645685">"Ovaj uređaj ne podržava ovaj medij (<xliff:g id="NAME">%s</xliff:g>). Izaberite da ga podesite u podržanom formatu."</string>
+    <string name="ext_media_unsupported_notification_message" product="tv" msgid="1595482802187036532">"Izaberite da biste podesili uređaj <xliff:g id="NAME">%s</xliff:g> u podržanom formatu."</string>
     <string name="ext_media_unsupported_notification_message" product="automotive" msgid="3412494732736336330">"Možda morate da reformatirate uređaj"</string>
     <string name="ext_media_badremoval_notification_title" msgid="4114625551266196872">"Uređaj <xliff:g id="NAME">%s</xliff:g> je neočekivano uklonjen"</string>
     <string name="ext_media_badremoval_notification_message" msgid="1986514704499809244">"Izbacite medijum pre nego što ga uklonite da ne biste izgubili sadržaj"</string>
@@ -1425,7 +1430,7 @@
     <string name="ime_action_previous" msgid="6548799326860401611">"Prethodno"</string>
     <string name="ime_action_default" msgid="8265027027659800121">"Izvrši"</string>
     <string name="dial_number_using" msgid="6060769078933953531">"Biraj broj\nkoristeći <xliff:g id="NUMBER">%s</xliff:g>"</string>
-    <string name="create_contact_using" msgid="6200708808003692594">"Kreirajte kontakt\nkoristeći <xliff:g id="NUMBER">%s</xliff:g>"</string>
+    <string name="create_contact_using" msgid="6200708808003692594">"Napravite kontakt\nkoristeći <xliff:g id="NUMBER">%s</xliff:g>"</string>
     <string name="grant_credentials_permission_message_header" msgid="5365733888842570481">"Sledeće aplikacije zahtevaju dozvolu za pristup nalogu, kako sada, tako i ubuduće."</string>
     <string name="grant_credentials_permission_message_footer" msgid="1886710210516246461">"Želite da odobrite ovaj zahtev?"</string>
     <string name="grant_permissions_header_text" msgid="3420736827804657201">"Zahtev za pristup"</string>
@@ -1735,6 +1740,17 @@
     <string name="mediasize_na_monarch" msgid="4396943937986136896">"Monarch"</string>
     <string name="mediasize_na_quarto" msgid="2119101847712239885">"Quarto"</string>
     <string name="mediasize_na_foolscap" msgid="5011612828564394648">"Foolscap"</string>
+    <string name="mediasize_na_ansi_c" msgid="3104916921818289618">"ANSI C"</string>
+    <string name="mediasize_na_ansi_d" msgid="254005964819282724">"ANSI D"</string>
+    <string name="mediasize_na_ansi_e" msgid="4424174989686785675">"ANSI E"</string>
+    <string name="mediasize_na_ansi_f" msgid="146980362213260987">"ANSI F"</string>
+    <string name="mediasize_na_arch_a" msgid="5280681822380032361">"Arch A"</string>
+    <string name="mediasize_na_arch_b" msgid="2113344093437297427">"Arch B"</string>
+    <string name="mediasize_na_arch_c" msgid="971002546186856623">"Arch C"</string>
+    <string name="mediasize_na_arch_d" msgid="6450996075335049806">"Arch D"</string>
+    <string name="mediasize_na_arch_e" msgid="6782708486949266519">"Arch E"</string>
+    <string name="mediasize_na_arch_e1" msgid="4707138568738504275">"Arch E1"</string>
+    <string name="mediasize_na_super_b" msgid="6964127155618393178">"Super B"</string>
     <string name="mediasize_chinese_roc_8k" msgid="411670106572707544">"ROC 8K"</string>
     <string name="mediasize_chinese_roc_16k" msgid="7496706798725321898">"ROC 16K"</string>
     <string name="mediasize_chinese_prc_1" msgid="946949835711037253">"PRC 1"</string>
@@ -1771,6 +1787,8 @@
     <string name="mediasize_japanese_kahu" msgid="7290232592648122042">"Kahu"</string>
     <string name="mediasize_japanese_kaku2" msgid="7477551750461028312">"Kaku2"</string>
     <string name="mediasize_japanese_you4" msgid="5552111912684384833">"You4"</string>
+    <!-- no translation found for mediasize_japanese_l (1326765321473431817) -->
+    <skip />
     <string name="mediasize_unknown_portrait" msgid="3817016220446495613">"Nepoznata veličina, uspravno"</string>
     <string name="mediasize_unknown_landscape" msgid="1584741567225095325">"Nepoznata veličina, vodoravno"</string>
     <string name="write_fail_reason_cancelled" msgid="2344081488493969190">"Otkazano je"</string>

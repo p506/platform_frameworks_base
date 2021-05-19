@@ -6126,6 +6126,17 @@ public class BatteryStatsImpl extends BatteryStats {
         }
     }
 
+    /**
+     * Records timing data related to an incoming Binder call in order to attribute
+     * the power consumption to the calling app.
+     */
+    public void noteBinderCallStats(int workSourceUid,
+            Collection<BinderCallsStats.CallStat> callStats) {
+        synchronized (this) {
+            getUidStatsLocked(workSourceUid).noteBinderCallStatsLocked(callStats);
+        }
+    }
+
     public String[] getWifiIfaces() {
         synchronized (mWifiNetworkLock) {
             return mWifiIfaces;
@@ -8690,6 +8701,17 @@ public class BatteryStatsImpl extends BatteryStats {
                     }
                 }
             }
+        }
+
+        /**
+         * Notes incoming binder call stats associated with this work source UID.
+         */
+        public void noteBinderCallStatsLocked(Collection<BinderCallsStats.CallStat> callStats) {
+            if (DEBUG) {
+                Slog.d(TAG, "noteBinderCalls() workSourceUid = [" + mUid + "], callStats = ["
+                        + new ArrayList<>(callStats) + "]");
+            }
+            // TODO(dplotnikov): finish the implementation by actually remembering the stats
         }
 
         /**
@@ -11879,16 +11901,17 @@ public class BatteryStatsImpl extends BatteryStats {
         final int numClusters = mPowerProfile.getNumCpuClusters();
         mWakeLockAllocationsUs = null;
         final long startTimeMs = mClocks.uptimeMillis();
+        final List<Integer> uidsToRemove = new ArrayList<>();
         mCpuUidFreqTimeReader.readDelta((uid, cpuFreqTimeMs) -> {
             uid = mapUid(uid);
             if (Process.isIsolated(uid)) {
-                mCpuUidFreqTimeReader.removeUid(uid);
+                uidsToRemove.add(uid);
                 Slog.d(TAG, "Got freq readings for an isolated uid with no mapping: " + uid);
                 return;
             }
             if (!mUserInfoProvider.exists(UserHandle.getUserId(uid))) {
                 Slog.d(TAG, "Got freq readings for an invalid user's uid " + uid);
-                mCpuUidFreqTimeReader.removeUid(uid);
+                uidsToRemove.add(uid);
                 return;
             }
             final Uid u = getUidStatsLocked(uid);
@@ -11947,6 +11970,9 @@ public class BatteryStatsImpl extends BatteryStats {
                 }
             }
         });
+        for (int uid : uidsToRemove) {
+            mCpuUidFreqTimeReader.removeUid(uid);
+        }
 
         final long elapsedTimeMs = mClocks.uptimeMillis() - startTimeMs;
         if (DEBUG_ENERGY_CPU || elapsedTimeMs >= 100) {
@@ -11992,21 +12018,25 @@ public class BatteryStatsImpl extends BatteryStats {
     @VisibleForTesting
     public void readKernelUidCpuActiveTimesLocked(boolean onBattery) {
         final long startTimeMs = mClocks.uptimeMillis();
+        final List<Integer> uidsToRemove = new ArrayList<>();
         mCpuUidActiveTimeReader.readDelta((uid, cpuActiveTimesMs) -> {
             uid = mapUid(uid);
             if (Process.isIsolated(uid)) {
-                mCpuUidActiveTimeReader.removeUid(uid);
+                uidsToRemove.add(uid);
                 Slog.w(TAG, "Got active times for an isolated uid with no mapping: " + uid);
                 return;
             }
             if (!mUserInfoProvider.exists(UserHandle.getUserId(uid))) {
                 Slog.w(TAG, "Got active times for an invalid user's uid " + uid);
-                mCpuUidActiveTimeReader.removeUid(uid);
+                uidsToRemove.add(uid);
                 return;
             }
             final Uid u = getUidStatsLocked(uid);
             u.mCpuActiveTimeMs.addCountLocked(cpuActiveTimesMs, onBattery);
         });
+        for (int uid : uidsToRemove) {
+            mCpuUidActiveTimeReader.removeUid(uid);
+        }
 
         final long elapsedTimeMs = mClocks.uptimeMillis() - startTimeMs;
         if (DEBUG_ENERGY_CPU || elapsedTimeMs >= 100) {
@@ -12021,21 +12051,25 @@ public class BatteryStatsImpl extends BatteryStats {
     @VisibleForTesting
     public void readKernelUidCpuClusterTimesLocked(boolean onBattery) {
         final long startTimeMs = mClocks.uptimeMillis();
+        final List<Integer> uidsToRemove = new ArrayList<>();
         mCpuUidClusterTimeReader.readDelta((uid, cpuClusterTimesMs) -> {
             uid = mapUid(uid);
             if (Process.isIsolated(uid)) {
-                mCpuUidClusterTimeReader.removeUid(uid);
+                uidsToRemove.add(uid);
                 Slog.w(TAG, "Got cluster times for an isolated uid with no mapping: " + uid);
                 return;
             }
             if (!mUserInfoProvider.exists(UserHandle.getUserId(uid))) {
                 Slog.w(TAG, "Got cluster times for an invalid user's uid " + uid);
-                mCpuUidClusterTimeReader.removeUid(uid);
+                uidsToRemove.add(uid);
                 return;
             }
             final Uid u = getUidStatsLocked(uid);
             u.mCpuClusterTimesMs.addCountLocked(cpuClusterTimesMs, onBattery);
         });
+        for (int uid : uidsToRemove) {
+            mCpuUidClusterTimeReader.removeUid(uid);
+        }
 
         final long elapsedTimeMs = mClocks.uptimeMillis() - startTimeMs;
         if (DEBUG_ENERGY_CPU || elapsedTimeMs >= 100) {

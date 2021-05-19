@@ -57,7 +57,7 @@
     <string name="imei" msgid="2157082351232630390">"IMEI"</string>
     <string name="meid" msgid="3291227361605924674">"MEID"</string>
     <string name="ClipMmi" msgid="4110549342447630629">"অন্তৰ্গামী কলাৰ আইডি"</string>
-    <string name="ClirMmi" msgid="4702929460236547156">"বহিৰ্গামী কলাৰ আইডি"</string>
+    <string name="ClirMmi" msgid="6752346475055446417">"বহিৰ্গামী কলাৰ আইডি লুকুৱাওক"</string>
     <string name="ColpMmi" msgid="4736462893284419302">"সংযোজিত লাইন আইডি"</string>
     <string name="ColrMmi" msgid="5889782479745764278">"সংযোজিত লাইন আইডিৰ সীমাবদ্ধতা"</string>
     <string name="CfMmi" msgid="8390012691099787178">"কল ফৰৱাৰ্ডিং"</string>
@@ -100,7 +100,7 @@
     <string name="peerTtyModeHco" msgid="5626377160840915617">"নেটৱৰ্ক পীয়েৰে TTY ম\'ড HCOলৈ সলনি কৰিবলৈ অনুৰোধ কৰিছে"</string>
     <string name="peerTtyModeVco" msgid="572208600818270944">"নেটৱৰ্ক পীয়েৰে TTY ম\'ড VCO লৈ সলনি কৰিবলৈ অনুৰোধ কৰিছে"</string>
     <string name="peerTtyModeOff" msgid="2420380956369226583">"নেটৱৰ্ক পীয়েৰে TTY ম\'ড OFFলৈ সলনি কৰিবলৈ অনুৰোধ কৰিছে"</string>
-    <string name="serviceClassVoice" msgid="2065556932043454987">"কণ্ঠস্বৰ"</string>
+    <string name="serviceClassVoice" msgid="2065556932043454987">"Voice"</string>
     <string name="serviceClassData" msgid="4148080018967300248">"ডেটা"</string>
     <string name="serviceClassFAX" msgid="2561653371698904118">"ফেক্স"</string>
     <string name="serviceClassSMS" msgid="1547664561704509004">"এছএমএছ"</string>
@@ -349,6 +349,8 @@
     <string name="permdesc_receiveMms" msgid="958102423732219710">"এমএমএছ বার্তাবোৰ লাভ আৰু ইয়াৰ প্ৰক্ৰিয়া সম্পন্ন কৰিবলৈ এপক অনুমতি দিয়ে। ইয়াৰ অৰ্থ হৈছে এই এপে আপোনাৰ ডিভাইচলৈ প্ৰেৰণ কৰা বার্তাসমূহ আপোনাক নেদেখুৱাকৈয়ে পৰ্যবেক্ষণ আৰু মচিব পাৰে।"</string>
     <string name="permlab_bindCellBroadcastService" msgid="586746677002040651">"চেল সম্প্ৰচাৰ বাৰ্তাসমূহ ফৰৱাৰ্ড কৰক"</string>
     <string name="permdesc_bindCellBroadcastService" msgid="6540910200973641606">"চেল সম্প্ৰচাৰ বাৰ্তাসমূহ লাভ কৰিলে সেইবোৰ ফৰৱাৰ্ড কৰিবলৈ এপ্‌টোক চেল সম্প্ৰচাৰ মডিউলটোৰ সৈতে সংযুক্ত হ\'বলৈ অনুমতি দিয়ে। আপোনাক জৰুৰীকালীন পৰিস্থিতিসমূহৰ বিষয়ে সতৰ্ক কৰিবলৈ কিছুমান অৱস্থানত চেল সম্প্ৰচাৰ সতৰ্কবাৰ্তাসমূহ ডেলিভাৰ কৰা হয়। কোনো জৰুৰীকালীন চেল সম্প্ৰচাৰ লাভ কৰিলে ক্ষতিকাৰক এপ্‌সমূহে আপোনাৰ ডিভাইচটোৰ কাৰ্যক্ষমতা অথবা কাৰ্যপ্ৰণালীত হস্তক্ষেপ কৰিব পাৰে।"</string>
+    <string name="permlab_manageOngoingCalls" msgid="281244770664231782">"চলি থকা কলসমূহ পৰিচালনা কৰক"</string>
+    <string name="permdesc_manageOngoingCalls" msgid="7003138133829915265">"এটা এপক আপোনাৰ ডিভাইচত চলি থকা কলৰ সবিশেষ চাবলৈ আৰু এই কলসমূহ নিয়ন্ত্ৰণ কৰিবলৈ অনুমতি দিয়ে।"</string>
     <string name="permlab_readCellBroadcasts" msgid="5869884450872137693">"চেল সম্প্ৰচাৰৰ বার্তাবোৰ পঢ়ক"</string>
     <string name="permdesc_readCellBroadcasts" msgid="672513437331980168">"আপোনাৰ ডিভাইচে লাভ কৰা চেল সম্প্ৰচাৰৰ বার্তাবোৰ পঢ়িবলৈ এপক অনুমতি দিয়ে। আপোনাক জৰুৰীকালীন পৰিস্থিতিবোৰত সর্তক কৰিবলৈ চেল সম্প্ৰচাৰৰ বার্তাবোৰ প্ৰেৰণ কৰা হয়। জৰুৰীকালীন চেল সম্প্ৰচাৰ লাভ কৰাৰ সময়ত আপোনাৰ ডিভাইচৰ কাৰ্যদক্ষতা বা কাৰ্যপ্ৰণালীত ক্ষতিকাৰক এপবোৰে হস্তক্ষেপ কৰিব পাৰে।"</string>
     <string name="permlab_subscribedFeedsRead" msgid="217624769238425461">"আপুনি সদস্যভুক্ত হোৱা ফীডসমূহ পঢ়ক"</string>
@@ -1340,11 +1342,14 @@
     <string name="alert_windows_notification_turn_off_action" msgid="7805857234839123780">"অফ কৰক"</string>
     <string name="ext_media_checking_notification_title" msgid="8299199995416510094">"<xliff:g id="NAME">%s</xliff:g> পৰীক্ষা কৰি থকা হৈছে…"</string>
     <string name="ext_media_checking_notification_message" msgid="2231566971425375542">"বৰ্তমানৰ সমলৰ সমীক্ষা কৰি থকা হৈছে"</string>
+    <string name="ext_media_checking_notification_message" product="tv" msgid="7986154434946021415">"মিডিয়া ষ্ট’ৰেজ বিশ্লেষণ কৰি থকা হৈছে"</string>
     <string name="ext_media_new_notification_title" msgid="3517407571407687677">"নতুন <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_new_notification_title" product="automotive" msgid="9085349544984742727">"<xliff:g id="NAME">%s</xliff:g>এ কাম কৰা নাই"</string>
     <string name="ext_media_new_notification_message" msgid="6095403121990786986">"ছেট আপ কৰিবলৈ টিপক"</string>
+    <string name="ext_media_new_notification_message" product="tv" msgid="216863352100263668">"ছেট আপ কৰিবলৈ বাছনি কৰক"</string>
     <string name="ext_media_new_notification_message" product="automotive" msgid="5140127881613227162">"আপুনি ডিভাইচটো পুনৰ ফৰ্মেট কৰিবলগীয়া হ’ব পাৰে। বাহিৰলৈ উলিয়াবলৈ টিপক।"</string>
     <string name="ext_media_ready_notification_message" msgid="777258143284919261">"ফট\' আৰু মিডিয়া স্থানান্তৰণৰ বাবে"</string>
+    <string name="ext_media_ready_notification_message" product="tv" msgid="8847134811163165935">"মিডিয়া ফাইল ব্ৰাউজ কৰক"</string>
     <string name="ext_media_unmountable_notification_title" msgid="4895444667278979910">"<xliff:g id="NAME">%s</xliff:g>ত কিবা সমস্যা আছে"</string>
     <string name="ext_media_unmountable_notification_title" product="automotive" msgid="3142723758949023280">"<xliff:g id="NAME">%s</xliff:g>এ কাম কৰা নাই"</string>
     <string name="ext_media_unmountable_notification_message" msgid="3256290114063126205">"সমাধান কৰিবলৈ টিপক"</string>
@@ -1353,7 +1358,7 @@
     <string name="ext_media_unsupported_notification_title" msgid="4358280700537030333">"<xliff:g id="NAME">%s</xliff:g>ক ব্যৱহাৰ কৰিব নোৱাৰি"</string>
     <string name="ext_media_unsupported_notification_title" product="automotive" msgid="6004193172658722381">"<xliff:g id="NAME">%s</xliff:g>এ কাম কৰা নাই"</string>
     <string name="ext_media_unsupported_notification_message" msgid="917738524888367560">"এই ডিভাইচটোৱে <xliff:g id="NAME">%s</xliff:g>ক ব্যৱহাৰ কৰিব নোৱাৰে। ব্যৱহাৰ কৰিব পৰা ফৰ্মেটত ছেট আপ কৰিবলৈ টিপক।"</string>
-    <string name="ext_media_unsupported_notification_message" product="tv" msgid="7744945987775645685">"এই ডিভাইচটোৱে <xliff:g id="NAME">%s</xliff:g>ক চলাব নোৱাৰে। চলাব পৰা কোনো ফৰ্মেটত ছেট আপ কৰিবলৈ বাছনি কৰক।"</string>
+    <string name="ext_media_unsupported_notification_message" product="tv" msgid="1595482802187036532">"এটা সমৰ্থিত ফৰ্মেটত <xliff:g id="NAME">%s</xliff:g> ছেট আপ কৰিবলৈ বাছনি কৰক।"</string>
     <string name="ext_media_unsupported_notification_message" product="automotive" msgid="3412494732736336330">"আপুনি ডিভাইচটো পুনৰ ফৰ্মেট কৰিবলগীয়া হ’ব পাৰে"</string>
     <string name="ext_media_badremoval_notification_title" msgid="4114625551266196872">"<xliff:g id="NAME">%s</xliff:g> অপ্ৰত্য়াশিতভাৱে আঁতৰোৱা হ’ল"</string>
     <string name="ext_media_badremoval_notification_message" msgid="1986514704499809244">"সমল হেৰুওৱাৰ পৰা হাত সাৰিবলৈ আঁতৰোৱাৰ আগতে মিডিয়া বাহিৰ কৰক"</string>
@@ -1507,7 +1512,7 @@
     <string name="action_menu_overflow_description" msgid="4579536843510088170">"অধিক বিকল্প"</string>
     <string name="action_bar_home_description_format" msgid="5087107531331621803">"%1$s: %2$s"</string>
     <string name="action_bar_home_subtitle_description_format" msgid="4346835454749569826">"%1$s, %2$s, %3$s"</string>
-    <string name="storage_internal" msgid="8490227947584914460">"শ্বেয়াৰ কৰা আভ্যন্তৰীণ সঞ্চয়াগাৰ"</string>
+    <string name="storage_internal" msgid="8490227947584914460">"শ্বেয়াৰ কৰা আভ্যন্তৰীণ ষ্ট\'ৰেজ"</string>
     <string name="storage_sd_card" msgid="3404740277075331881">"এছডি কাৰ্ড"</string>
     <string name="storage_sd_card_label" msgid="7526153141147470509">"<xliff:g id="MANUFACTURER">%s</xliff:g> এছডি কাৰ্ড"</string>
     <string name="storage_usb_drive" msgid="448030813201444573">"ইউএছবি ড্ৰাইভ"</string>
@@ -1713,6 +1718,28 @@
     <string name="mediasize_na_monarch" msgid="4396943937986136896">"ম\'নাৰ্ক"</string>
     <string name="mediasize_na_quarto" msgid="2119101847712239885">"কুৱাট্ৰো"</string>
     <string name="mediasize_na_foolscap" msgid="5011612828564394648">"ফুলস্কেপ"</string>
+    <!-- no translation found for mediasize_na_ansi_c (3104916921818289618) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_d (254005964819282724) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_e (4424174989686785675) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_f (146980362213260987) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_a (5280681822380032361) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_b (2113344093437297427) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_c (971002546186856623) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_d (6450996075335049806) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e (6782708486949266519) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e1 (4707138568738504275) -->
+    <skip />
+    <!-- no translation found for mediasize_na_super_b (6964127155618393178) -->
+    <skip />
     <string name="mediasize_chinese_roc_8k" msgid="411670106572707544">"ROC 8K"</string>
     <string name="mediasize_chinese_roc_16k" msgid="7496706798725321898">"ROC 16K"</string>
     <string name="mediasize_chinese_prc_1" msgid="946949835711037253">"PRC 1"</string>
@@ -1749,6 +1776,8 @@
     <string name="mediasize_japanese_kahu" msgid="7290232592648122042">"Kahu"</string>
     <string name="mediasize_japanese_kaku2" msgid="7477551750461028312">"Kaku2"</string>
     <string name="mediasize_japanese_you4" msgid="5552111912684384833">"You4"</string>
+    <!-- no translation found for mediasize_japanese_l (1326765321473431817) -->
+    <skip />
     <string name="mediasize_unknown_portrait" msgid="3817016220446495613">"অজ্ঞাত প\'ৰ্ট্ৰেইট"</string>
     <string name="mediasize_unknown_landscape" msgid="1584741567225095325">"অজ্ঞাত লেণ্ডস্কেইপ"</string>
     <string name="write_fail_reason_cancelled" msgid="2344081488493969190">"বাতিল কৰা হ’ল"</string>
@@ -1794,7 +1823,7 @@
     <string name="confirm_battery_saver" msgid="5247976246208245754">"ঠিক আছে"</string>
     <string name="battery_saver_description_with_learn_more" msgid="4424488535318105801">"বেটাৰীৰ জীৱনকাল বৃদ্ধি কৰিবলৈ, বেটাৰী সঞ্চয়কাৰীয়ে:\n\n•গাঢ় ৰঙৰ থীম অন কৰে\n•নেপথ্যৰ কাৰ্যকলাপ, কিছুমান ভিজুৱেল ইফেক্ট আৰু “Hey Google”ৰ দৰে অন্য সুবিধাসমূহ অফ কৰে অথবা সেইবোৰ সীমাবদ্ধ কৰে\n\n"<annotation id="url">"অধিক জানক"</annotation></string>
     <string name="battery_saver_description" msgid="6794188153647295212">"বেটাৰীৰ জীৱনকাল বৃদ্ধি কৰিবলৈ বেটাৰী সঞ্চয়কাৰীয়ে:\n\n• গাঢ় ৰঙৰ থীম অন কৰে\n• নেপথ্যৰ কাৰ্যকলাপ, কিছুমান ভিজুৱেল ইফেক্ট আৰু “Hey Google”ৰ দৰে অন্য সুবিধাসমূহ অফ কৰে অথবা সীমাবদ্ধ কৰে"</string>
-    <string name="data_saver_description" msgid="4995164271550590517">"ডেটা ব্য়ৱহাৰ মাত্ৰা কম কৰিবৰ বাবে ডেটা সঞ্চয়কাৰীয়ে কিছুমান এপক নেপথ্য়ত ডেটা প্ৰেৰণ বা সংগ্ৰহ কৰাত বাধা প্ৰদান কৰে। আপুনি বৰ্তমান ব্য়ৱহাৰ কৰি থকা এটা এপে ডেটা ব্য়ৱহাৰ কৰিব পাৰে, কিন্তু সঘনাই এই কার্য কৰিব নোৱাৰিব পাৰে। ইয়াৰ অৰ্থ এইয়ে হ\'ব পাৰে যে, উদাহৰণস্বৰূপে, আপুনি নিটিপা পর্যন্ত প্ৰতিচ্ছবিসমূহ দেখুওৱা নহ’ব।"</string>
+    <string name="data_saver_description" msgid="4995164271550590517">"ডেটা ব্য়ৱহাৰৰ হ্ৰাস কৰিবলৈ ডেটা সঞ্চয়কাৰীয়ে কিছুমান এপক নেপথ্য়ত ডেটা প্ৰেৰণ বা সংগ্ৰহ কৰাত বাধা প্ৰদান কৰে। আপুনি বৰ্তমান ব্য়ৱহাৰ কৰি থকা এটা এপে ডেটা এক্সেছ কৰিব পাৰে, কিন্তু সঘনাই এক্সেছ কৰিব নোৱাৰিব পাৰে। ইয়াৰ অৰ্থ উদাহৰণস্বৰূপে এয়া হ\'ব পাৰে যে, আপুনি নিটিপা পর্যন্ত প্ৰতিচ্ছবিসমূহ দেখুওৱা নহ’ব।"</string>
     <string name="data_saver_enable_title" msgid="7080620065745260137">"ডেটা সঞ্চয়কাৰী অন কৰিবনে?"</string>
     <string name="data_saver_enable_button" msgid="4399405762586419726">"অন কৰক"</string>
     <plurals name="zen_mode_duration_minutes_summary" formatted="false" msgid="2877101784123058273">
@@ -2000,7 +2029,7 @@
     <string name="dynamic_mode_notification_channel_name" msgid="2986926422100223328">"ৰুটিন ম’ডৰ তথ্য জাননী"</string>
     <string name="dynamic_mode_notification_title" msgid="9205715501274608016">"চ্চাৰ্জ কৰাৰ সচৰাচৰ সময়ৰ আগতেই বেটাৰি শেষ হ’ব পাৰে"</string>
     <string name="dynamic_mode_notification_summary" msgid="4141614604437372157">"বেটাৰিৰ খৰচ কমাবলৈ বেটাৰি সঞ্চয়কাৰী অন কৰা হৈছে"</string>
-    <string name="battery_saver_notification_channel_name" msgid="3918243458067916913">"বেটাৰি সঞ্চয়কাৰী"</string>
+    <string name="battery_saver_notification_channel_name" msgid="3918243458067916913">"বেটাৰী সঞ্চয়কাৰী"</string>
     <string name="battery_saver_off_notification_title" msgid="7637255960468032515">"বেটাৰি সঞ্চয়কাৰী অফ কৰা হ’ল"</string>
     <string name="battery_saver_charged_notification_summary" product="default" msgid="5544457317418624367">"ফ\'নটোত পর্যাপ্ত পৰিমাণে চার্জ আছে। সুবিধাবোৰ আৰু সীমাবদ্ধ কৰা নাই।"</string>
     <string name="battery_saver_charged_notification_summary" product="tablet" msgid="4426317048139996888">"টেবলেটটোত পর্যাপ্ত পৰিমাণে চার্জ আছে। সুবিধাবোৰ আৰু সীমাবদ্ধ কৰা নাই।"</string>

@@ -20,6 +20,7 @@ import static com.android.internal.annotations.VisibleForTesting.Visibility;
 import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.content.Context;
+import android.net.NetworkRequest;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.PersistableBundle;
@@ -41,7 +42,6 @@ import java.util.Set;
  * brought up on demand based on active {@link NetworkRequest}(s).
  *
  * @see VcnManager for more information on the Virtual Carrier Network feature
- * @hide
  */
 public final class VcnConfig implements Parcelable {
     @NonNull private static final String TAG = VcnConfig.class.getSimpleName();
@@ -52,11 +52,17 @@ public final class VcnConfig implements Parcelable {
     private static final String GATEWAY_CONNECTION_CONFIGS_KEY = "mGatewayConnectionConfigs";
     @NonNull private final Set<VcnGatewayConnectionConfig> mGatewayConnectionConfigs;
 
+    private static final String IS_TEST_MODE_PROFILE_KEY = "mIsTestModeProfile";
+    private final boolean mIsTestModeProfile;
+
     private VcnConfig(
             @NonNull String packageName,
-            @NonNull Set<VcnGatewayConnectionConfig> gatewayConnectionConfigs) {
+            @NonNull Set<VcnGatewayConnectionConfig> gatewayConnectionConfigs,
+            boolean isTestModeProfile) {
         mPackageName = packageName;
-        mGatewayConnectionConfigs = Collections.unmodifiableSet(gatewayConnectionConfigs);
+        mGatewayConnectionConfigs =
+                Collections.unmodifiableSet(new ArraySet<>(gatewayConnectionConfigs));
+        mIsTestModeProfile = isTestModeProfile;
 
         validate();
     }
@@ -76,6 +82,7 @@ public final class VcnConfig implements Parcelable {
                 new ArraySet<>(
                         PersistableBundleUtils.toList(
                                 gatewayConnectionConfigsBundle, VcnGatewayConnectionConfig::new));
+        mIsTestModeProfile = in.getBoolean(IS_TEST_MODE_PROFILE_KEY);
 
         validate();
     }
@@ -96,14 +103,19 @@ public final class VcnConfig implements Parcelable {
         return mPackageName;
     }
 
-    /**
-     * Retrieves the set of configured tunnels.
-     *
-     * @hide
-     */
+    /** Retrieves the set of configured GatewayConnection(s). */
     @NonNull
     public Set<VcnGatewayConnectionConfig> getGatewayConnectionConfigs() {
         return Collections.unmodifiableSet(mGatewayConnectionConfigs);
+    }
+
+    /**
+     * Returns whether or not this VcnConfig is restricted to test networks.
+     *
+     * @hide
+     */
+    public boolean isTestModeProfile() {
+        return mIsTestModeProfile;
     }
 
     /**
@@ -122,13 +134,14 @@ public final class VcnConfig implements Parcelable {
                         new ArrayList<>(mGatewayConnectionConfigs),
                         VcnGatewayConnectionConfig::toPersistableBundle);
         result.putPersistableBundle(GATEWAY_CONNECTION_CONFIGS_KEY, gatewayConnectionConfigsBundle);
+        result.putBoolean(IS_TEST_MODE_PROFILE_KEY, mIsTestModeProfile);
 
         return result;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mPackageName, mGatewayConnectionConfigs);
+        return Objects.hash(mPackageName, mGatewayConnectionConfigs, mIsTestModeProfile);
     }
 
     @Override
@@ -139,7 +152,8 @@ public final class VcnConfig implements Parcelable {
 
         final VcnConfig rhs = (VcnConfig) other;
         return mPackageName.equals(rhs.mPackageName)
-                && mGatewayConnectionConfigs.equals(rhs.mGatewayConnectionConfigs);
+                && mGatewayConnectionConfigs.equals(rhs.mGatewayConnectionConfigs)
+                && mIsTestModeProfile == rhs.mIsTestModeProfile;
     }
 
     // Parcelable methods
@@ -168,16 +182,14 @@ public final class VcnConfig implements Parcelable {
                 }
             };
 
-    /**
-     * This class is used to incrementally build {@link VcnConfig} objects.
-     *
-     * @hide
-     */
+    /** This class is used to incrementally build {@link VcnConfig} objects. */
     public static final class Builder {
         @NonNull private final String mPackageName;
 
         @NonNull
         private final Set<VcnGatewayConnectionConfig> mGatewayConnectionConfigs = new ArraySet<>();
+
+        private boolean mIsTestModeProfile = false;
 
         public Builder(@NonNull Context context) {
             Objects.requireNonNull(context, "context was null");
@@ -190,14 +202,42 @@ public final class VcnConfig implements Parcelable {
          *
          * @param gatewayConnectionConfig the configuration for an individual gateway connection
          * @return this {@link Builder} instance, for chaining
-         * @hide
+         * @throws IllegalArgumentException if a VcnGatewayConnectionConfig has already been set for
+         *     this {@link VcnConfig} with the same GatewayConnection name (as returned via {@link
+         *     VcnGatewayConnectionConfig#getGatewayConnectionName()}).
          */
         @NonNull
         public Builder addGatewayConnectionConfig(
                 @NonNull VcnGatewayConnectionConfig gatewayConnectionConfig) {
             Objects.requireNonNull(gatewayConnectionConfig, "gatewayConnectionConfig was null");
 
+            for (final VcnGatewayConnectionConfig vcnGatewayConnectionConfig :
+                    mGatewayConnectionConfigs) {
+                if (vcnGatewayConnectionConfig
+                        .getGatewayConnectionName()
+                        .equals(gatewayConnectionConfig.getGatewayConnectionName())) {
+                    throw new IllegalArgumentException(
+                            "GatewayConnection for specified name already exists");
+                }
+            }
+
             mGatewayConnectionConfigs.add(gatewayConnectionConfig);
+            return this;
+        }
+
+        /**
+         * Restricts this VcnConfig to matching with test networks (only).
+         *
+         * <p>This method is for testing only, and must not be used by apps. Calling {@link
+         * VcnManager#setVcnConfig(ParcelUuid, VcnConfig)} with a VcnConfig where test-network usage
+         * is enabled will require the MANAGE_TEST_NETWORKS permission.
+         *
+         * @return this {@link Builder} instance, for chaining
+         * @hide
+         */
+        @NonNull
+        public Builder setIsTestModeProfile() {
+            mIsTestModeProfile = true;
             return this;
         }
 
@@ -205,11 +245,10 @@ public final class VcnConfig implements Parcelable {
          * Builds and validates the VcnConfig.
          *
          * @return an immutable VcnConfig instance
-         * @hide
          */
         @NonNull
         public VcnConfig build() {
-            return new VcnConfig(mPackageName, mGatewayConnectionConfigs);
+            return new VcnConfig(mPackageName, mGatewayConnectionConfigs, mIsTestModeProfile);
         }
     }
 }

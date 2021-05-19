@@ -66,9 +66,6 @@ public final class KeymasterDefs {
     public static final int KM_TAG_CALLER_NONCE = Tag.CALLER_NONCE; // KM_BOOL | 7;
     public static final int KM_TAG_MIN_MAC_LENGTH = Tag.MIN_MAC_LENGTH; // KM_UINT | 8;
 
-    public static final int KM_TAG_BLOB_USAGE_REQUIREMENTS =
-            Tag.BLOB_USAGE_REQUIREMENTS; // KM_ENUM | 705;
-
     public static final int KM_TAG_RSA_PUBLIC_EXPONENT = Tag.RSA_PUBLIC_EXPONENT; // KM_ULONG | 200;
     public static final int KM_TAG_INCLUDE_UNIQUE_ID = Tag.INCLUDE_UNIQUE_ID; // KM_BOOL | 202;
 
@@ -188,6 +185,7 @@ public final class KeymasterDefs {
     public static final int KM_PURPOSE_VERIFY = KeyPurpose.VERIFY;
     public static final int KM_PURPOSE_WRAP = KeyPurpose.WRAP_KEY;
     public static final int KM_PURPOSE_AGREE_KEY = KeyPurpose.AGREE_KEY;
+    public static final int KM_PURPOSE_ATTEST_KEY = KeyPurpose.ATTEST_KEY;
 
     // Key formats.
     public static final int KM_KEY_FORMAT_X509 = KeyFormat.X509;

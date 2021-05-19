@@ -57,7 +57,7 @@
     <string name="imei" msgid="2157082351232630390">"IMEI"</string>
     <string name="meid" msgid="3291227361605924674">"MEID"</string>
     <string name="ClipMmi" msgid="4110549342447630629">"ID do Autor da Chamada"</string>
-    <string name="ClirMmi" msgid="4702929460236547156">"ID do autor da chamada efetuada"</string>
+    <string name="ClirMmi" msgid="6752346475055446417">"Ocultar identificação do autor da chamada efetuada"</string>
     <string name="ColpMmi" msgid="4736462893284419302">"ID de linha ligada"</string>
     <string name="ColrMmi" msgid="5889782479745764278">"Restrição de ID de linha ligada"</string>
     <string name="CfMmi" msgid="8390012691099787178">"Encaminhamento de chamadas"</string>
@@ -254,7 +254,7 @@
       <item quantity="one">A tirar uma captura de ecrã do relatório de erro dentro de <xliff:g id="NUMBER_0">%d</xliff:g> segundo…</item>
     </plurals>
     <string name="bugreport_screenshot_success_toast" msgid="7986095104151473745">"Captura de ecrã tirada com o relatório de erro."</string>
-    <string name="bugreport_screenshot_failure_toast" msgid="6736320861311294294">"Falha ao tirar captura de ecrã com o relatório de erro."</string>
+    <string name="bugreport_screenshot_failure_toast" msgid="6736320861311294294">"Falha ao fazer captura de ecrã com o relatório de erro."</string>
     <string name="global_action_toggle_silent_mode" msgid="8464352592860372188">"Modo silencioso"</string>
     <string name="global_action_silent_mode_on_status" msgid="2371892537738632013">"Som desativado"</string>
     <string name="global_action_silent_mode_off_status" msgid="6608006545950920042">"O som está ativado"</string>
@@ -327,7 +327,7 @@
     <string name="capability_desc_canPerformGestures" msgid="6619457251067929726">"É possível tocar, deslizar rapidamente, juntar os dedos e realizar outros gestos"</string>
     <string name="capability_title_canCaptureFingerprintGestures" msgid="1189053104594608091">"Gestos de impressão digital"</string>
     <string name="capability_desc_canCaptureFingerprintGestures" msgid="6861869337457461274">"Pode capturar gestos realizados no sensor de impressões digitais do dispositivo."</string>
-    <string name="capability_title_canTakeScreenshot" msgid="3895812893130071930">"Tirar captura de ecrã"</string>
+    <string name="capability_title_canTakeScreenshot" msgid="3895812893130071930">"Fazer captura de ecrã"</string>
     <string name="capability_desc_canTakeScreenshot" msgid="7762297374317934052">"É possível tirar uma captura de ecrã."</string>
     <string name="permlab_statusBar" msgid="8798267849526214017">"desativar ou modificar barra de estado"</string>
     <string name="permdesc_statusBar" msgid="5809162768651019642">"Permite à app desativar a barra de estado ou adicionar e remover ícones do sistema."</string>
@@ -349,6 +349,8 @@
     <string name="permdesc_receiveMms" msgid="958102423732219710">"Permite que a app receba e processe mensagens MMS. Isto significa que a app poderá monitorizar ou eliminar mensagens enviadas para o seu dispositivo sem as apresentar."</string>
     <string name="permlab_bindCellBroadcastService" msgid="586746677002040651">"Encaminhar mensagens de difusão celular"</string>
     <string name="permdesc_bindCellBroadcastService" msgid="6540910200973641606">"Permite que a app se vincule ao módulo de difusão celular para encaminhar mensagens de difusão celular à medida que são recebidas. Os alertas de difusão celular são fornecidos em algumas localizações para avisar sobre situações de emergência. As aplicações maliciosas podem interferir com o desempenho ou funcionamento do seu dispositivo quando for recebida uma difusão celular de emergência."</string>
+    <string name="permlab_manageOngoingCalls" msgid="281244770664231782">"Gerir chamadas em curso"</string>
+    <string name="permdesc_manageOngoingCalls" msgid="7003138133829915265">"Permite que uma app veja detalhes acerca das chamadas em curso no seu dispositivo e controle essas chamadas."</string>
     <string name="permlab_readCellBroadcasts" msgid="5869884450872137693">"ler mensagens de transmissão celular"</string>
     <string name="permdesc_readCellBroadcasts" msgid="672513437331980168">"Permite que a app leia mensagens de transmissão celular recebidas pelo seu dispositivo. Os alertas de transmissão celular são fornecidos em algumas localizações para avisá-lo sobre situações de emergência. As aplicações maliciosas podem interferir com o desempenho ou funcionamento do seu dispositivo quando for recebida uma transmissão celular de emergência."</string>
     <string name="permlab_subscribedFeedsRead" msgid="217624769238425461">"ler feeds subscritos"</string>
@@ -1340,11 +1342,14 @@
     <string name="alert_windows_notification_turn_off_action" msgid="7805857234839123780">"Desligar"</string>
     <string name="ext_media_checking_notification_title" msgid="8299199995416510094">"A verificar o <xliff:g id="NAME">%s</xliff:g>…"</string>
     <string name="ext_media_checking_notification_message" msgid="2231566971425375542">"A rever o conteúdo atual…"</string>
+    <string name="ext_media_checking_notification_message" product="tv" msgid="7986154434946021415">"A analisar o armazenamento de multimédia"</string>
     <string name="ext_media_new_notification_title" msgid="3517407571407687677">"Novo <xliff:g id="NAME">%s</xliff:g>."</string>
     <string name="ext_media_new_notification_title" product="automotive" msgid="9085349544984742727">"<xliff:g id="NAME">%s</xliff:g> não está a funcionar."</string>
     <string name="ext_media_new_notification_message" msgid="6095403121990786986">"Toque para configurar."</string>
+    <string name="ext_media_new_notification_message" product="tv" msgid="216863352100263668">"Selecione para configurar"</string>
     <string name="ext_media_new_notification_message" product="automotive" msgid="5140127881613227162">"Poderá ser necessário reformatar o dispositivo. Toque para o ejetar."</string>
     <string name="ext_media_ready_notification_message" msgid="777258143284919261">"Transf. fotos, conteúdos multimédia."</string>
+    <string name="ext_media_ready_notification_message" product="tv" msgid="8847134811163165935">"Procure ficheiros multimédia"</string>
     <string name="ext_media_unmountable_notification_title" msgid="4895444667278979910">"Ocorreu um problema com o <xliff:g id="NAME">%s</xliff:g>"</string>
     <string name="ext_media_unmountable_notification_title" product="automotive" msgid="3142723758949023280">"<xliff:g id="NAME">%s</xliff:g> não está a funcionar."</string>
     <string name="ext_media_unmountable_notification_message" msgid="3256290114063126205">"Toque para corrigir."</string>
@@ -1353,7 +1358,7 @@
     <string name="ext_media_unsupported_notification_title" msgid="4358280700537030333">"<xliff:g id="NAME">%s</xliff:g> não suportado"</string>
     <string name="ext_media_unsupported_notification_title" product="automotive" msgid="6004193172658722381">"<xliff:g id="NAME">%s</xliff:g> não está a funcionar."</string>
     <string name="ext_media_unsupported_notification_message" msgid="917738524888367560">"Este dispositivo não é compatível com este <xliff:g id="NAME">%s</xliff:g>. Toque para o configurar num formato compatível."</string>
-    <string name="ext_media_unsupported_notification_message" product="tv" msgid="7744945987775645685">"Este dispositivo não é compatível com este(a) <xliff:g id="NAME">%s</xliff:g>. Selecione para configurar num formato compatível."</string>
+    <string name="ext_media_unsupported_notification_message" product="tv" msgid="1595482802187036532">"Selecione para configurar o(a) <xliff:g id="NAME">%s</xliff:g> num formato suportado."</string>
     <string name="ext_media_unsupported_notification_message" product="automotive" msgid="3412494732736336330">"Poderá ser necessário reformatar o dispositivo."</string>
     <string name="ext_media_badremoval_notification_title" msgid="4114625551266196872">"<xliff:g id="NAME">%s</xliff:g> foi removido inesperadamente"</string>
     <string name="ext_media_badremoval_notification_message" msgid="1986514704499809244">"Ejete o armazenamento multimédia antes de o remover para evitar a perda de conteúdos."</string>
@@ -1562,7 +1567,7 @@
     <string name="wireless_display_route_description" msgid="8297563323032966831">"Visualização sem fios"</string>
     <string name="media_route_button_content_description" msgid="2299223698196869956">"Transmitir"</string>
     <string name="media_route_chooser_title" msgid="6646594924991269208">"Ligar ao dispositivo"</string>
-    <string name="media_route_chooser_title_for_remote_display" msgid="3105906508794326446">"Transmitir ecrã para o dispositivo"</string>
+    <string name="media_route_chooser_title_for_remote_display" msgid="3105906508794326446">"Transmitir ecrã para dispositivo"</string>
     <string name="media_route_chooser_searching" msgid="6119673534251329535">"A pesquisar dispositivos…"</string>
     <string name="media_route_chooser_extended_settings" msgid="2506352159381327741">"Definições"</string>
     <string name="media_route_controller_disconnect" msgid="7362617572732576959">"Desligar"</string>
@@ -1633,11 +1638,11 @@
     <string name="accessibility_shortcut_menu_item_status_off" msgid="5531598275559472393">"DESATIVADO"</string>
     <string name="accessibility_enable_service_title" msgid="3931558336268541484">"Permitir que o serviço <xliff:g id="SERVICE">%1$s</xliff:g> tenha controlo total sobre o seu dispositivo?"</string>
     <string name="accessibility_enable_service_encryption_warning" msgid="8603532708618236909">"Se ativar o serviço <xliff:g id="SERVICE">%1$s</xliff:g>, o dispositivo não utilizará o bloqueio de ecrã para otimizar a encriptação de dados."</string>
-    <string name="accessibility_service_warning_description" msgid="291674995220940133">"O controlo total é adequado para aplicações que ajudam nas necessidades de acessibilidade, mas não para a maioria das aplicações."</string>
+    <string name="accessibility_service_warning_description" msgid="291674995220940133">"O controlo total é adequado para aplicações que ajudam nas necessidades de acessibilidade, mas não para a maioria das apps."</string>
     <string name="accessibility_service_screen_control_title" msgid="190017412626919776">"Ver e controlar o ecrã"</string>
     <string name="accessibility_service_screen_control_description" msgid="6946315917771791525">"Pode ler todo o conteúdo do ecrã e sobrepor conteúdo a outras aplicações."</string>
     <string name="accessibility_service_action_perform_title" msgid="779670378951658160">"Veja e execute ações"</string>
-    <string name="accessibility_service_action_perform_description" msgid="2718852014003170558">"Pode monitorizar as suas interações com uma app ou um sensor de hardware e interagir com aplicações em seu nome."</string>
+    <string name="accessibility_service_action_perform_description" msgid="2718852014003170558">"Pode monitorizar as suas interações com uma app ou um sensor de hardware e interagir com apps em seu nome."</string>
     <string name="accessibility_dialog_button_allow" msgid="2092558122987144530">"Permitir"</string>
     <string name="accessibility_dialog_button_deny" msgid="4129575637812472671">"Recusar"</string>
     <string name="accessibility_select_shortcut_menu_title" msgid="6002726538854613272">"Toque numa funcionalidade para começar a utilizá-la:"</string>
@@ -1713,6 +1718,28 @@
     <string name="mediasize_na_monarch" msgid="4396943937986136896">"Monarch"</string>
     <string name="mediasize_na_quarto" msgid="2119101847712239885">"Quarto"</string>
     <string name="mediasize_na_foolscap" msgid="5011612828564394648">"Foolscap"</string>
+    <!-- no translation found for mediasize_na_ansi_c (3104916921818289618) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_d (254005964819282724) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_e (4424174989686785675) -->
+    <skip />
+    <!-- no translation found for mediasize_na_ansi_f (146980362213260987) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_a (5280681822380032361) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_b (2113344093437297427) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_c (971002546186856623) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_d (6450996075335049806) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e (6782708486949266519) -->
+    <skip />
+    <!-- no translation found for mediasize_na_arch_e1 (4707138568738504275) -->
+    <skip />
+    <!-- no translation found for mediasize_na_super_b (6964127155618393178) -->
+    <skip />
     <string name="mediasize_chinese_roc_8k" msgid="411670106572707544">"ROC 8K"</string>
     <string name="mediasize_chinese_roc_16k" msgid="7496706798725321898">"ROC 16K"</string>
     <string name="mediasize_chinese_prc_1" msgid="946949835711037253">"PRC 1"</string>
@@ -1749,6 +1776,8 @@
     <string name="mediasize_japanese_kahu" msgid="7290232592648122042">"Kahu"</string>
     <string name="mediasize_japanese_kaku2" msgid="7477551750461028312">"Kaku2"</string>
     <string name="mediasize_japanese_you4" msgid="5552111912684384833">"You4"</string>
+    <!-- no translation found for mediasize_japanese_l (1326765321473431817) -->
+    <skip />
     <string name="mediasize_unknown_portrait" msgid="3817016220446495613">"Vertical desconhecido"</string>
     <string name="mediasize_unknown_landscape" msgid="1584741567225095325">"Horizontal desconhecido"</string>
     <string name="write_fail_reason_cancelled" msgid="2344081488493969190">"Cancelada"</string>
@@ -2048,7 +2077,7 @@
     <string name="conversation_single_line_name_display" msgid="8958948312915255999">"<xliff:g id="SENDER_NAME">%1$s</xliff:g>:"</string>
     <string name="conversation_single_line_image_placeholder" msgid="6983271082911936900">"enviou uma imagem"</string>
     <string name="conversation_title_fallback_one_to_one" msgid="1980753619726908614">"Conversa"</string>
-    <string name="conversation_title_fallback_group_chat" msgid="456073374993104303">"Conversa de grupo"</string>
+    <string name="conversation_title_fallback_group_chat" msgid="456073374993104303">"Conversa em grupo"</string>
     <string name="unread_convo_overflow" msgid="920517615597353833">"&gt; <xliff:g id="MAX_UNREAD_COUNT">%1$d</xliff:g>"</string>
     <string name="resolver_personal_tab" msgid="2051260504014442073">"Pessoal"</string>
     <string name="resolver_work_tab" msgid="2690019516263167035">"Trabalho"</string>

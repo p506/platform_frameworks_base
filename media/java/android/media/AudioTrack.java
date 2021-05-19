@@ -44,6 +44,7 @@ import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.NioUtils;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.Executor;
 
@@ -922,12 +923,21 @@ public class AudioTrack extends PlayerBase
         private final int mSyncId;
 
         /**
+         * A special content id for {@link #TunerConfiguration(int, int)}
+         * indicating audio is delivered
+         * from an {@code AudioTrack} write, not tunneled from the tuner stack.
+         */
+        public static final int CONTENT_ID_NONE = 0;
+
+        /**
          * Constructs a TunerConfiguration instance for use in {@link AudioTrack.Builder}
          *
          * @param contentId selects the audio stream to use.
          *     The contentId may be obtained from
-         *     {@link android.media.tv.tuner.filter.Filter#getId()}.
-         *     This is always a positive number.
+         *     {@link android.media.tv.tuner.filter.Filter#getId()},
+         *     such obtained id is always a positive number.
+         *     If audio is to be delivered through an {@code AudioTrack} write
+         *     then {@code CONTENT_ID_NONE} may be used.
          * @param syncId selects the clock to use for synchronization
          *     of audio with other streams such as video.
          *     The syncId may be obtained from
@@ -936,10 +946,10 @@ public class AudioTrack extends PlayerBase
          */
         @RequiresPermission(android.Manifest.permission.MODIFY_AUDIO_ROUTING)
         public TunerConfiguration(
-                @IntRange(from = 1) int contentId, @IntRange(from = 1)int syncId) {
-            if (contentId < 1) {
+                @IntRange(from = 0) int contentId, @IntRange(from = 1)int syncId) {
+            if (contentId < 0) {
                 throw new IllegalArgumentException(
-                        "contentId " + contentId + " must be positive");
+                        "contentId " + contentId + " must be positive or CONTENT_ID_NONE");
             }
             if (syncId < 1) {
                 throw new IllegalArgumentException("syncId " + syncId + " must be positive");
@@ -1576,9 +1586,24 @@ public class AudioTrack extends PlayerBase
             AudioFormat.CHANNEL_OUT_LOW_FREQUENCY |
             AudioFormat.CHANNEL_OUT_BACK_LEFT |
             AudioFormat.CHANNEL_OUT_BACK_RIGHT |
+            AudioFormat.CHANNEL_OUT_FRONT_LEFT_OF_CENTER |
+            AudioFormat.CHANNEL_OUT_FRONT_RIGHT_OF_CENTER |
             AudioFormat.CHANNEL_OUT_BACK_CENTER |
             AudioFormat.CHANNEL_OUT_SIDE_LEFT |
-            AudioFormat.CHANNEL_OUT_SIDE_RIGHT;
+            AudioFormat.CHANNEL_OUT_SIDE_RIGHT |
+            AudioFormat.CHANNEL_OUT_TOP_CENTER |
+            AudioFormat.CHANNEL_OUT_TOP_FRONT_LEFT |
+            AudioFormat.CHANNEL_OUT_TOP_FRONT_CENTER |
+            AudioFormat.CHANNEL_OUT_TOP_FRONT_RIGHT |
+            AudioFormat.CHANNEL_OUT_TOP_BACK_LEFT |
+            AudioFormat.CHANNEL_OUT_TOP_BACK_CENTER |
+            AudioFormat.CHANNEL_OUT_TOP_BACK_RIGHT |
+            AudioFormat.CHANNEL_OUT_TOP_SIDE_LEFT |
+            AudioFormat.CHANNEL_OUT_TOP_SIDE_RIGHT |
+            AudioFormat.CHANNEL_OUT_BOTTOM_FRONT_LEFT |
+            AudioFormat.CHANNEL_OUT_BOTTOM_FRONT_CENTER |
+            AudioFormat.CHANNEL_OUT_BOTTOM_FRONT_RIGHT |
+            AudioFormat.CHANNEL_OUT_LOW_FREQUENCY_2;
 
     // Returns a boolean whether the attributes, format, bufferSizeInBytes, mode allow
     // power saving to be automatically enabled for an AudioTrack. Returns false if
@@ -1687,9 +1712,10 @@ public class AudioTrack extends PlayerBase
                 mChannelCount = 0;
                 break; // channel index configuration only
             }
-            if (!isMultichannelConfigSupported(channelConfig)) {
-                // input channel configuration features unsupported channels
-                throw new IllegalArgumentException("Unsupported channel configuration.");
+            if (!isMultichannelConfigSupported(channelConfig, audioFormat)) {
+                throw new IllegalArgumentException(
+                        "Unsupported channel mask configuration " + channelConfig
+                        + " for encoding " + audioFormat);
             }
             mChannelMask = channelConfig;
             mChannelCount = AudioFormat.channelCountFromOutChannelMask(channelConfig);
@@ -1697,13 +1723,17 @@ public class AudioTrack extends PlayerBase
         // check the channel index configuration (if present)
         mChannelIndexMask = channelIndexMask;
         if (mChannelIndexMask != 0) {
-            // restrictive: indexMask could allow up to AUDIO_CHANNEL_BITS_LOG2
-            final int indexMask = (1 << AudioSystem.OUT_CHANNEL_COUNT_MAX) - 1;
-            if ((channelIndexMask & ~indexMask) != 0) {
-                throw new IllegalArgumentException("Unsupported channel index configuration "
-                        + channelIndexMask);
+            // As of S, we accept up to 24 channel index mask.
+            final int fullIndexMask = (1 << AudioSystem.FCC_24) - 1;
+            final int channelIndexCount = Integer.bitCount(channelIndexMask);
+            final boolean accepted = (channelIndexMask & ~fullIndexMask) == 0
+                    && (!AudioFormat.isEncodingLinearFrames(audioFormat)  // compressed OK
+                            || channelIndexCount <= AudioSystem.OUT_CHANNEL_COUNT_MAX); // PCM
+            if (!accepted) {
+                throw new IllegalArgumentException(
+                        "Unsupported channel index mask configuration " + channelIndexMask
+                        + " for encoding " + audioFormat);
             }
-            int channelIndexCount = Integer.bitCount(channelIndexMask);
             if (mChannelCount == 0) {
                  mChannelCount = channelIndexCount;
             } else if (mChannelCount != channelIndexCount) {
@@ -1731,21 +1761,44 @@ public class AudioTrack extends PlayerBase
         mDataLoadMode = mode;
     }
 
+    // General pair map
+    private static final HashMap<String, Integer> CHANNEL_PAIR_MAP = new HashMap<>() {{
+        put("front", AudioFormat.CHANNEL_OUT_FRONT_LEFT
+                | AudioFormat.CHANNEL_OUT_FRONT_RIGHT);
+        put("back", AudioFormat.CHANNEL_OUT_BACK_LEFT
+                | AudioFormat.CHANNEL_OUT_BACK_RIGHT);
+        put("front of center", AudioFormat.CHANNEL_OUT_FRONT_LEFT_OF_CENTER
+                | AudioFormat.CHANNEL_OUT_FRONT_RIGHT_OF_CENTER);
+        put("side", AudioFormat.CHANNEL_OUT_SIDE_LEFT
+                | AudioFormat.CHANNEL_OUT_SIDE_RIGHT);
+        put("top front", AudioFormat.CHANNEL_OUT_TOP_FRONT_LEFT
+                | AudioFormat.CHANNEL_OUT_TOP_FRONT_RIGHT);
+        put("top back", AudioFormat.CHANNEL_OUT_TOP_BACK_LEFT
+                | AudioFormat.CHANNEL_OUT_TOP_BACK_RIGHT);
+        put("top side", AudioFormat.CHANNEL_OUT_TOP_SIDE_LEFT
+                | AudioFormat.CHANNEL_OUT_TOP_SIDE_RIGHT);
+        put("bottom front", AudioFormat.CHANNEL_OUT_BOTTOM_FRONT_LEFT
+                | AudioFormat.CHANNEL_OUT_BOTTOM_FRONT_RIGHT);
+    }};
+
     /**
      * Convenience method to check that the channel configuration (a.k.a channel mask) is supported
      * @param channelConfig the mask to validate
      * @return false if the AudioTrack can't be used with such a mask
      */
-    private static boolean isMultichannelConfigSupported(int channelConfig) {
+    private static boolean isMultichannelConfigSupported(int channelConfig, int encoding) {
         // check for unsupported channels
         if ((channelConfig & SUPPORTED_OUT_CHANNELS) != channelConfig) {
             loge("Channel configuration features unsupported channels");
             return false;
         }
         final int channelCount = AudioFormat.channelCountFromOutChannelMask(channelConfig);
-        if (channelCount > AudioSystem.OUT_CHANNEL_COUNT_MAX) {
-            loge("Channel configuration contains too many channels " +
-                    channelCount + ">" + AudioSystem.OUT_CHANNEL_COUNT_MAX);
+        final int channelCountLimit = AudioFormat.isEncodingLinearFrames(encoding)
+                ? AudioSystem.OUT_CHANNEL_COUNT_MAX  // PCM limited to OUT_CHANNEL_COUNT_MAX
+                : AudioSystem.FCC_24;                // Compressed limited to 24 channels
+        if (channelCount > channelCountLimit) {
+            loge("Channel configuration contains too many channels for encoding "
+                    + encoding + "(" + channelCount + " > " + channelCountLimit + ")");
             return false;
         }
         // check for unsupported multichannel combinations:
@@ -1757,20 +1810,14 @@ public class AudioTrack extends PlayerBase
                 loge("Front channels must be present in multichannel configurations");
                 return false;
         }
-        final int backPair =
-                AudioFormat.CHANNEL_OUT_BACK_LEFT | AudioFormat.CHANNEL_OUT_BACK_RIGHT;
-        if ((channelConfig & backPair) != 0) {
-            if ((channelConfig & backPair) != backPair) {
-                loge("Rear channels can't be used independently");
+        // Check all pairs to see that they are matched (front duplicated here).
+        for (HashMap.Entry<String, Integer> e : CHANNEL_PAIR_MAP.entrySet()) {
+            final int positionPair = e.getValue();
+            if ((channelConfig & positionPair) != 0
+                    && (channelConfig & positionPair) != positionPair) {
+                loge("Channel pair (" + e.getKey() + ") cannot be used independently");
                 return false;
             }
-        }
-        final int sidePair =
-                AudioFormat.CHANNEL_OUT_SIDE_LEFT | AudioFormat.CHANNEL_OUT_SIDE_RIGHT;
-        if ((channelConfig & sidePair) != 0
-                && (channelConfig & sidePair) != sidePair) {
-            loge("Side channels can't be used independently");
-            return false;
         }
         return true;
     }
@@ -2068,6 +2115,65 @@ public class AudioTrack extends PlayerBase
     }
 
     /**
+     * Sets the streaming start threshold for an <code>AudioTrack</code>.
+     * <p> The streaming start threshold is the buffer level that the written audio
+     * data must reach for audio streaming to start after {@link #play()} is called.
+     * <p> For compressed streams, the size of a frame is considered to be exactly one byte.
+     *
+     * @param startThresholdInFrames the desired start threshold.
+     * @return the actual start threshold in frames value. This is
+     *         an integer between 1 to the buffer capacity
+     *         (see {@link #getBufferCapacityInFrames()}),
+     *         and might change if the output sink changes after track creation.
+     * @throws IllegalStateException if the track is not initialized or the
+     *         track transfer mode is not {@link #MODE_STREAM}.
+     * @throws IllegalArgumentException if startThresholdInFrames is not positive.
+     * @see #getStartThresholdInFrames()
+     */
+    public @IntRange(from = 1) int setStartThresholdInFrames(
+            @IntRange (from = 1) int startThresholdInFrames) {
+        if (mState != STATE_INITIALIZED) {
+            throw new IllegalStateException("AudioTrack is not initialized");
+        }
+        if (mDataLoadMode != MODE_STREAM) {
+            throw new IllegalStateException("AudioTrack must be a streaming track");
+        }
+        if (startThresholdInFrames < 1) {
+            throw new IllegalArgumentException("startThresholdInFrames "
+                    + startThresholdInFrames + " must be positive");
+        }
+        return native_setStartThresholdInFrames(startThresholdInFrames);
+    }
+
+    /**
+     * Returns the streaming start threshold of the <code>AudioTrack</code>.
+     * <p> The streaming start threshold is the buffer level that the written audio
+     * data must reach for audio streaming to start after {@link #play()} is called.
+     * When an <code>AudioTrack</code> is created, the streaming start threshold
+     * is the buffer capacity in frames. If the buffer size in frames is reduced
+     * by {@link #setBufferSizeInFrames(int)} to a value smaller than the start threshold
+     * then that value will be used instead for the streaming start threshold.
+     * <p> For compressed streams, the size of a frame is considered to be exactly one byte.
+     *
+     * @return the current start threshold in frames value. This is
+     *         an integer between 1 to the buffer capacity
+     *         (see {@link #getBufferCapacityInFrames()}),
+     *         and might change if the  output sink changes after track creation.
+     * @throws IllegalStateException if the track is not initialized or the
+     *         track is not {@link #MODE_STREAM}.
+     * @see #setStartThresholdInFrames(int)
+     */
+    public @IntRange (from = 1) int getStartThresholdInFrames() {
+        if (mState != STATE_INITIALIZED) {
+            throw new IllegalStateException("AudioTrack is not initialized");
+        }
+        if (mDataLoadMode != MODE_STREAM) {
+            throw new IllegalStateException("AudioTrack must be a streaming track");
+        }
+        return native_getStartThresholdInFrames();
+    }
+
+    /**
      *  Returns the frame count of the native <code>AudioTrack</code> buffer.
      *  @return current size in frames of the <code>AudioTrack</code> buffer.
      *  @throws IllegalStateException
@@ -2203,7 +2309,7 @@ public class AudioTrack extends PlayerBase
             channelCount = 2;
             break;
         default:
-            if (!isMultichannelConfigSupported(channelConfig)) {
+            if (!isMultichannelConfigSupported(channelConfig, audioFormat)) {
                 loge("getMinBufferSize(): Invalid channel configuration.");
                 return ERROR_BAD_VALUE;
             } else {
@@ -2894,7 +3000,7 @@ public class AudioTrack extends PlayerBase
      */
     public int write(@NonNull byte[] audioData, int offsetInBytes, int sizeInBytes,
             @WriteMode int writeMode) {
-
+        // Note: we allow writes of extended integers and compressed formats from a byte array.
         if (mState == STATE_UNINITIALIZED || mAudioFormat == AudioFormat.ENCODING_PCM_FLOAT) {
             return ERROR_INVALID_OPERATION;
         }
@@ -3008,7 +3114,10 @@ public class AudioTrack extends PlayerBase
     public int write(@NonNull short[] audioData, int offsetInShorts, int sizeInShorts,
             @WriteMode int writeMode) {
 
-        if (mState == STATE_UNINITIALIZED || mAudioFormat == AudioFormat.ENCODING_PCM_FLOAT) {
+        if (mState == STATE_UNINITIALIZED
+                || mAudioFormat == AudioFormat.ENCODING_PCM_FLOAT
+                // use ByteBuffer or byte[] instead for later encodings
+                || mAudioFormat > AudioFormat.ENCODING_LEGACY_SHORT_ARRAY_THRESHOLD) {
             return ERROR_INVALID_OPERATION;
         }
 
@@ -4170,6 +4279,8 @@ public class AudioTrack extends PlayerBase
     private native int native_get_audio_description_mix_level_db(float[] level);
     private native int native_set_dual_mono_mode(int dualMonoMode);
     private native int native_get_dual_mono_mode(int[] dualMonoMode);
+    private native int native_setStartThresholdInFrames(int startThresholdInFrames);
+    private native int native_getStartThresholdInFrames();
 
     //---------------------------------------------------------
     // Utility methods

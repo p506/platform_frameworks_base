@@ -117,7 +117,7 @@
     <string name="bluetooth_pairing_decline" msgid="6483118841204885890">"Cancel·la"</string>
     <string name="bluetooth_pairing_will_share_phonebook" msgid="3064334458659165176">"La vinculació permet accedir als contactes i a l\'historial de trucades quan el dispositiu està connectat."</string>
     <string name="bluetooth_pairing_error_message" msgid="6626399020672335565">"No s\'ha pogut vincular amb <xliff:g id="DEVICE_NAME">%1$s</xliff:g>."</string>
-    <string name="bluetooth_pairing_pin_error_message" msgid="264422127613704940">"No s\'ha pogut vincular amb <xliff:g id="DEVICE_NAME">%1$s</xliff:g>, perquè el PIN o la contrasenya són incorrectes."</string>
+    <string name="bluetooth_pairing_pin_error_message" msgid="264422127613704940">"No s\'ha pogut vincular a <xliff:g id="DEVICE_NAME">%1$s</xliff:g>: el PIN o la clau d\'accés són incorrectes."</string>
     <string name="bluetooth_pairing_device_down_error_message" msgid="2554424863101358857">"No es pot comunicar amb <xliff:g id="DEVICE_NAME">%1$s</xliff:g>."</string>
     <string name="bluetooth_pairing_rejected_error_message" msgid="5943444352777314442">"Vinculació rebutjada per <xliff:g id="DEVICE_NAME">%1$s</xliff:g>."</string>
     <string name="bluetooth_talkback_computer" msgid="3736623135703893773">"Ordinador"</string>
@@ -446,6 +446,7 @@
     <string name="power_charging" msgid="6727132649743436802">"<xliff:g id="LEVEL">%1$s</xliff:g>: <xliff:g id="STATE">%2$s</xliff:g>"</string>
     <string name="power_remaining_charging_duration_only" msgid="7415639699283965818">"<xliff:g id="TIME">%1$s</xliff:g> per completar la càrrega"</string>
     <string name="power_charging_duration" msgid="5005740040558984057">"<xliff:g id="LEVEL">%1$s</xliff:g>: <xliff:g id="TIME">%2$s</xliff:g> per completar la càrrega"</string>
+    <string name="power_charging_limited" msgid="1956874810658999681">"<xliff:g id="LEVEL">%1$s</xliff:g>: s\'està optimitzant per preservar l\'estat de la bateria"</string>
     <string name="battery_info_status_unknown" msgid="268625384868401114">"Desconegut"</string>
     <string name="battery_info_status_charging" msgid="4279958015430387405">"S\'està carregant"</string>
     <string name="battery_info_status_charging_fast" msgid="8027559755902954885">"Carregant ràpidament"</string>
